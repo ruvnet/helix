@@ -59,6 +59,7 @@
         <button class="nav-item" data-view="report"><span class="ni-dot"></span>Health report</button>
         <button class="nav-item" data-view="ask"><span class="ni-dot"></span>Ask Helix</button>
         <button class="nav-item" data-view="records"><span class="ni-dot"></span>Records</button>
+        <button class="nav-item" data-view="import"><span class="ni-dot"></span>Import</button>
         <button class="nav-item" data-view="sources"><span class="ni-dot"></span>Data sources</button>
       </nav>
       <button class="guide-btn" id="open-guide">Step-by-step guide</button>
@@ -167,6 +168,40 @@
             <thead><tr><th>Concept</th><th>Value</th><th>Date</th><th>Source</th><th>Range</th></tr></thead>
             <tbody id="records-body"></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- IMPORT -->
+      <section class="view hidden" data-view="import">
+        <p class="muted" style="margin:-6px 0 16px">Bring in everything you have — it's parsed on-device, normalized, and flows into your dashboard. Nothing leaves your browser.</p>
+        <div class="grid import-grid">
+          <div class="card import-card">
+            <div class="card-title">① Medical records · FHIR / EMR</div>
+            <p class="muted small">Paste a FHIR R4 Bundle (or a single Observation), or drop a <code>.json</code> export.</p>
+            <textarea id="fhir-in" class="import-ta" spellcheck="false"></textarea>
+            <div class="import-row"><label class="filebtn">Choose .json<input type="file" id="fhir-file" accept=".json,application/json" hidden></label>
+              <button class="primary sm" id="fhir-import">Import records</button></div>
+          </div>
+
+          <div class="card import-card">
+            <div class="card-title">② Lab report · image or PDF (OCR)</div>
+            <p class="muted small">Drop a photo/scan of a lab report. It's OCR'd in-browser, then each value passes the safety gate (implausible/unit-less values are held for review — never auto-trusted).</p>
+            <label class="dropzone" id="ocr-drop"><input type="file" id="ocr-file" accept="image/*" hidden>
+              <span id="ocr-drop-label">📷 Drop a lab image, or click to choose</span></label>
+            <div class="import-status" id="ocr-status"></div>
+          </div>
+
+          <div class="card import-card">
+            <div class="card-title">③ Paste values · CSV</div>
+            <p class="muted small">One row per value: <code>concept, code, value, unit, low, high</code></p>
+            <textarea id="csv-in" class="import-ta" spellcheck="false"></textarea>
+            <div class="import-row"><button class="primary sm" id="csv-import">Import values</button></div>
+          </div>
+
+          <div class="card import-result-card">
+            <div class="card-title">Imported this session <span class="muted" id="import-count"></span></div>
+            <div id="import-log"><div class="report-empty">Imported values appear here and immediately flow into your Dashboard, Health report, and Ask Helix.</div></div>
+          </div>
         </div>
       </section>
 

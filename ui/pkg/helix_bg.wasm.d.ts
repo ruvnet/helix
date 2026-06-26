@@ -4,6 +4,7 @@ export const memory: WebAssembly.Memory;
 export const analyze_json: (a: number, b: number) => [number, number, number, number];
 export const bioage_json: (a: number, b: number) => [number, number, number, number];
 export const compose_score_json: (a: number, b: number) => [number, number, number, number];
+export const fhir_import_json: (a: number, b: number, c: number, d: number) => [number, number, number, number];
 export const focus_json: (a: number, b: number) => [number, number, number, number];
 export const genome_profile_json: (a: number, b: number) => [number, number, number, number];
 export const neural_disclaimer: () => [number, number];

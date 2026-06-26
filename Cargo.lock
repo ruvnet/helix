@@ -697,6 +697,7 @@ name = "helix-wasm"
 version = "0.1.0"
 dependencies = [
  "helix-bioage",
+ "helix-connect",
  "helix-escalation",
  "helix-evidence",
  "helix-focus",

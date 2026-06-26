@@ -19,6 +19,13 @@ export function bioage_json(inputs: string): string;
 export function compose_score_json(subscores: string): string;
 
 /**
+ * Import a FHIR R4 Bundle (ADR-029): parse every `Observation` entry into
+ * provenance records. Returns `{records, queued}` — un-parseable resources are
+ * counted into the review queue (ADR-012), never silently dropped.
+ */
+export function fhir_import_json(bundle: string, source: string): string;
+
+/**
  * Focus areas (ADR-032): input `{records, now, config}` JSON → ranked focus items.
  */
 export function focus_json(payload: string): string;
@@ -77,6 +84,7 @@ export interface InitOutput {
     readonly analyze_json: (a: number, b: number) => [number, number, number, number];
     readonly bioage_json: (a: number, b: number) => [number, number, number, number];
     readonly compose_score_json: (a: number, b: number) => [number, number, number, number];
+    readonly fhir_import_json: (a: number, b: number, c: number, d: number) => [number, number, number, number];
     readonly focus_json: (a: number, b: number) => [number, number, number, number];
     readonly genome_profile_json: (a: number, b: number) => [number, number, number, number];
     readonly neural_disclaimer: () => [number, number];

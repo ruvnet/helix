@@ -16,6 +16,9 @@ grounded answer comes from the audited Rust crates.
 ### Health report — score over time, vitals, focus areas, biological age
 [![Helix health report](./screenshots/health-report.png)](https://ruvnet.github.io/helix/ui/#report)
 
+### Import — FHIR/EMR, lab-image OCR, and CSV (parsed on-device)
+[![Helix import](./screenshots/import.png)](https://ruvnet.github.io/helix/ui/#import)
+
 ### Ask Helix — grounded, cited answers (or an honest abstention)
 [![Helix grounded answer](./screenshots/answer.png)](https://ruvnet.github.io/helix/ui/#ask)
 

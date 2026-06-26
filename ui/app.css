@@ -155,6 +155,29 @@ body {
   background: #0e2417; border: 1px solid #2e7d5b; color: #7fe9cf; margin-right: 8px; }
 .report-empty { color: var(--muted); }
 
+/* Import */
+.import-grid { grid-template-columns: 1fr 1fr; }
+.import-result-card { grid-column: 1 / -1; }
+.import-card .small, .muted.small { font-size: 12.5px; }
+.import-ta { width: 100%; height: 120px; resize: vertical; background: #0a1422; color: var(--text);
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px; margin: 8px 0; }
+.import-row { display: flex; gap: 10px; align-items: center; }
+.primary.sm { width: auto; padding: 9px 16px; font-size: 13px; }
+.filebtn { background: #11203a; border: 1px solid var(--line2); color: var(--vital2); padding: 9px 14px;
+  border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; }
+.dropzone { display: grid; place-items: center; height: 110px; border: 1.5px dashed var(--line2);
+  border-radius: 12px; color: var(--muted); cursor: pointer; margin: 8px 0; transition: .15s; text-align: center; }
+.dropzone:hover, .dropzone.drag { border-color: var(--vital); color: var(--text); background: #0c1828; }
+.import-status { font-size: 12.5px; color: var(--muted); min-height: 18px; }
+.import-status .ok { color: var(--ok); } .import-status .warn { color: var(--warm); }
+.imp-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #14233a; font-size: 13px; }
+.imp-row:last-child { border: 0; }
+.imp-row .imp-src { color: var(--muted2); font-size: 11.5px; }
+.imp-badge { font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
+.imp-ok { background: #0e2417; color: #7fe9cf; border: 1px solid #2e7d5b; }
+.imp-queue { background: #241a0c; color: #f6c177; border: 1px solid #7a5a2a; }
+
 /* Records */
 .records { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .records th { text-align: left; color: var(--muted2); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: 12px; }

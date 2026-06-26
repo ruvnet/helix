@@ -11,6 +11,8 @@ import init, {
   bioage_json,
   focus_json,
   timeline_json,
+  fhir_import_json,
+  ocr_ingest_json,
 } from "./pkg/helix.js";
 
 const DAY = 86_400_000;
@@ -70,6 +72,7 @@ async function boot() {
   renderReport();
   wireNav();
   wireModals();
+  wireImport();
 
   // Deep-link hooks (used for headless screenshot capture & shareable states).
   const h = location.hash;
@@ -86,6 +89,12 @@ async function boot() {
     runGenomeDemo();
   } else if (h === "#report") {
     document.querySelector('.nav-item[data-view="report"]').click();
+  } else if (h === "#import") {
+    document.querySelector('.nav-item[data-view="import"]').click();
+  } else if (h === "#import-demo") {
+    document.querySelector('.nav-item[data-view="import"]').click();
+    importFhir(SAMPLE_FHIR);
+    importCsv(SAMPLE_CSV);
   }
 }
 
@@ -395,6 +404,148 @@ function sparkline(tl) {
   </svg><div class="tl-cap">${dir} · ${pts.length} points${tl.change_point_at ? " · change-point detected" : ""}</div>`;
 }
 
+// ---- Import (FHIR / OCR image / CSV → real records into the live dossier) ----
+let importedCount = 0;
+
+function addImportedRecords(recs, badge = "imported") {
+  recs.forEach((r) => records.push(r));
+  importedCount += recs.length;
+  // re-render everything that consumes records
+  renderRecords();
+  renderReport();
+  const log = document.getElementById("import-log");
+  if (importedCount === recs.length) log.innerHTML = "";
+  recs.forEach((r) => {
+    const div = document.createElement("div");
+    div.className = "imp-row";
+    div.innerHTML = `<span>${r.concept} <b>${r.value}</b> ${r.unit}
+      <span class="imp-src">· ${r.source}${r.code ? " · " + r.code : ""}</span></span>
+      <span class="imp-badge imp-ok">${badge}</span>`;
+    log.appendChild(div);
+  });
+  document.getElementById("import-count").textContent = `· ${importedCount} value(s)`;
+}
+function logQueued(label, reason) {
+  const log = document.getElementById("import-log");
+  const div = document.createElement("div");
+  div.className = "imp-row";
+  div.innerHTML = `<span>${label} <span class="imp-src">· held: ${reason.replace(/_/g, " ")}</span></span>
+    <span class="imp-badge imp-queue">review</span>`;
+  log.appendChild(div);
+}
+
+const SAMPLE_FHIR = JSON.stringify({
+  resourceType: "Bundle",
+  entry: [
+    { resource: { resourceType: "Observation", id: "hdl1",
+      code: { coding: [{ system: "http://loinc.org", code: "2085-9", display: "HDL Cholesterol" }] },
+      valueQuantity: { value: 58, unit: "mg/dL" }, effectiveDateTime: "2026-06-10",
+      referenceRange: [{ low: { value: 40 }, high: { value: 100 } }] } },
+    { resource: { resourceType: "Observation", id: "tsh1",
+      code: { coding: [{ system: "http://loinc.org", code: "3016-3", display: "TSH" }] },
+      valueQuantity: { value: 2.1, unit: "mIU/L" }, effectiveDateTime: "2026-06-10",
+      referenceRange: [{ low: { value: 0.4 }, high: { value: 4.0 } }] } },
+  ],
+}, null, 2);
+const SAMPLE_CSV = "Vitamin B12, 2132-9, 540, pg/mL, 200, 900\nHbA1c, 4548-4, 5.4, %, 4.0, 5.6";
+
+function wireImport() {
+  document.getElementById("fhir-in").value = SAMPLE_FHIR;
+  document.getElementById("csv-in").value = SAMPLE_CSV;
+
+  // ① FHIR
+  document.getElementById("fhir-import").onclick = () => importFhir(document.getElementById("fhir-in").value);
+  document.getElementById("fhir-file").onchange = (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { document.getElementById("fhir-in").value = r.result; importFhir(r.result); };
+    r.readAsText(f);
+  };
+
+  // ② OCR image
+  const drop = document.getElementById("ocr-drop");
+  const fileIn = document.getElementById("ocr-file");
+  drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("drag"); };
+  drop.ondragleave = () => drop.classList.remove("drag");
+  drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("drag"); if (e.dataTransfer.files[0]) ocrImage(e.dataTransfer.files[0]); };
+  fileIn.onchange = (e) => { if (e.target.files[0]) ocrImage(e.target.files[0]); };
+
+  // ③ CSV
+  document.getElementById("csv-import").onclick = () => importCsv(document.getElementById("csv-in").value);
+}
+
+function importFhir(text) {
+  try {
+    const out = JSON.parse(fhir_import_json(text, "Imported FHIR"));
+    if (out.records.length) addImportedRecords(out.records, "FHIR");
+    if (out.queued) logQueued(`${out.queued} FHIR resource(s)`, "unparseable");
+    if (!out.records.length && !out.queued) flashImport("No Observations found in that bundle.");
+  } catch (e) { flashImport("Couldn't parse that JSON: " + e.message); }
+}
+
+function importCsv(text) {
+  const recs = [];
+  text.split(/\n+/).forEach((line) => {
+    const p = line.split(",").map((s) => s.trim());
+    if (p.length < 4 || !p[0]) return;
+    const [concept, code, value, unit, lo, hi] = p;
+    const v = parseFloat(value);
+    if (!isFinite(v)) return;
+    recs.push({
+      id: `csv-${concept}-${Date.now()}-${recs.length}`, source: "Manual / CSV",
+      measured_at: NOW, method: "manual_entry", code: code || null, concept, value: v, unit: unit || "",
+      reference_range: { low: lo ? parseFloat(lo) : null, high: hi ? parseFloat(hi) : null },
+      confidence: 0.8,
+    });
+  });
+  if (recs.length) addImportedRecords(recs, "CSV"); else flashImport("No valid rows parsed.");
+}
+
+// In-browser OCR of a lab image (tesseract.js from CDN), then the helix-ocr safety gate.
+async function ocrImage(file) {
+  const status = document.getElementById("ocr-status");
+  status.innerHTML = "Loading on-device OCR…";
+  try {
+    const { default: Tesseract } = await import("https://esm.sh/tesseract.js@5");
+    status.innerHTML = "Reading the image…";
+    const url = URL.createObjectURL(file);
+    const { data } = await Tesseract.recognize(url, "eng");
+    URL.revokeObjectURL(url);
+    const candidates = extractAnalytes(data.text);
+    if (!candidates.length) { status.innerHTML = `<span class="warn">No values found in that image.</span>`; return; }
+    const doc = { doc_label: file.name || "lab-image", imported_at: NOW, candidates };
+    const gated = JSON.parse(ocr_ingest_json(JSON.stringify(doc), 0.5));
+    const accepted = gated.filter((g) => g.status === "accepted").map((g) => g.record);
+    let queued = 0;
+    gated.forEach((g) => { if (g.status === "queued") { queued++; logQueued(g.candidate.label, g.reason); } });
+    if (accepted.length) addImportedRecords(accepted, "OCR");
+    status.innerHTML = `<span class="ok">✓ ${accepted.length} value(s) imported</span>${queued ? ` · <span class="warn">${queued} held for review</span>` : ""}`;
+  } catch (e) {
+    status.innerHTML = `<span class="warn">OCR unavailable here (${e.message}). Try the CSV paste instead.</span>`;
+  }
+}
+
+// Naive analyte extraction: lines like "Ferritin 28 ng/mL  (30-400)".
+function extractAnalytes(text) {
+  const out = [];
+  text.split(/\n+/).forEach((line) => {
+    const m = line.match(/^([A-Za-z][A-Za-z0-9 \-]{1,30}?)\s+(-?\d+(?:\.\d+)?)\s*([A-Za-z%\/µ]+(?:\/[A-Za-z]+)?)?/);
+    if (!m) return;
+    const rr = line.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/);
+    out.push({
+      label: m[1].trim(), value: parseFloat(m[2]), unit: (m[3] || "").trim(),
+      reference_low: rr ? parseFloat(rr[1]) : null, reference_high: rr ? parseFloat(rr[2]) : null,
+      ocr_confidence: 0.9,
+    });
+  });
+  return out;
+}
+
+function flashImport(msg) {
+  const log = document.getElementById("import-log");
+  log.innerHTML = `<div class="report-empty">${msg}</div>`;
+}
+
 // Run a sample RuView WiFi-CSI reading through the real wasm adapter (ADR-020).
 function runSensingDemo() {
   const reading = {
@@ -451,6 +602,7 @@ function wireNav() {
     report: ["Health report", "Score over time, vitals, focus areas, and your biological age."],
     ask: ["Ask Helix", "Answered only from your data — with citations."],
     records: ["Records", "Every value, sourced and dated."],
+    import: ["Import", "Bring in records, lab images, and values — parsed on-device."],
     sources: ["Data sources", "Connect everything; it just works."],
   };
   document.querySelectorAll(".nav-item").forEach((btn) => {

@@ -173,6 +173,31 @@ pub fn timeline_json(payload: &str) -> Result<String, JsValue> {
     serde_json::to_string(&tl).map_err(err)
 }
 
+/// Import a FHIR R4 Bundle (ADR-029): parse every `Observation` entry into
+/// provenance records. Returns `{records, queued}` — un-parseable resources are
+/// counted into the review queue (ADR-012), never silently dropped.
+#[wasm_bindgen]
+pub fn fhir_import_json(bundle: &str, source: &str) -> Result<String, JsValue> {
+    let v: serde_json::Value = serde_json::from_str(bundle).map_err(err)?;
+    let entries = v["entry"].as_array().cloned().unwrap_or_default();
+    let mut records = Vec::new();
+    let mut queued = 0usize;
+    // A bare Observation (not a Bundle) is also accepted.
+    let candidates: Vec<serde_json::Value> =
+        if entries.is_empty() && v["resourceType"] == "Observation" {
+            vec![v.clone()]
+        } else {
+            entries.iter().map(|e| e["resource"].clone()).collect()
+        };
+    for r in &candidates {
+        match helix_connect::parse_observation(r, source) {
+            Ok(rec) => records.push(rec),
+            Err(_) => queued += 1,
+        }
+    }
+    serde_json::to_string(&serde_json::json!({ "records": records, "queued": queued })).map_err(err)
+}
+
 /// Crate version string for the UI footer / diagnostics.
 #[wasm_bindgen]
 pub fn version() -> String {
