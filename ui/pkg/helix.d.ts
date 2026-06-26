@@ -14,6 +14,12 @@ export function analyze_json(payload: string): string;
 export function compose_score_json(subscores: string): string;
 
 /**
+ * Ingest a user-owned genome profile (ADR-021): returns `{records, advisories}` —
+ * GENO-* records plus "verify with your prescriber" pharmacogenomic advisories.
+ */
+export function genome_profile_json(profile: string): string;
+
+/**
  * The non-diagnostic disclaimer that must accompany any ruv-neural signal.
  */
 export function neural_disclaimer(): string;
@@ -26,9 +32,22 @@ export function neural_disclaimer(): string;
 export function neural_session_to_records_json(session: string): string;
 
 /**
+ * Gate an OCR'd lab document (ADR-022): returns the gated outcomes
+ * (accepted records / queued candidates with reasons). `floor` is the minimum
+ * OCR confidence to accept.
+ */
+export function ocr_ingest_json(document: string, floor: number): string;
+
+/**
  * The red-flag threshold registry version currently in force (ADR-009).
  */
 export function redflag_registry_version(): string;
+
+/**
+ * Ingest a RuView WiFi-CSI reading (ADR-020): returns `{records, flags}` —
+ * vital ProvRecords plus Escalation Guardian screening flags.
+ */
+export function sensing_reading_json(reading: string): string;
 
 /**
  * Crate version string for the UI footer / diagnostics.
@@ -41,9 +60,12 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly analyze_json: (a: number, b: number) => [number, number, number, number];
     readonly compose_score_json: (a: number, b: number) => [number, number, number, number];
+    readonly genome_profile_json: (a: number, b: number) => [number, number, number, number];
     readonly neural_disclaimer: () => [number, number];
     readonly neural_session_to_records_json: (a: number, b: number) => [number, number, number, number];
+    readonly ocr_ingest_json: (a: number, b: number, c: number) => [number, number, number, number];
     readonly redflag_registry_version: () => [number, number];
+    readonly sensing_reading_json: (a: number, b: number) => [number, number, number, number];
     readonly version: () => [number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;

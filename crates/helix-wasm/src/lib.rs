@@ -94,6 +94,41 @@ pub fn neural_disclaimer() -> String {
     helix_neural::RESEARCH_DISCLAIMER.to_string()
 }
 
+/// Ingest a RuView WiFi-CSI reading (ADR-020): returns `{records, flags}` —
+/// vital ProvRecords plus Escalation Guardian screening flags.
+#[wasm_bindgen]
+pub fn sensing_reading_json(reading: &str) -> Result<String, JsValue> {
+    let r: helix_sensing::RuViewReading = serde_json::from_str(reading).map_err(err)?;
+    let records = helix_sensing::reading_to_records(&r).map_err(err)?;
+    let flags = helix_sensing::screening_flags(&r);
+    serde_json::to_string(&serde_json::json!({ "records": records, "flags": flags })).map_err(err)
+}
+
+/// Ingest a user-owned genome profile (ADR-021): returns `{records, advisories}` —
+/// GENO-* records plus "verify with your prescriber" pharmacogenomic advisories.
+#[wasm_bindgen]
+pub fn genome_profile_json(profile: &str) -> Result<String, JsValue> {
+    let p: helix_genome::GenomeProfile = serde_json::from_str(profile).map_err(err)?;
+    let records = helix_genome::profile_to_records(&p).map_err(err)?;
+    let advisories = helix_genome::prescriber_advisories(&p);
+    serde_json::to_string(&serde_json::json!({
+        "records": records,
+        "advisories": advisories,
+        "privacy_note": helix_genome::GENOME_PRIVACY_NOTE,
+    }))
+    .map_err(err)
+}
+
+/// Gate an OCR'd lab document (ADR-022): returns the gated outcomes
+/// (accepted records / queued candidates with reasons). `floor` is the minimum
+/// OCR confidence to accept.
+#[wasm_bindgen]
+pub fn ocr_ingest_json(document: &str, floor: f64) -> Result<String, JsValue> {
+    let doc: helix_ocr::OcrDocument = serde_json::from_str(document).map_err(err)?;
+    let gated = helix_ocr::ingest_document(&doc, floor, |_| None).map_err(err)?;
+    serde_json::to_string(&gated).map_err(err)
+}
+
 /// Crate version string for the UI footer / diagnostics.
 #[wasm_bindgen]
 pub fn version() -> String {

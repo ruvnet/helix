@@ -35,9 +35,25 @@ remains the specification and the table notes the interface seam.
 
 **Legend:** ✅ real, tested crate · ◑ interface/seam modeled here, full realization upstream or I/O-bound · ⬜ client/hardware/networked, spec-only by design.
 
+## Integration ADRs (ruvnet ecosystem capabilities)
+
+| ADR | Title | Status | Where |
+|-----|-------|--------|-------|
+| 020 | WiFi-CSI ambient sensing (RuView) | ✅ Implemented | `helix-sensing` (wasm: `sensing_reading_json`) |
+| 021 | Genome ingestion & pharmacogenomics (rvDNA) | ✅ Implemented | `helix-genome` (wasm: `genome_profile_json`) |
+| 022 | OCR lab-document ingestion (RuVector OCR) | ✅ Implemented | `helix-ocr` (wasm: `ocr_ingest_json`) |
+| 023 | Semantic retrieval over the health graph (RuVector HNSW/GraphRAG) | ✅ Implemented | `helix-retrieval` (Embedder/Index injected) |
+
+Each integration realizes/strengthens a core ADR: 020→014 (ambient tier backend) + 009 (escalation);
+021→005/§7.4 (genome, user-owned); 022→012 (connector degradation, the primary lab path); 023→003/005
+(the Retrieve step). All carry the anti-hallucination guardrails: capped confidence, screening-not-diagnosis,
+provenance-required, recall≠grounding.
+
 ## Tally
-- **Fully implemented + tested crates:** 001, 004, 005, 006, 007, 008, 009, 010, 013, 016 (10)
+- **Fully implemented + tested crates:** 001, 004, 005, 006, 007, 008, 009, 010, 013, 016, **020, 021, 022, 023** (14)
 - **Core/seam modeled here:** 002, 003, 012, 014, 018, 019 (6)
 - **Documented N/A (client/hardware/networked):** 011, 015, 017 (3)
 
 Every ADR is accounted for: a crate, a modeled seam, or a documented out-of-scope rationale.
+15 crates · 112 tests · `cargo audit` clean (130 deps) · the four ruvnet-ecosystem integrations are
+exposed through `helix-wasm` so the console and mobile app can use them.

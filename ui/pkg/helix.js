@@ -55,6 +55,33 @@ export function compose_score_json(subscores) {
 }
 
 /**
+ * Ingest a user-owned genome profile (ADR-021): returns `{records, advisories}` —
+ * GENO-* records plus "verify with your prescriber" pharmacogenomic advisories.
+ * @param {string} profile
+ * @returns {string}
+ */
+export function genome_profile_json(profile) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(profile, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.genome_profile_json(ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * The non-diagnostic disclaimer that must accompany any ruv-neural signal.
  * @returns {string}
  */
@@ -100,6 +127,35 @@ export function neural_session_to_records_json(session) {
 }
 
 /**
+ * Gate an OCR'd lab document (ADR-022): returns the gated outcomes
+ * (accepted records / queued candidates with reasons). `floor` is the minimum
+ * OCR confidence to accept.
+ * @param {string} document
+ * @param {number} floor
+ * @returns {string}
+ */
+export function ocr_ingest_json(document, floor) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(document, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.ocr_ingest_json(ptr0, len0, floor);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * The red-flag threshold registry version currently in force (ADR-009).
  * @returns {string}
  */
@@ -113,6 +169,33 @@ export function redflag_registry_version() {
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
         wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+    }
+}
+
+/**
+ * Ingest a RuView WiFi-CSI reading (ADR-020): returns `{records, flags}` —
+ * vital ProvRecords plus Escalation Guardian screening flags.
+ * @param {string} reading
+ * @returns {string}
+ */
+export function sensing_reading_json(reading) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(reading, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.sensing_reading_json(ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
     }
 }
 
