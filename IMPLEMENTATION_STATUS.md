@@ -21,8 +21,8 @@ A core is SOTA-complete for this loop when **all** hold:
 |-------|-----|--------|
 | `helix-provenance` | 005 | ✅ implemented + tests |
 | `helix-numeric` | 007 | ✅ implemented + tests |
-| `helix-evidence` | 006 | ⬜ next |
-| `helix-escalation` | 009 | ⬜ |
+| `helix-evidence` | 006 | ✅ implemented + tests |
+| `helix-escalation` | 009 | ✅ implemented + tests |
 | `helix-ontology` | 004 | ⬜ |
 | `helix-vault` | 001, 013 | ⬜ |
 | `helix-verifier` | 008 | ⬜ |
@@ -37,8 +37,15 @@ A core is SOTA-complete for this loop when **all** hold:
   slope/range-crossings/pearson/CUSUM change-point), all with unit tests. Parent Cargo.toml excludes
   helix so it stays a detached, liftable workspace. ← build/test verification in progress.
 
+- **Iter 2 (2026-06-25):** `helix-evidence` (ADR-006: Tier 1–4 enum mapped to CEBM, abstention gate with
+  NoData/Stale/LowConfidence triggers + GapNotice, default staleness windows) and `helix-escalation`
+  (ADR-009: versioned RedFlagThreshold registry with cited critical values — K⁺/Hb/glucose/SpO₂ + Seed
+  screening REI, evaluate→level+suppress_optimization, unknown-code-never-assumed-safe). 33 tests green,
+  clippy+fmt clean. Both depend only on helix-provenance / std.
+
 ## Next iteration picks (ordered)
-1. `helix-evidence` (ADR-006): Tier 1–4 enum, abstention triggers (stale/missing/low-confidence), gap-notice type.
-2. `helix-escalation` (ADR-009): versioned RedFlagThreshold registry + evaluator; optimization-suppression flag.
-3. `helix-core`: wire provenance + numeric + evidence + escalation into one grounded-answer pipeline + integration test.
-4. Add clippy/fmt/criterion + CI workflow; security pass.
+1. `helix-core`: wire provenance + numeric + evidence + escalation into one grounded-answer pipeline
+   (retrieve → numerics → ground → tier → escalate) + integration test. This is the keystone.
+2. `helix-ontology` (ADR-004): canonical code-system enum + normalization result + un-mappable→review-queue.
+3. Add criterion benchmarks (numeric engine, grounding gate) with recorded baselines; CI workflow; `cargo audit`.
+4. `helix-vault` (ADR-001/013) interface: sealed-record trait, encryption boundary (XChaCha20-Poly1305 via a trait, impl later).

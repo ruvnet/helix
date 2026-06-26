@@ -1,0 +1,17 @@
+[package]
+name = "helix-evidence"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-006: evidence tiering and explicit abstention policy for Helix"
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+helix-provenance = { path = "../helix-provenance" }
+
+[dev-dependencies]
+serde_json.workspace = true

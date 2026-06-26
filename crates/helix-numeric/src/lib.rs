@@ -118,7 +118,10 @@ pub fn slope_per_day(series: &[Point]) -> Result<f64, NumericError> {
     // Work in days relative to the first timestamp to keep magnitudes sane.
     const MS_PER_DAY: f64 = 86_400_000.0;
     let t0 = series[0].t as f64;
-    let xs: Vec<f64> = series.iter().map(|p| (p.t as f64 - t0) / MS_PER_DAY).collect();
+    let xs: Vec<f64> = series
+        .iter()
+        .map(|p| (p.t as f64 - t0) / MS_PER_DAY)
+        .collect();
     let ys: Vec<f64> = series.iter().map(|p| p.value).collect();
     let n = xs.len() as f64;
     let mean_x = xs.iter().sum::<f64>() / n;

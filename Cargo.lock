@@ -3,6 +3,25 @@
 version = 3
 
 [[package]]
+name = "helix-escalation"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "helix-evidence"
+version = "0.1.0"
+dependencies = [
+ "helix-provenance",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-numeric"
 version = "0.1.0"
 dependencies = [

@@ -3,6 +3,8 @@ resolver = "2"
 members = [
     "crates/helix-provenance",
     "crates/helix-numeric",
+    "crates/helix-evidence",
+    "crates/helix-escalation",
 ]
 
 [workspace.package]

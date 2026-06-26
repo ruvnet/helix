@@ -223,8 +223,7 @@ pub fn ground(
     if draft.cites.is_empty() {
         return Err(GroundingError::NoCitations);
     }
-    let index: BTreeMap<&RecordId, &ProvRecord> =
-        evidence.iter().map(|r| (&r.id, r)).collect();
+    let index: BTreeMap<&RecordId, &ProvRecord> = evidence.iter().map(|r| (&r.id, r)).collect();
 
     let mut resolved = Vec::with_capacity(draft.cites.len());
     let mut dangling = Vec::new();
