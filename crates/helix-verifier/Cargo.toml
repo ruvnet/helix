@@ -1,0 +1,18 @@
+[package]
+name = "helix-verifier"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-008: independent verifier/critic that re-derives every claim from source before it reaches the user"
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+helix-provenance = { path = "../helix-provenance" }
+helix-evidence = { path = "../helix-evidence" }
+
+[dev-dependencies]
+serde_json.workspace = true

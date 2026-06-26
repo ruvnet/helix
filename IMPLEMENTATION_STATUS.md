@@ -25,7 +25,7 @@ A core is SOTA-complete for this loop when **all** hold:
 | `helix-escalation` | 009 | ✅ implemented + tests |
 | `helix-ontology` | 004 | ✅ implemented + tests |
 | `helix-vault` | 001, 013 | ⬜ |
-| `helix-verifier` | 008 | ⬜ |
+| `helix-verifier` | 008 | ✅ implemented + tests |
 | `helix-core` (pipeline) | 002, 005, integration | ✅ implemented + 3 e2e integration tests |
 | `helix-score` | 016 | ⬜ |
 | `helix-router` | 019 | ⬜ (may wrap ruvector tiny-dancer) |
@@ -57,10 +57,18 @@ A core is SOTA-complete for this loop when **all** hold:
   crates; `cargo audit` clean (54 deps, exit 0, no RUSTSEC); release profile lto+codegen-units=1. 44 tests
   green; clippy+fmt clean; bench compiles.
 
+- **Iter 5 (2026-06-25):** `helix-verifier` (ADR-008: independent `verify()` gate — cross-family fusion
+  invariant encoded as `ModelFamily` type [rejects verifier==synthesizer], `ClaimChecker` trait abstracts
+  the different-family LLM, Informational=1-pass vs Clinical=odd-quorum≥3 majority consensus, Approved/
+  DownGraded/Rejected dispositions). Added **CI gate** `.github/workflows/ci.yml` (fmt+clippy-deny+test+
+  bench-compile + cargo-audit job) that ships with the standalone repo. 50 tests green; clippy+fmt clean;
+  zero unsafe.
+
 ## Next iteration picks (ordered)
-1. `helix-verifier` (ADR-008): independent re-derivation of a GroundedAnswer's claims from source + tier
-   check + cross-family-model invariant doc; "different model family than synthesizer" encoded as a config type.
-2. `helix-vault` (ADR-001/013) interface: sealed-record trait + encryption boundary (AEAD via trait), key-custody model.
-3. `helix-score` (ADR-016): decomposable 0–100 score (subsystem sub-scores, each tracing to driving records, trend dir, confidence) — never black-box.
-4. CI workflow (.github/workflows): fmt+clippy+test+audit gate. Record criterion baselines into the repo.
-5. Run criterion to capture baseline numbers; add a doc table of measured ns/op to the ledger.
+1. `helix-vault` (ADR-001/013) interface: sealed-record trait + AEAD encryption boundary (XChaCha20-Poly1305
+   via trait), key-custody/recovery model, "company can't read the corpus" property as a type boundary.
+2. `helix-score` (ADR-016): decomposable 0–100 score (subsystem sub-scores, each tracing to driving records,
+   trend dir, confidence) — never black-box; versioned methodology.
+3. Capture criterion baselines (run `cargo bench`); record measured ns/op table in ledger.
+4. Documented N/A crates for client/hardware ADRs (014/015/011/017/018/019): write interface stubs + a
+   COVERAGE.md mapping every ADR to crate-or-N/A, so the SOTA exit criterion #1 is provably met.

@@ -211,6 +211,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-verifier"
+version = "0.1.0"
+dependencies = [
+ "helix-evidence",
+ "helix-provenance",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "hermit-abi"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
