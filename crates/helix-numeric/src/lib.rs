@@ -309,9 +309,63 @@ pub fn trend_direction(slope_per_day: f64, flat_band: f64) -> TrendDirection {
     }
 }
 
+/// Scale-invariant trend classification: a move counts as a trend only if it
+/// exceeds `frac` of the reference-range span over the observation window. This
+/// makes one threshold work across markers of very different scales — a single
+/// absolute `flat_band` cannot (a slow HbA1c rise and cholesterol noise have
+/// similar absolute slopes but very different clinical meaning).
+///
+/// The effective absolute band is `frac * range_span / window_days`; with a
+/// non-positive span or window it reports Flat (no scale to judge against).
+pub fn trend_direction_relative(
+    slope_per_day: f64,
+    range_span: f64,
+    window_days: f64,
+    frac: f64,
+) -> TrendDirection {
+    if range_span <= 0.0 || window_days <= 0.0 || frac <= 0.0 {
+        return TrendDirection::Flat;
+    }
+    trend_direction(slope_per_day, frac * range_span / window_days)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn relative_band_is_scale_invariant() {
+        // Small-scale marker (HbA1c span 1.6): a 0.0033/day rise over 180d is a
+        // REAL trend (~37% of range) — absolute band 0.01 misses it, relative catches it.
+        assert_eq!(trend_direction(0.0033, 0.01), TrendDirection::Flat); // absolute: missed
+        assert_eq!(
+            trend_direction_relative(0.0033, 1.6, 180.0, 0.08),
+            TrendDirection::Rising // relative: caught
+        );
+        // Large-scale marker (cholesterol span 75): 0.043/day over 120d is ~7% of
+        // range = noise — absolute band 0.01 over-reads it, relative reads it flat.
+        assert_eq!(trend_direction(0.043, 0.01), TrendDirection::Rising); // absolute: false trend
+        assert_eq!(
+            trend_direction_relative(0.043, 75.0, 120.0, 0.08),
+            TrendDirection::Flat // relative: correctly flat
+        );
+    }
+
+    #[test]
+    fn relative_band_falls_back_to_flat_without_scale() {
+        assert_eq!(
+            trend_direction_relative(5.0, 0.0, 100.0, 0.1),
+            TrendDirection::Flat
+        );
+        assert_eq!(
+            trend_direction_relative(5.0, 10.0, 0.0, 0.1),
+            TrendDirection::Flat
+        );
+        assert_eq!(
+            trend_direction_relative(5.0, 10.0, 100.0, 0.0),
+            TrendDirection::Flat
+        );
+    }
 
     const DAY: i64 = 86_400_000;
 

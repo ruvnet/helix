@@ -30,6 +30,9 @@ pub struct Params {
     pub confidence_floor: f64,
     pub staleness_window_days: i64,
     pub flat_band_per_day: f64,
+    /// Scale-invariant trend dead-band (ADR-036): fraction of reference range over
+    /// the observation window. `0.0` falls back to the absolute band.
+    pub flat_band_frac: f64,
 }
 
 /// Inclusive bounds for the search space — evolution never leaves these, so it
@@ -39,6 +42,7 @@ pub struct Bounds {
     pub confidence_floor: (f64, f64),
     pub staleness_window_days: (i64, i64),
     pub flat_band_per_day: (f64, f64),
+    pub flat_band_frac: (f64, f64),
 }
 
 impl Default for Bounds {
@@ -47,6 +51,7 @@ impl Default for Bounds {
             confidence_floor: (0.3, 0.8),
             staleness_window_days: (120, 900),
             flat_band_per_day: (0.0, 0.2),
+            flat_band_frac: (0.0, 0.4),
         }
     }
 }
@@ -117,6 +122,7 @@ pub fn fitness(p: &Params, cases: &[EvalCase], registry: &ThresholdRegistry) -> 
             reference_low: c.reference_low,
             reference_high: c.reference_high,
             flat_band_per_day: p.flat_band_per_day,
+            flat_band_frac: p.flat_band_frac,
         };
         let outcome = match analyze(&req, registry) {
             Ok(o) => o,
@@ -187,6 +193,7 @@ fn mutate(p: &Params, b: &Bounds, rng: &mut Lcg) -> Params {
             p.flat_band_per_day + rng.signed() * 0.03,
             b.flat_band_per_day,
         ),
+        flat_band_frac: clampf(p.flat_band_frac + rng.signed() * 0.05, b.flat_band_frac),
     }
 }
 
@@ -328,6 +335,7 @@ mod tests {
             confidence_floor: 0.3,
             staleness_window_days: 900,
             flat_band_per_day: 0.0,
+            flat_band_frac: 0.0,
         };
         let f = fitness(&reckless, &cases, &reg);
         assert!(f.over_confident >= 1, "reckless params should over-answer");
@@ -342,6 +350,7 @@ mod tests {
             confidence_floor: 0.5,
             staleness_window_days: 365,
             flat_band_per_day: 0.0,
+            flat_band_frac: 0.0,
         };
         let res = evolve(baseline, &Bounds::default(), &cases, &reg, 200, 42);
 
@@ -370,6 +379,7 @@ mod tests {
             confidence_floor: 0.5,
             staleness_window_days: 365,
             flat_band_per_day: 0.0,
+            flat_band_frac: 0.0,
         };
         let a = evolve(p, &Bounds::default(), &cases, &reg, 100, 7);
         let b = evolve(p, &Bounds::default(), &cases, &reg, 100, 7);

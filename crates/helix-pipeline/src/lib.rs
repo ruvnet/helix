@@ -45,6 +45,11 @@ pub struct AnalyzeRequest<'a> {
     pub reference_high: Option<f64>,
     /// Slope dead-band (units/day) below which a trend reads as flat.
     pub flat_band_per_day: f64,
+    /// Optional scale-invariant dead-band: fraction of the reference-range span
+    /// over the observation window (ADR-036). When `> 0` and a reference range is
+    /// present, this supersedes the absolute `flat_band_per_day` so one threshold
+    /// works across markers of different scales. `0.0` = use the absolute band.
+    pub flat_band_frac: f64,
 }
 
 /// Deterministically-computed trend facts (ADR-007 output handed to the analyst).
@@ -103,6 +108,14 @@ fn series_of(records: &[ProvRecord]) -> Vec<Point> {
     pts
 }
 
+/// Observation window (days) spanned by a sorted series — newest minus oldest.
+fn window_days_of(series: &[Point]) -> f64 {
+    match (series.first(), series.last()) {
+        (Some(a), Some(b)) => (b.t - a.t) as f64 / 86_400_000.0,
+        _ => 0.0,
+    }
+}
+
 /// Escalation that treats "concept not in the registry" as *no red-flag rule*
 /// (level None) rather than an error — the registry only errors when asked about
 /// a code it is supposed to know. A concept with no acute critical value simply
@@ -149,11 +162,16 @@ pub fn analyze(
     let mean = num::mean(&series)?;
     let (slope, direction, pct) = if series.len() >= 2 {
         let s = slope_per_day(&series)?;
-        (
-            Some(s),
-            trend_direction(s, req.flat_band_per_day),
-            num::percent_change(&series).ok(),
-        )
+        // Prefer the scale-invariant relative band (ADR-036) when configured and a
+        // reference range is available; otherwise the absolute band.
+        let dir = match (req.flat_band_frac, req.reference_low, req.reference_high) {
+            (frac, Some(lo), Some(hi)) if frac > 0.0 && hi > lo => {
+                let window_days = window_days_of(&series);
+                num::trend_direction_relative(s, hi - lo, window_days, frac)
+            }
+            _ => trend_direction(s, req.flat_band_per_day),
+        };
+        (Some(s), dir, num::percent_change(&series).ok())
     } else {
         (None, TrendDirection::Flat, None)
     };
@@ -226,6 +244,7 @@ mod tests {
             reference_low: Some(30.0),
             reference_high: Some(400.0),
             flat_band_per_day: 0.0,
+            flat_band_frac: 0.0,
         };
         assert!(matches!(
             analyze(&req, &reg).unwrap(),

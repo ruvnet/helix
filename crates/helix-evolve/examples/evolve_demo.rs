@@ -74,6 +74,7 @@ fn main() {
         confidence_floor: 0.5,
         staleness_window_days: 365,
         flat_band_per_day: 0.01,
+        flat_band_frac: 0.0,
     };
     let ship_fit = fitness(&shipping, &cases, &reg);
     let ship_res = evolve(shipping, &Bounds::default(), &cases, &reg, 300, 42);
@@ -87,6 +88,7 @@ fn main() {
         confidence_floor: 0.5,
         staleness_window_days: 365,
         flat_band_per_day: 0.0,
+        flat_band_frac: 0.0,
     };
     let base_fit = fitness(&baseline, &cases, &reg);
     let res = evolve(baseline, &Bounds::default(), &cases, &reg, 300, 42);

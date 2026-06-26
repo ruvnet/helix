@@ -60,6 +60,7 @@ fn fresh_falling_ferritin_yields_grounded_cited_trended_answer() {
         reference_low: Some(30.0),
         reference_high: Some(400.0),
         flat_band_per_day: 0.01,
+        flat_band_frac: 0.0,
     };
 
     let out = analyze(&req, &reg).unwrap();
@@ -100,6 +101,7 @@ fn stale_data_abstains_with_gap_notice() {
         reference_low: Some(30.0),
         reference_high: Some(400.0),
         flat_band_per_day: 0.01,
+        flat_band_frac: 0.0,
     };
 
     match analyze(&req, &reg).unwrap() {
@@ -125,6 +127,7 @@ fn critical_potassium_escalates_and_suppresses_optimization() {
         reference_low: Some(3.5),
         reference_high: Some(5.1),
         flat_band_per_day: 0.01,
+        flat_band_frac: 0.0,
     };
 
     let AnswerOutcome::Answered(ans) = analyze(&req, &reg).unwrap() else {

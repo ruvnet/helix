@@ -34,6 +34,10 @@ pub struct AnalyzePayload {
     pub reference_high: Option<f64>,
     #[serde(default)]
     pub flat_band_per_day: f64,
+    /// Scale-invariant dead-band (ADR-036): fraction of reference range over the
+    /// observation window. `0.0` = use the absolute band.
+    #[serde(default)]
+    pub flat_band_frac: f64,
 }
 
 fn default_window() -> i64 {
@@ -57,6 +61,7 @@ pub fn analyze_json(payload: &str) -> Result<String, JsValue> {
         reference_low: p.reference_low,
         reference_high: p.reference_high,
         flat_band_per_day: p.flat_band_per_day,
+        flat_band_frac: p.flat_band_frac,
     };
     let registry = builtin_registry_v1();
     let outcome = analyze(&req, &registry).map_err(err)?;

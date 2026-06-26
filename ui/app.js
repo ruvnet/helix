@@ -199,7 +199,7 @@ function renderBriefing() {
         concept_code: q.code,
         records: records.filter((r) => r.code === q.code),
         now: NOW, staleness_window_days: 365, confidence_floor: 0.5,
-        reference_low: q.lo, reference_high: q.hi, flat_band_per_day: 0.01,
+        reference_low: q.lo, reference_high: q.hi, flat_band_per_day: 0.01, flat_band_frac: 0.08,
       })
     )
   );
@@ -254,7 +254,7 @@ function runAsk() {
     staleness_window_days: 365,
     confidence_floor: 0.5,
     reference_low: q.lo, reference_high: q.hi,
-    flat_band_per_day: 0.01,
+    flat_band_per_day: 0.01, flat_band_frac: 0.08,
   };
   const out = JSON.parse(analyze_json(JSON.stringify(payload)));
   document.getElementById("answer").innerHTML = renderAnswer(out, q);
@@ -388,7 +388,7 @@ function renderReport() {
   const ans = JSON.parse(analyze_json(JSON.stringify({
     concept_code: "2276-4", records: records.filter((r) => r.code === "2276-4"),
     now: NOW, staleness_window_days: 365, confidence_floor: 0.5,
-    reference_low: 30, reference_high: 400, flat_band_per_day: 0.01,
+    reference_low: 30, reference_high: 400, flat_band_per_day: 0.01, flat_band_frac: 0.08,
   })));
   const recs = [];
   if (ans.outcome === "answered" && ans.recommendation)

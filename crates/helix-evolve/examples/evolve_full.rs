@@ -240,6 +240,7 @@ fn classify(p: &Params, c: &EvalCase, reg: &helix_escalation::ThresholdRegistry)
         reference_low: c.reference_low,
         reference_high: c.reference_high,
         flat_band_per_day: p.flat_band_per_day,
+        flat_band_frac: p.flat_band_frac,
     };
     let (got, ok) = match (analyze(&req, reg).unwrap(), &c.expected) {
         (AnswerOutcome::Abstained(_), Expected::Abstained) => ("abstained".into(), true),
@@ -259,6 +260,7 @@ fn main() {
         confidence_floor: 0.5,
         staleness_window_days: 365,
         flat_band_per_day: 0.01,
+        flat_band_frac: 0.0,
     };
 
     println!(
