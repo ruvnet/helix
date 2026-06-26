@@ -13,6 +13,7 @@ members = [
     "crates/helix-neural",
     "crates/helix-sensing",
     "crates/helix-genome",
+    "crates/helix-ocr",
     "crates/helix-wasm",
 ]
 

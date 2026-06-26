@@ -42,6 +42,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [019](ADR-019-cost-aware-model-routing.md) | Cost-Aware Model Routing Under Privacy Constraints | Self-optimization |
 | [020](ADR-020-wifi-csi-ambient-sensing.md) | WiFi-CSI Contactless Ambient Sensing (RuView backend) | Sensing / integration |
 | [021](ADR-021-genome-ingestion-rvdna.md) | User-Owned Genome Ingestion & Pharmacogenomics (rvDNA backend) | Genomics / integration |
+| [022](ADR-022-ocr-lab-ingestion.md) | OCR Lab-Document Ingestion (RuVector OCR backend) | Ingestion / integration |
 
 ## Status
 

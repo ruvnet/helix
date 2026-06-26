@@ -22,7 +22,7 @@ from all three repos are integrated and validated.
 |---|-----------|--------|-----|-------|--------|
 | 1 | WiFi-CSI ambient sensing + escalation | ruview | ADR-020 | `helix-sensing` | ✅ done |
 | 2 | Genome ingestion + pharmacogenomics (GINA-aware) | rvdna | ADR-021 | `helix-genome` | ✅ done |
-| 3 | OCR lab-PDF ingestion (connector degradation) | ruvector | ADR-022 | `helix-ocr` | ⬜ |
+| 3 | OCR lab-PDF ingestion (connector degradation) | ruvector | ADR-022 | `helix-ocr` | ✅ done |
 | 4 | Vector / GraphRAG semantic retrieval | ruvector | ADR-023 | `helix-retrieval` | ⬜ |
 
 ## Ledger
@@ -38,9 +38,14 @@ from all three repos are integrated and validated.
   directive); biomarker risk → GENO-RISK-* records (0.4 conf, band + ancestry caveat); GINA-aware privacy
   note; excluded from federation; rejects empty/out-of-range/NaN. 100 tests green; clippy+fmt clean. Pushed.
 
+- **Iter 3 (2026-06-25):** ADR-022 (OCR lab ingestion, RuVector OCR) + `helix-ocr`: `extract → gate →
+  record|queue`. The sanity gate queues (never coerces) candidates that are non-finite, unit-less, below an
+  OCR-confidence floor, or physiologically implausible (a misread "28"→"2800000" is caught); survivors become
+  OcrExtraction records with confidence capped at 0.8 (below a clean feed), code=None for later ADR-004
+  normalization. Unblocks the real primary lab path (Quest/Labcorp have no consumer APIs). 107 tests; clean. Pushed.
+
 ## Next picks
-1. ADR-022 OCR lab-PDF ingestion (ruvector ai-ocr) → `helix-ocr`: scanned lab → normalized records (connector
-   degradation, ADR-012). Re-run cargo audit if new deps.
-2. ADR-023 vector/GraphRAG semantic retrieval (ruvector HNSW) → `helix-retrieval`: similarity recall over the
+1. ADR-023 vector/GraphRAG semantic retrieval (ruvector HNSW) → `helix-retrieval`: similarity recall over the
    health graph for the analyst's Retrieve step (ADR-003/005).
-3. Expose helix-sensing/neural/genome via wasm; add live "Ambient / Genome" panels in the UI; capture screenshots.
+2. Expose helix-sensing/genome/ocr via wasm; add live "Ambient / Genome / Import" panels in the UI; screenshots.
+3. Re-run `cargo audit` + the property-test sweep across the new crates; refresh COVERAGE.md.

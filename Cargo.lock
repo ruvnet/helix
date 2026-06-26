@@ -425,6 +425,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-ocr"
+version = "0.1.0"
+dependencies = [
+ "helix-provenance",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-ontology"
 version = "0.1.0"
 dependencies = [
