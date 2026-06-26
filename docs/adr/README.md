@@ -55,9 +55,10 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [032](ADR-032-evidence-based-focus-areas.md) | Evidence-Based "Focus Areas" & Vitals Panel (non-diagnostic) | Dashboard / clinical safety |
 | [033](ADR-033-dashboard-updates-recommendations.md) | Dashboard Updates & Recommendations (evidence-tiered, grounded) | Dashboard / anti-hallucination |
 | [034](ADR-034-biological-age-estimate.md) | Biological / Medical Age Estimate from Routine Labs | Dashboard / biomarkers |
+| [035](ADR-035-darwin-parameter-evolution.md) | Darwin-Style Parameter Evolution (safety-frozen) | Self-optimization / safety |
 
 ## Status
 
-All 34 ADRs are **Proposed** (v1.0.0). They are derived from the v1.0.0 product spec and
+All 35 ADRs are **Proposed** (v1.0.0). They are derived from the v1.0.0 product spec and
 grounded by multi-source research; they have not yet been ratified against an
 implementation or reviewed by regulatory counsel / a clinical advisory board.

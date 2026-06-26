@@ -25,6 +25,7 @@ members = [
     "crates/helix-bioage",
     "crates/helix-focus",
     "crates/helix-timeline",
+    "crates/helix-evolve",
     "crates/helix-wasm",
 ]
 

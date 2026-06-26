@@ -1,0 +1,19 @@
+[package]
+name = "helix-evolve"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-035: Darwin-style parameter evolution — tunes non-safety pipeline params against a labeled eval set; safety thresholds frozen"
+
+[dependencies]
+serde.workspace = true
+helix-provenance = { path = "../helix-provenance", version = "0.1.0" }
+helix-numeric = { path = "../helix-numeric", version = "0.1.0" }
+helix-pipeline = { path = "../helix-pipeline", version = "0.1.0" }
+helix-escalation = { path = "../helix-escalation", version = "0.1.0" }
+
+[dev-dependencies]
+serde_json.workspace = true

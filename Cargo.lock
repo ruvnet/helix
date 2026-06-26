@@ -494,6 +494,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-evolve"
+version = "0.1.0"
+dependencies = [
+ "helix-escalation",
+ "helix-numeric",
+ "helix-pipeline",
+ "helix-provenance",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "helix-fed"
 version = "0.1.0"
 dependencies = [
