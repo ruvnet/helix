@@ -6,6 +6,8 @@ import init, {
   compose_score_json,
   redflag_registry_version,
   version,
+  sensing_reading_json,
+  genome_profile_json,
 } from "./pkg/helix.js";
 
 const DAY = 86_400_000;
@@ -72,6 +74,12 @@ async function boot() {
     runAsk();
   } else if (h === "#guide") {
     openModal(guideModal());
+  } else if (h === "#sensing") {
+    document.querySelector('.nav-item[data-view="sources"]').click();
+    runSensingDemo();
+  } else if (h === "#genome") {
+    document.querySelector('.nav-item[data-view="sources"]').click();
+    runGenomeDemo();
   }
 }
 
@@ -201,16 +209,68 @@ function renderSources() {
     { n: "Apple Health / Connect", s: "connected", d: "Steps, HR, HRV, sleep" },
     { n: "Quest · Labcorp", s: "connected", d: "Blood panels, hormones, micronutrients" },
     { n: "Oura · Whoop", s: "available", d: "Recovery, strain, sleep stages" },
-    { n: "Cognitum Seed", s: "available", d: "Contactless mmWave vitals (screening)" },
+    { n: "RuView (WiFi-CSI)", s: "live", d: "Contactless breathing/HR + fall/apnea screening — tap to run", demo: "sensing" },
     { n: "ruv-neural", s: "available", d: "40 Hz gamma-entrainment / EEG research signal (screening, not diagnosis)" },
-    { n: "Genome (VCF)", s: "available", d: "User-owned import — never a third-party vault" },
+    { n: "rvDNA genome", s: "live", d: "User-owned genome + pharmacogenomics — tap to run", demo: "genome" },
   ];
   const g = document.getElementById("sources-grid");
   g.innerHTML = sources
-    .map((s) => `<div class="source"><h3>${s.n}</h3>
-      <span class="st ${s.s}">${s.s}</span>
+    .map((s, i) => `<div class="source" ${s.demo ? `data-demo="${s.demo}" style="cursor:pointer"` : ""} data-i="${i}"><h3>${s.n}</h3>
+      <span class="st ${s.s === "live" ? "connected" : s.s}">${s.s}</span>
       <p class="muted" style="margin:10px 0 0;font-size:13px">${s.d}</p></div>`)
     .join("");
+  g.querySelectorAll("[data-demo]").forEach((el) => {
+    el.onclick = () => (el.dataset.demo === "sensing" ? runSensingDemo() : runGenomeDemo());
+  });
+}
+
+// Run a sample RuView WiFi-CSI reading through the real wasm adapter (ADR-020).
+function runSensingDemo() {
+  const reading = {
+    node_id: "esp-bedroom", room: "bedroom", recorded_at: NOW,
+    vitals: { breathing_bpm: 14.2, heart_rate_bpm: 61 },
+    states: ["someone-sleeping", "apnea-screening", "possible-distress"],
+    witness_signature: "ed25519:demo",
+  };
+  const out = JSON.parse(sensing_reading_json(JSON.stringify(reading)));
+  const recs = out.records
+    .map((r) => `<div class="cite">• ${r.concept} ${r.value} ${r.unit} — ${r.source} · conf ${r.confidence}</div>`)
+    .join("");
+  const flags = out.flags
+    .map((f) => `<div class="bd-row"><span>${f.state} <span class="muted">(${f.room})</span></span><b style="color:${f.level === "critical" ? "#fb7185" : "#f6c177"}">${f.level}</b></div>`)
+    .join("");
+  openModal(`<h2>RuView WiFi-CSI · live</h2>
+    <p class="muted">Contactless vitals extracted on-device, mapped through the real Rust adapter (ADR-020).</p>
+    <div style="margin:12px 0">${recs}</div>
+    <div class="muted" style="font-size:11.5px;letter-spacing:1px;font-weight:700">ESCALATION SCREENING FLAGS</div>
+    ${flags}
+    <p class="disclaimer" style="margin-top:12px">Screening only, not a diagnosis. Safety flags route to the Escalation Guardian (ADR-009).</p>`);
+}
+
+// Run a sample genome profile through the real wasm adapter (ADR-021).
+function runGenomeDemo() {
+  const profile = {
+    source_file: "23andMe-v5", imported_at: NOW, genotype_count: 640000,
+    pharmaco: [
+      { gene: "CYP2D6", diplotype: "*4/*4", phenotype: "poor" },
+      { gene: "CYP2C19", diplotype: "*1/*1", phenotype: "normal" },
+    ],
+    risks: [{ trait_name: "Type 2 diabetes", score: 0.62, band: "elevated" }],
+    ancestry_caveat: "primarily European reference panel",
+  };
+  const out = JSON.parse(genome_profile_json(JSON.stringify(profile)));
+  const recs = out.records
+    .map((r) => `<div class="cite">• ${r.concept} — ${r.unit} · conf ${r.confidence}</div>`)
+    .join("");
+  const adv = out.advisories
+    .map((a) => `<p style="margin:6px 0;font-size:13px">⚕ ${a.message}</p>`)
+    .join("");
+  openModal(`<h2>rvDNA genome · live</h2>
+    <p class="muted">User-owned genome analyzed on-device, mapped through the real Rust adapter (ADR-021).</p>
+    <div style="margin:12px 0">${recs}</div>
+    ${adv}
+    <p class="disclaimer" style="margin-top:8px">${out.privacy_note}</p>
+    <p class="disclaimer">Decision-support, not a diagnosis — verify with your prescriber.</p>`);
 }
 
 // ---- Nav ----

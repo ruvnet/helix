@@ -67,3 +67,10 @@ diagnosis, provenance-required, recall≠grounding). Pushed to ruvnet/helix main
   (ADR-021/GINA); quasi-identifiers need a 2k cell; injected NoiseSource (CSPRNG in prod, deterministic in
   tests). Elevates ADR-011 from documented-N/A to "the hard anonymization primitive is built + tested".
   119 tests green; clippy+fmt clean. Pushed.
+
+- **Iter 7 (2026-06-26):** Wired the new adapters into the LIVE UI + validated in-browser. The Data Sources
+  view now runs real sample data through the wasm: RuView CSI reading → vitals (conf 0.5) + escalation flags
+  (apnea→urgent, distress→critical); rvDNA genome → pharmacogenomic phenotypes (conf 0.6) + prescriber
+  advisory (CYP2D6 poor only) + T2D risk (conf 0.4) + GINA privacy note. Headless-Chrome screenshots captured
+  (sensing-demo.png, genome-demo.png) and embedded in docs/ui. Deep-link hooks #sensing/#genome. End-to-end
+  adapter→wasm→UI validated. Pushed.

@@ -26,6 +26,15 @@ evidence chip.
 ### Mobile PWA (WASM, installable)
 <img src="./screenshots/mobile.png" alt="Helix mobile PWA" width="300" />
 
+### Live integrations — ruvnet ecosystem adapters running in the UI
+The Data Sources view runs the real Rust integration crates through WASM:
+
+**RuView WiFi-CSI (ADR-020)** — contactless vitals + escalation screening flags:
+![RuView sensing demo](./screenshots/sensing-demo.png)
+
+**rvDNA genome (ADR-021)** — pharmacogenomics + prescriber advisory + GINA privacy note:
+![rvDNA genome demo](./screenshots/genome-demo.png)
+
 ---
 
 
