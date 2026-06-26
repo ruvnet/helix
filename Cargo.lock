@@ -432,6 +432,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-bioage"
+version = "0.1.0"
+dependencies = [
+ "helix-provenance",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-cohort"
 version = "0.1.0"
 dependencies = [

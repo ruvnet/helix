@@ -51,9 +51,13 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [028](ADR-028-learned-visual-encoder.md) | Learned Visual Encoder for Medical-Document Retrieval (local GPU) | Visual encoder / on-device |
 | [029](ADR-029-connector-clients.md) | Live Connector Clients — FHIR/SMART + Wearables (Rust, sandbox-first) | Connectors / ingestion |
 | [030](ADR-030-federation-transport.md) | Federation Transport — Opt-In Cohort Contribution (Rust, privacy-gated) | Federation / privacy |
+| [031](ADR-031-longitudinal-health-score-timeline.md) | Longitudinal Health-Score Timeline | Dashboard / visual |
+| [032](ADR-032-evidence-based-focus-areas.md) | Evidence-Based "Focus Areas" & Vitals Panel (non-diagnostic) | Dashboard / clinical safety |
+| [033](ADR-033-dashboard-updates-recommendations.md) | Dashboard Updates & Recommendations (evidence-tiered, grounded) | Dashboard / anti-hallucination |
+| [034](ADR-034-biological-age-estimate.md) | Biological / Medical Age Estimate from Routine Labs | Dashboard / biomarkers |
 
 ## Status
 
-All 30 ADRs are **Proposed** (v1.0.0). They are derived from the v1.0.0 product spec and
+All 34 ADRs are **Proposed** (v1.0.0). They are derived from the v1.0.0 product spec and
 grounded by multi-source research; they have not yet been ratified against an
 implementation or reviewed by regulatory counsel / a clinical advisory board.

@@ -22,6 +22,7 @@ members = [
     "crates/helix-vision",
     "crates/helix-connect",
     "crates/helix-fed",
+    "crates/helix-bioage",
     "crates/helix-wasm",
 ]
 

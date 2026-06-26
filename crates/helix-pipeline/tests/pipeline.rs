@@ -5,10 +5,10 @@
 //! 2. an honest abstention when data is stale;
 //! 3. a red-flag escalation that suppresses optimization for a critical value.
 
-use helix_pipeline::{analyze, AnalyzeRequest, AnswerOutcome};
 use helix_escalation::{builtin_registry_v1, EscalationLevel};
 use helix_evidence::AbstentionReason;
 use helix_numeric::TrendDirection;
+use helix_pipeline::{analyze, AnalyzeRequest, AnswerOutcome};
 use helix_provenance::{Confidence, MeasurementMethod, ProvRecord, RecordId, ReferenceRange};
 
 const DAY: i64 = 86_400_000;

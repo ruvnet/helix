@@ -14,8 +14,8 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-use helix_pipeline::{analyze, AnalyzeRequest};
 use helix_escalation::builtin_registry_v1;
+use helix_pipeline::{analyze, AnalyzeRequest};
 use helix_provenance::ProvRecord;
 use helix_score::{compose, SubScore};
 
