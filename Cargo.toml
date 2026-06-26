@@ -8,6 +8,7 @@ members = [
     "crates/helix-core",
     "crates/helix-ontology",
     "crates/helix-verifier",
+    "crates/helix-vault",
 ]
 
 [workspace.package]

@@ -24,7 +24,7 @@ A core is SOTA-complete for this loop when **all** hold:
 | `helix-evidence` | 006 | ✅ implemented + tests |
 | `helix-escalation` | 009 | ✅ implemented + tests |
 | `helix-ontology` | 004 | ✅ implemented + tests |
-| `helix-vault` | 001, 013 | ⬜ |
+| `helix-vault` | 001, 013 | ✅ implemented + tests (real AEAD) |
 | `helix-verifier` | 008 | ✅ implemented + tests |
 | `helix-core` (pipeline) | 002, 005, integration | ✅ implemented + 3 e2e integration tests |
 | `helix-score` | 016 | ⬜ |
@@ -64,11 +64,17 @@ A core is SOTA-complete for this loop when **all** hold:
   bench-compile + cargo-audit job) that ships with the standalone repo. 50 tests green; clippy+fmt clean;
   zero unsafe.
 
+- **Iter 6 (2026-06-25):** `helix-vault` (ADR-001/013) — REAL AEAD boundary, not a stub. XChaCha20-Poly1305
+  (192-bit random nonce, no reuse footgun), `SealKey` zeroize-on-drop + redacted Debug, `seal`/`open` with
+  authentication (wrong key / tampered ciphertext → OpenFailed). The ADR-001 property as a TYPE: `VaultStore`
+  holds only ciphertext and has no plaintext accessor (serializing the whole store never exposes plaintext —
+  tested), and `UserKeyring` is the sole capability that can open. 58 tests; clippy+fmt clean; `cargo audit`
+  clean across 75 deps incl. the crypto stack; zero unsafe in helix code.
+
 ## Next iteration picks (ordered)
-1. `helix-vault` (ADR-001/013) interface: sealed-record trait + AEAD encryption boundary (XChaCha20-Poly1305
-   via trait), key-custody/recovery model, "company can't read the corpus" property as a type boundary.
-2. `helix-score` (ADR-016): decomposable 0–100 score (subsystem sub-scores, each tracing to driving records,
+1. `helix-score` (ADR-016): decomposable 0–100 score (subsystem sub-scores, each tracing to driving records,
    trend dir, confidence) — never black-box; versioned methodology.
-3. Capture criterion baselines (run `cargo bench`); record measured ns/op table in ledger.
-4. Documented N/A crates for client/hardware ADRs (014/015/011/017/018/019): write interface stubs + a
-   COVERAGE.md mapping every ADR to crate-or-N/A, so the SOTA exit criterion #1 is provably met.
+2. Capture criterion baselines (run `cargo bench`); record measured ns/op table in ledger.
+3. `COVERAGE.md` mapping every ADR (001–019) to crate-or-documented-N/A so SOTA exit criterion #1 is provably
+   met; interface notes for the client/hardware ADRs (014/015/011/017/018/019) that can't be realized here.
+4. Final SOTA sweep: re-check all 6 exit criteria, then propose closing the loop (CronDelete 4c424726).

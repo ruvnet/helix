@@ -1,0 +1,20 @@
+[package]
+name = "helix-vault"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-001/013: user-owned, local-first encrypted vault boundary (XChaCha20-Poly1305) for Helix"
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+helix-provenance = { path = "../helix-provenance" }
+chacha20poly1305 = "0.10"
+getrandom = "0.2"
+zeroize = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+serde_json.workspace = true
