@@ -26,7 +26,7 @@ A core is SOTA-complete for this loop when **all** hold:
 | `helix-ontology` | 004 | ⬜ |
 | `helix-vault` | 001, 013 | ⬜ |
 | `helix-verifier` | 008 | ⬜ |
-| `helix-core` (pipeline) | 002, 005, integration | ⬜ |
+| `helix-core` (pipeline) | 002, 005, integration | ✅ implemented + 3 e2e integration tests |
 | `helix-score` | 016 | ⬜ |
 | `helix-router` | 019 | ⬜ (may wrap ruvector tiny-dancer) |
 | sensing / twin / federation / darwin | 014/015/011/017/018 | ⬜ (spec/interface stubs; HW + client deferred) |
@@ -43,9 +43,16 @@ A core is SOTA-complete for this loop when **all** hold:
   screening REI, evaluate→level+suppress_optimization, unknown-code-never-assumed-safe). 33 tests green,
   clippy+fmt clean. Both depend only on helix-provenance / std.
 
+- **Iter 3 (2026-06-25):** `helix-core` — the keystone grounded-answer pipeline `analyze()` composing all
+  four primitives in safe order (abstain → escalate → deterministic numerics → ground → tier). Recommendation
+  suppressed when escalation fires. 3 end-to-end integration tests prove the three outcomes: grounded+cited+
+  trended answer (falling ferritin w/ range crossing), stale→abstain, critical K⁺→escalate+suppress.
+  37 tests total green; clippy+fmt clean. Confirmed: parent workspace independent of helix even after the
+  linter dropped the exclude lines (parent uses explicit members; helix has its own [workspace]).
+
 ## Next iteration picks (ordered)
-1. `helix-core`: wire provenance + numeric + evidence + escalation into one grounded-answer pipeline
-   (retrieve → numerics → ground → tier → escalate) + integration test. This is the keystone.
-2. `helix-ontology` (ADR-004): canonical code-system enum + normalization result + un-mappable→review-queue.
-3. Add criterion benchmarks (numeric engine, grounding gate) with recorded baselines; CI workflow; `cargo audit`.
-4. `helix-vault` (ADR-001/013) interface: sealed-record trait, encryption boundary (XChaCha20-Poly1305 via a trait, impl later).
+1. `helix-ontology` (ADR-004): canonical code-system enum (LOINC/RxNorm/SNOMED/ICD-10/UCUM) + normalization
+   result + un-mappable→review-queue policy + a worked mapping.
+2. Add criterion benchmarks (numeric engine, grounding gate, pipeline) with recorded baselines; CI workflow; `cargo audit`.
+3. `helix-vault` (ADR-001/013) interface: sealed-record trait + encryption boundary (XChaCha20-Poly1305 via trait).
+4. `helix-verifier` (ADR-008): independent re-derivation of a GroundedAnswer's claims from source + tier check.

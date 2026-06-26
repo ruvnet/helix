@@ -5,6 +5,7 @@ members = [
     "crates/helix-numeric",
     "crates/helix-evidence",
     "crates/helix-escalation",
+    "crates/helix-core",
 ]
 
 [workspace.package]

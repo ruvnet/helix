@@ -1,0 +1,20 @@
+[package]
+name = "helix-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-002/005: the grounded-answer pipeline wiring Helix's anti-hallucination crates"
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+helix-provenance = { path = "../helix-provenance" }
+helix-numeric = { path = "../helix-numeric" }
+helix-evidence = { path = "../helix-evidence" }
+helix-escalation = { path = "../helix-escalation" }
+
+[dev-dependencies]
+serde_json.workspace = true
