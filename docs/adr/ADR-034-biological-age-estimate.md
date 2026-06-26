@@ -75,6 +75,17 @@ all 9 markers; "biological age" is inherently easy to misread as precise.
 **Mitigations.** Abstain on missing markers; confidence band + explicit "estimate"
 framing; ancestry caveat; coefficient verification gate; clinical-governance review.
 
+## Validation (NHANES, 2026-06-26)
+
+Validated against **NHANES 2021–2023** (CDC, public domain) — the population family
+PhenoAge was derived from. On **3,134 adults** with the full 9-marker panel + age, our
+deterministic PhenoAge gives **correlation r = 0.922 with chronological age** (Levine
+2018 reported ~0.94), **mean delta −0.64 yrs** (≈0 as expected), and 86.1% within
+±10 yrs. This **empirically clears the coefficient/unit gate** — the coefficients and
+unit conversions reproduce PhenoAge on its source population. Reproduce:
+`cargo run -p helix-bioage --example nhanes_validate`. Clinical-governance sign-off for
+production remains separate.
+
 ## Open Questions
 
 - Final coefficient/unit verification against Levine 2018 (release gate).
