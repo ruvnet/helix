@@ -227,6 +227,111 @@ fn cases() -> Vec<EvalCase> {
             &[(400, 99.0, 0.5)],
             Expected::Abstained,
         ),
+        // === Expanded set (iter 2): more markers, scales, and windows ===
+        // Creatinine (mg/dL, 0.6–1.2): tiny scale — kidney decline is a slow real rise.
+        mk(
+            "creatinine-rise",
+            "2160-0",
+            "Creatinine",
+            0.6,
+            1.2,
+            &[(200, 0.9, 1.0), (100, 1.15, 1.0), (0, 1.4, 1.0)],
+            ans(Rising),
+        ),
+        mk(
+            "creatinine-stable",
+            "2160-0",
+            "Creatinine",
+            0.6,
+            1.2,
+            &[(90, 0.95, 1.0), (45, 0.92, 1.0), (0, 0.96, 1.0)],
+            ans(Flat),
+        ),
+        // eGFR (mL/min, 60–120): large scale, gradual decline.
+        mk(
+            "egfr-decline",
+            "33914-3",
+            "eGFR",
+            60.0,
+            120.0,
+            &[(300, 95.0, 1.0), (150, 88.0, 1.0), (0, 80.0, 1.0)],
+            ans(Falling),
+        ),
+        // Systolic BP (mmHg, 90–140): large scale.
+        mk(
+            "bp-rise",
+            "8480-6",
+            "Systolic BP",
+            90.0,
+            140.0,
+            &[(180, 120.0, 1.0), (90, 132.0, 1.0), (0, 146.0, 1.0)],
+            ans(Rising),
+        ),
+        mk(
+            "bp-noise",
+            "8480-6",
+            "Systolic BP",
+            90.0,
+            140.0,
+            &[
+                (120, 124.0, 1.0),
+                (90, 118.0, 1.0),
+                (60, 129.0, 1.0),
+                (30, 121.0, 1.0),
+                (0, 125.0, 1.0),
+            ],
+            ans(Flat),
+        ),
+        // ALT (U/L, 7–56): liver enzyme, big range, real rise.
+        mk(
+            "alt-rise",
+            "1742-6",
+            "ALT",
+            7.0,
+            56.0,
+            &[(120, 30.0, 1.0), (60, 48.0, 1.0), (0, 70.0, 1.0)],
+            ans(Rising),
+        ),
+        // Platelets (10^3/uL, 150–400): large range, stable.
+        mk(
+            "platelets-stable",
+            "777-3",
+            "Platelets",
+            150.0,
+            400.0,
+            &[(90, 255.0, 1.0), (45, 248.0, 1.0), (0, 258.0, 1.0)],
+            ans(Flat),
+        ),
+        // Short-window real change (2 points, 10 days): a big move IS a trend.
+        mk(
+            "short-window-jump",
+            "2276-4",
+            "Ferritin",
+            30.0,
+            400.0,
+            &[(10, 95.0, 1.0), (0, 38.0, 1.0)],
+            ans(Falling),
+        ),
+        // Long-window tiny drift that is just noise (HbA1c, 1 yr, ~2% of range).
+        mk(
+            "hba1c-long-noise",
+            "4548-4",
+            "HbA1c",
+            4.0,
+            5.6,
+            &[(360, 5.30, 1.0), (180, 5.33, 1.0), (0, 5.32, 1.0)],
+            ans(Flat),
+        ),
+        // TSH borderline real rise (smaller than tsh-drift, still clinically up).
+        mk(
+            "tsh-mild-rise",
+            "3016-3",
+            "TSH",
+            0.4,
+            4.0,
+            &[(150, 2.2, 1.0), (75, 2.9, 1.0), (0, 3.5, 1.0)],
+            ans(Rising),
+        ),
     ]
 }
 
@@ -256,15 +361,16 @@ fn classify(p: &Params, c: &EvalCase, reg: &helix_escalation::ThresholdRegistry)
 fn main() {
     let reg = helix_escalation::builtin_registry_v1();
     let cases = cases();
+    // The ACTUALLY-ADOPTED shipping config (ADR-036: relative band frac 0.08).
     let shipping = Params {
         confidence_floor: 0.5,
         staleness_window_days: 365,
         flat_band_per_day: 0.01,
-        flat_band_frac: 0.0,
+        flat_band_frac: 0.08,
     };
 
     println!(
-        "Eval set: {} labeled cases · 6 markers · registry FROZEN ({})\n",
+        "Eval set: {} labeled cases · 11 markers · registry FROZEN ({})\n",
         cases.len(),
         reg.version
     );
