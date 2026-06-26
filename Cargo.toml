@@ -5,7 +5,7 @@ members = [
     "crates/helix-numeric",
     "crates/helix-evidence",
     "crates/helix-escalation",
-    "crates/helix-core",
+    "crates/helix-pipeline",
     "crates/helix-ontology",
     "crates/helix-verifier",
     "crates/helix-vault",

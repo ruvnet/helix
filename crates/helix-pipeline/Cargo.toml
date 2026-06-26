@@ -1,5 +1,5 @@
 [package]
-name = "helix-core"
+name = "helix-pipeline"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

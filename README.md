@@ -59,11 +59,35 @@ The three decisions that make or break a product in this space:
 **privacy & data ownership** ([ADR-001](docs/adr/ADR-001-user-owned-local-first-vault.md), [011](docs/adr/ADR-011-federation-pii-stripped-cohort.md), [013](docs/adr/ADR-013-on-device-inference.md)),
 and **clinical safety** ([ADR-009](docs/adr/ADR-009-red-flag-escalation-clinician-in-loop.md), [010](docs/adr/ADR-010-wellness-vs-samd-boundary.md)).
 
+## What's built
+
+This is no longer just a spec — the testable core is implemented in Rust and validated.
+
+- **22 crates · 153 tests · 30 ADRs** · clippy/fmt clean · `cargo audit` clean.
+- **Anti-hallucination core**: provenance grounding (`helix-provenance`), deterministic
+  numerics (`helix-numeric`), evidence tiering (`helix-evidence`), red-flag escalation
+  (`helix-escalation`), verifier (`helix-verifier`), the grounded-answer pipeline
+  (`helix-pipeline`), and a real AEAD vault (`helix-vault`).
+- **On-device AI on the local GPU** (Rust, never Python): the LLM analyst narrates grounded
+  facts via **ruvLLM** with a number-guard (`helix-llm`), real **MiniLM** text embeddings
+  (`helix-embed`), and a **layout-only** visual encoder (`helix-vision`) — each GPU-validated.
+- **ruvnet-ecosystem integrations**: WiFi-CSI sensing (`helix-sensing`/RuView), genome +
+  pharmacogenomics (`helix-genome`/rvDNA), OCR ingestion (`helix-ocr`), semantic retrieval
+  (`helix-retrieval`), visual RAG (`helix-visual`/rupixel), privacy-preserving cohort
+  (`helix-cohort`), FHIR connectors (`helix-connect`), and federation transport (`helix-fed`).
+- **Web console + WASM mobile app** running the real pipeline in-browser — **[live demo](https://ruvnet.github.io/helix/)**.
+
+Every integration keeps the discipline: the LLM narrates (never reasons), embeddings/visual
+are recall (not grounding), genomics/cohort data is privacy-gated, and nothing diagnoses.
+
 ## Status
 
-**v1.0.0 — Proposed.** This repository currently holds the product specification and the
-architecture decision records. The ADRs are grounded by multi-source research and carry
-inline evidence grades, but have not been ratified against an implementation.
+**v0.1.0 — implemented core, Proposed ADRs.** The Rust core is built, tested, and
+GUI/GPU-validated. The ADRs are grounded by multi-source research but have not been
+ratified by regulatory counsel or a clinical advisory board. Genuinely out of scope for
+this workspace (and flagged in [`docs/COVERAGE.md`](docs/COVERAGE.md)): live partner-API
+auth, the federation aggregator network, physical sensing hardware, the 3D WebGL twin, and
+clinical/regulatory sign-off.
 
 ---
 

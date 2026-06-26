@@ -453,19 +453,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "helix-core"
-version = "0.1.0"
-dependencies = [
- "helix-escalation",
- "helix-evidence",
- "helix-numeric",
- "helix-provenance",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
 name = "helix-embed"
 version = "0.1.0"
 dependencies = [
@@ -572,6 +559,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-pipeline"
+version = "0.1.0"
+dependencies = [
+ "helix-escalation",
+ "helix-evidence",
+ "helix-numeric",
+ "helix-provenance",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-provenance"
 version = "0.1.0"
 dependencies = [
@@ -663,7 +663,6 @@ dependencies = [
 name = "helix-wasm"
 version = "0.1.0"
 dependencies = [
- "helix-core",
  "helix-escalation",
  "helix-evidence",
  "helix-genome",
@@ -671,6 +670,7 @@ dependencies = [
  "helix-numeric",
  "helix-ocr",
  "helix-ontology",
+ "helix-pipeline",
  "helix-provenance",
  "helix-score",
  "helix-sensing",

@@ -14,12 +14,12 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-use helix_core::{analyze, AnalyzeRequest};
+use helix_pipeline::{analyze, AnalyzeRequest};
 use helix_escalation::builtin_registry_v1;
 use helix_provenance::ProvRecord;
 use helix_score::{compose, SubScore};
 
-/// The owned mirror of `helix_core::AnalyzeRequest` (which borrows). Deserialized
+/// The owned mirror of `helix_pipeline::AnalyzeRequest` (which borrows). Deserialized
 /// from the JS payload, then turned into the borrowed request internally.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AnalyzePayload {
@@ -44,7 +44,7 @@ fn default_floor() -> f64 {
 }
 
 /// Run the grounded-answer pipeline. Input: an [`AnalyzePayload`] as JSON.
-/// Output: a `helix_core::AnswerOutcome` as JSON (`abstained` or `answered`).
+/// Output: a `helix_pipeline::AnswerOutcome` as JSON (`abstained` or `answered`).
 #[wasm_bindgen]
 pub fn analyze_json(payload: &str) -> Result<String, JsValue> {
     let p: AnalyzePayload = serde_json::from_str(payload).map_err(err)?;

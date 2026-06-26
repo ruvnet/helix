@@ -1,4 +1,4 @@
-//! # helix-core — the grounded-answer pipeline (ADR-002 orchestration of ADR-005/006/007/009)
+//! # helix-pipeline — the grounded-answer pipeline (ADR-002 orchestration of ADR-005/006/007/009)
 //!
 //! This is the keystone: it composes the four anti-hallucination primitives into
 //! the single flow §4 of the spec describes, in the order that makes the product
