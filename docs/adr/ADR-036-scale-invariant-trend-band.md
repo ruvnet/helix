@@ -65,6 +65,28 @@ reference range and ≥2 points spanning a window (falls back to the absolute ba
 otherwise). **Mitigations.** Graceful fallback; the value is eval-gated and can be
 re-evolved as the eval set grows.
 
+## Real-data validation (honest finding)
+
+Checked against the **MIMIC-IV demo** (open, 894 real serial-lab series), with ground
+truth = the **statistical significance of the OLS slope** (t-test, |t|>2 ⇒ trend) —
+deliberately independent of the range-fraction heuristic. Result:
+
+| config | agreement w/ statistical trend test |
+|---|---|
+| absolute band (0.01/day) | 55.4% |
+| **adopted relative band (frac 0.08)** | 54.3% |
+| evolved on this data | 82.1% (→ frac ≈ 0.37) |
+
+**The adopted 0.08 is no better than the absolute band on this data, and evolution
+wants a far higher frac.** This is a *population* effect, not a refutation: MIMIC is
+**ICU** data — short, noisy, irregular bursts — a poor proxy for Helix's **outpatient
+longitudinal self-tracking** target, and a high frac "wins" mostly by calling noisy
+series flat. **Decision: retain 0.08 for the outpatient target** (it remains correct
+on the clinically-labeled outpatient-style eval, 27/27) and treat the frac as
+**population-dependent, to be re-calibrated on outpatient longitudinal data** (ICU is
+the wrong population). The real-data harness (`examples/mimic_eval`) is kept as the
+calibration tool; this is the kind of check that needs real outpatient data to settle.
+
 ## References
 
 - ADR-035 (the eval + evolve run that surfaced this), ADR-007 (deterministic engine). **[A]**
