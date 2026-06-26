@@ -1,0 +1,31 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Node / tooling (for when the harness is minted into this repo)
+node_modules/
+dist/
+build/
+.env
+.env.*
+*.log
+
+# Rust (RuVector / Ruflo crates)
+target/
+**/*.rs.bk
+
+# Local vault / health data must never be committed
+*.vault
+vault/
+*.fhir.json
+data/
+*.vcf
+*.fastq
+
+# Stray tooling artifacts
+.claude-flow/
+ruvector.db
+*.db
