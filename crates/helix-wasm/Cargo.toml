@@ -22,6 +22,7 @@ helix-escalation = { path = "../helix-escalation" }
 helix-ontology = { path = "../helix-ontology" }
 helix-core = { path = "../helix-core" }
 helix-score = { path = "../helix-score" }
+helix-neural = { path = "../helix-neural" }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

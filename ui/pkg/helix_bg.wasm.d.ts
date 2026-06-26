@@ -3,6 +3,8 @@
 export const memory: WebAssembly.Memory;
 export const analyze_json: (a: number, b: number) => [number, number, number, number];
 export const compose_score_json: (a: number, b: number) => [number, number, number, number];
+export const neural_disclaimer: () => [number, number];
+export const neural_session_to_records_json: (a: number, b: number) => [number, number, number, number];
 export const redflag_registry_version: () => [number, number];
 export const version: () => [number, number];
 export const __wbindgen_externrefs: WebAssembly.Table;

@@ -55,6 +55,51 @@ export function compose_score_json(subscores) {
 }
 
 /**
+ * The non-diagnostic disclaimer that must accompany any ruv-neural signal.
+ * @returns {string}
+ */
+export function neural_disclaimer() {
+    let deferred1_0;
+    let deferred1_1;
+    try {
+        const ret = wasm.neural_disclaimer();
+        deferred1_0 = ret[0];
+        deferred1_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+    }
+}
+
+/**
+ * Ingest a `ruv-neural` signed session (JSON) and return the provenance-tagged
+ * records it maps to (JSON array), so EEG/40 Hz entrainment signals flow into
+ * the same dossier as labs — as a research/screening signal (ADR-014 framing).
+ * @param {string} session
+ * @returns {string}
+ */
+export function neural_session_to_records_json(session) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(session, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.neural_session_to_records_json(ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * The red-flag threshold registry version currently in force (ADR-009).
  * @returns {string}
  */

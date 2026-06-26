@@ -1,0 +1,18 @@
+[package]
+name = "helix-neural"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Integration adapter: ruvnet/ruv-neural gamma-entrainment/EEG session evidence -> Helix ProvRecords (research-grade screening, not diagnosis)"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+helix-provenance = { path = "../helix-provenance" }
+
+[dev-dependencies]
+proptest.workspace = true

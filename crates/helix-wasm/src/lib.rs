@@ -78,6 +78,22 @@ pub fn redflag_registry_version() -> String {
     builtin_registry_v1().version
 }
 
+/// Ingest a `ruv-neural` signed session (JSON) and return the provenance-tagged
+/// records it maps to (JSON array), so EEG/40 Hz entrainment signals flow into
+/// the same dossier as labs — as a research/screening signal (ADR-014 framing).
+#[wasm_bindgen]
+pub fn neural_session_to_records_json(session: &str) -> Result<String, JsValue> {
+    let s: helix_neural::NeuralSession = serde_json::from_str(session).map_err(err)?;
+    let recs = helix_neural::session_to_records(&s).map_err(err)?;
+    serde_json::to_string(&recs).map_err(err)
+}
+
+/// The non-diagnostic disclaimer that must accompany any ruv-neural signal.
+#[wasm_bindgen]
+pub fn neural_disclaimer() -> String {
+    helix_neural::RESEARCH_DISCLAIMER.to_string()
+}
+
 /// Crate version string for the UI footer / diagnostics.
 #[wasm_bindgen]
 pub fn version() -> String {

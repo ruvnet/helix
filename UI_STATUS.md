@@ -48,8 +48,14 @@ session→ProvRecord mapping). Do NOT claim clinical/therapeutic effect — rese
   WASM:** score=76 from compose_score_json; grounded ferritin answer with 3 citations + deterministic trend
   "−38% vs first reading · crossed reference range"; guide modal renders. `docs/ui/README.md` walkthrough.
 
+- **Iter 3 (2026-06-25):** `helix-neural` — the **ruv-neural integration**. Maps a signed gamma-entrainment
+  (40 Hz) / EEG session into provenance-tagged ProvRecords (RUVN-* research codes, never clinical LOINC;
+  AmbientSensing method; capped 0.6 confidence; RESEARCH_DISCLAIMER "not a diagnosis / not a therapeutic
+  claim"); rejects unsigned/empty/non-finite sessions; `neuro_orientation()` 0–100 for an optional Neuro
+  subsystem. Exposed via wasm: `neural_session_to_records_json` + `neural_disclaimer`. 87 tests green;
+  clippy+fmt clean; wasm pkg rebuilt.
+
 ## Next picks
-1. `helix-neural` crate: ruv-neural session evidence → ProvRecords (the integration request) + a "Neuro" subsystem.
-2. Mobile PWA: manifest, service worker, mobile-first layout reusing the wasm; /browser mobile-viewport screenshot.
-3. Validate abstain + escalate outcomes in-browser; capture screenshots into docs/ui/.
-4. Final validation sweep; close loop.
+1. Mobile PWA: manifest, service worker, mobile-first layout reusing the wasm; /browser mobile-viewport screenshot.
+2. Wire a ruv-neural sample session + Neuro card into the UI; validate abstain + escalate outcomes in-browser.
+3. Final validation sweep; close loop.

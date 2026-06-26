@@ -14,6 +14,18 @@ export function analyze_json(payload: string): string;
 export function compose_score_json(subscores: string): string;
 
 /**
+ * The non-diagnostic disclaimer that must accompany any ruv-neural signal.
+ */
+export function neural_disclaimer(): string;
+
+/**
+ * Ingest a `ruv-neural` signed session (JSON) and return the provenance-tagged
+ * records it maps to (JSON array), so EEG/40 Hz entrainment signals flow into
+ * the same dossier as labs — as a research/screening signal (ADR-014 framing).
+ */
+export function neural_session_to_records_json(session: string): string;
+
+/**
  * The red-flag threshold registry version currently in force (ADR-009).
  */
 export function redflag_registry_version(): string;
@@ -29,6 +41,8 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly analyze_json: (a: number, b: number) => [number, number, number, number];
     readonly compose_score_json: (a: number, b: number) => [number, number, number, number];
+    readonly neural_disclaimer: () => [number, number];
+    readonly neural_session_to_records_json: (a: number, b: number) => [number, number, number, number];
     readonly redflag_registry_version: () => [number, number];
     readonly version: () => [number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;

@@ -392,6 +392,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-neural"
+version = "0.1.0"
+dependencies = [
+ "helix-provenance",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-numeric"
 version = "0.1.0"
 dependencies = [
@@ -462,6 +473,7 @@ dependencies = [
  "helix-core",
  "helix-escalation",
  "helix-evidence",
+ "helix-neural",
  "helix-numeric",
  "helix-ontology",
  "helix-provenance",
