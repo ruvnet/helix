@@ -11,8 +11,8 @@ description = "ADR-008: independent verifier/critic that re-derives every claim 
 [dependencies]
 serde.workspace = true
 thiserror.workspace = true
-helix-provenance = { path = "../helix-provenance" }
-helix-evidence = { path = "../helix-evidence" }
+helix-provenance = { path = "../helix-provenance", version = "0.1.0" }
+helix-evidence = { path = "../helix-evidence", version = "0.1.0" }
 
 [dev-dependencies]
 serde_json.workspace = true

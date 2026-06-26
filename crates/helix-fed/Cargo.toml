@@ -12,7 +12,7 @@ description = "ADR-030: federation transport — opt-in, DP-gated cohort contrib
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
-helix-cohort = { path = "../helix-cohort" }
+helix-cohort = { path = "../helix-cohort", version = "0.1.0" }
 
 [dev-dependencies]
 proptest.workspace = true

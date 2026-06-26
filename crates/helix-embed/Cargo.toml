@@ -13,5 +13,5 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 ureq = "2"
-helix-provenance = { path = "../helix-provenance" }
-helix-retrieval = { path = "../helix-retrieval" }
+helix-provenance = { path = "../helix-provenance", version = "0.1.0" }
+helix-retrieval = { path = "../helix-retrieval", version = "0.1.0" }

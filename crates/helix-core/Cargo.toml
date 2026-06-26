@@ -11,10 +11,10 @@ description = "ADR-002/005: the grounded-answer pipeline wiring Helix's anti-hal
 [dependencies]
 serde.workspace = true
 thiserror.workspace = true
-helix-provenance = { path = "../helix-provenance" }
-helix-numeric = { path = "../helix-numeric" }
-helix-evidence = { path = "../helix-evidence" }
-helix-escalation = { path = "../helix-escalation" }
+helix-provenance = { path = "../helix-provenance", version = "0.1.0" }
+helix-numeric = { path = "../helix-numeric", version = "0.1.0" }
+helix-evidence = { path = "../helix-evidence", version = "0.1.0" }
+helix-escalation = { path = "../helix-escalation", version = "0.1.0" }
 
 [dev-dependencies]
 serde_json.workspace = true

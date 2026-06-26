@@ -15,17 +15,17 @@ crate-type = ["cdylib", "rlib"]
 serde.workspace = true
 serde_json.workspace = true
 wasm-bindgen = "0.2"
-helix-provenance = { path = "../helix-provenance" }
-helix-numeric = { path = "../helix-numeric" }
-helix-evidence = { path = "../helix-evidence" }
-helix-escalation = { path = "../helix-escalation" }
-helix-ontology = { path = "../helix-ontology" }
-helix-core = { path = "../helix-core" }
-helix-score = { path = "../helix-score" }
-helix-neural = { path = "../helix-neural" }
-helix-sensing = { path = "../helix-sensing" }
-helix-genome = { path = "../helix-genome" }
-helix-ocr = { path = "../helix-ocr" }
+helix-provenance = { path = "../helix-provenance", version = "0.1.0" }
+helix-numeric = { path = "../helix-numeric", version = "0.1.0" }
+helix-evidence = { path = "../helix-evidence", version = "0.1.0" }
+helix-escalation = { path = "../helix-escalation", version = "0.1.0" }
+helix-ontology = { path = "../helix-ontology", version = "0.1.0" }
+helix-core = { path = "../helix-core", version = "0.1.0" }
+helix-score = { path = "../helix-score", version = "0.1.0" }
+helix-neural = { path = "../helix-neural", version = "0.1.0" }
+helix-sensing = { path = "../helix-sensing", version = "0.1.0" }
+helix-genome = { path = "../helix-genome", version = "0.1.0" }
+helix-ocr = { path = "../helix-ocr", version = "0.1.0" }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
