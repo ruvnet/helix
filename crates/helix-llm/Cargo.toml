@@ -1,0 +1,18 @@
+[package]
+name = "helix-llm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-026: on-device LLM analyst — narrates grounded facts via a local-GPU model, with an anti-hallucination number-guard"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+ureq = "2"
+
+[dev-dependencies]
+# integration test hits the local ollama GPU endpoint (run with --ignored)
