@@ -24,7 +24,7 @@ remains the specification and the table notes the interface seam.
 | 009 | Red-flag escalation & clinician-in-the-loop | ✅ Implemented | `helix-escalation` + `helix-core` |
 | 010 | Wellness positioning vs. SaMD boundary | ✅ Encoded as policy | non-diagnostic framing enforced in `helix-escalation` (screening language) + `helix-score` (disclaimer) |
 | 011 | Federation for opt-in PII-stripped cohort intel | ◑ Privacy primitive implemented | `helix-cohort` (ADR-024: generalize + cell-suppression + DP); network transport still out of scope |
-| 012 | Connector abstraction with graceful degradation | ◑ Interface modeled | `helix-ontology` review-queue is the un-mappable seam; live connectors are I/O-bound integration work |
+| 012 | Connector abstraction with graceful degradation | ✅ Core implemented | `helix-connect` (ADR-029: FHIR→ProvRecord parse + OAuth model + degradation ladder; real partner auth pending) + `helix-ontology` review queue |
 | 013 | On-device inference where feasible | ✅ Boundary implemented | `helix-vault` (local key custody); model routing in `helix-core` seam + ADR-019 |
 | 014 | Ambient passive sensing (Cognitum Seed, mmWave) | ◑ Signal modeled | screening-grade thresholds in `helix-escalation` (`SEED-REI`); radar firmware is hardware-bound |
 | 015 | Visual 3D anatomical digital twin | ⬜ N/A (client/WebGL) | spec-only; data it renders comes from `helix-core` + `helix-score` |
@@ -48,6 +48,7 @@ remains the specification and the table notes the interface seam.
 | 026 | On-device LLM analyst — grounded compose (local GPU) | ✅ Implemented + GPU-validated | `helix-llm` (ruvLLM default, ollama fallback, number-guard) |
 | 027 | Learned MiniLM text embeddings (local GPU) | ✅ Implemented + GPU-validated | `helix-embed` (all-MiniLM-L6-v2, wires into helix-retrieval) |
 | 028 | Learned visual encoder (local GPU) | ✅ Implemented + GPU-validated (value-guard verified) | `helix-vision` (moondream layout-only + MiniLM; CLIP is the quality upgrade) |
+| 029 | Live connector clients (FHIR/SMART + wearables) | ✅ Core implemented (sandbox-tested) | `helix-connect` (parse + degradation; real auth pending partner onboarding) |
 
 Each integration realizes/strengthens a core ADR: 020→014 (ambient tier backend) + 009 (escalation);
 021→005/§7.4 (genome, user-owned); 022→012 (connector degradation, the primary lab path); 023→003/005

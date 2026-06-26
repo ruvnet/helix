@@ -42,3 +42,11 @@ regulatory/clinical sign-off.
   weak (moondream returns garbage on the synthetic x-ray), so retrieval is degenerate here; a true in-process
   CLIP/ColPali encoder (candle, GPU) behind the same `VisionCaptioner`/embedder traits is the quality upgrade.
   5 unit tests + 1 GPU integration test; clippy/fmt clean. base64 inlined (no new dep).
+
+- **Iter 4 (2026-06-26):** ADR-029 + `helix-connect` — the buildable core of the live-API connector tier
+  (ADR-012), no partner credential needed. `HttpTransport` trait (sandbox in tests, real client + auth later);
+  FHIR R4 `Observation` → `ProvRecord` parse (LOINC + UCUM unit + ISO-8601 date via an inline civil-date
+  parser, no chrono; reference range; un-parseable → review queue); typed `OAuthToken` (secret, redacted
+  Debug, expiry/scopes); and the **degradation ladder** made executable (`fallback_for`: auth/rate-limit →
+  user-export, parse-fail → PDF/OCR). `FhirConnector::pull_observations` imports or degrades. 8 tests; clean.
+  Elevates ADR-012 from modeled-seam to core-implemented. (Real partner network/auth still needs onboarding.)

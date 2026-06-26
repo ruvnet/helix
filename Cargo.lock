@@ -442,6 +442,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-connect"
+version = "0.1.0"
+dependencies = [
+ "helix-provenance",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-core"
 version = "0.1.0"
 dependencies = [

@@ -49,6 +49,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [026](ADR-026-on-device-llm-analyst.md) | On-Device LLM Analyst — Grounded Compose Step (local GPU, ruvLLM) | LLM / on-device |
 | [027](ADR-027-learned-text-embeddings.md) | Learned MiniLM Text Embeddings for Semantic Retrieval (local GPU) | Embeddings / on-device |
 | [028](ADR-028-learned-visual-encoder.md) | Learned Visual Encoder for Medical-Document Retrieval (local GPU) | Visual encoder / on-device |
+| [029](ADR-029-connector-clients.md) | Live Connector Clients — FHIR/SMART + Wearables (Rust, sandbox-first) | Connectors / ingestion |
 
 ## Status
 
