@@ -25,3 +25,10 @@ regulatory/clinical sign-off.
   RTX 5080: ruvLLM narrated a grounded ferritin answer, number-guard passed. Honest note: the guard blocks
   fabricated *values*, not added qualitative claims (e.g. "anemia") — that's the Verifier's job (ADR-008).
   6 unit tests + 1 GPU integration test (`--ignored`). clippy/fmt clean.
+
+- **Iter 2 (2026-06-26):** ADR-027 + `helix-embed` — learned MiniLM text embeddings on the GPU. all-MiniLM-L6-v2
+  (384-dim, ruvnet standard) served locally (ollama, on-device, ADR-013) behind a `TextEmbedder` trait;
+  `LearnedEmbedder` adapts it to `helix_retrieval::Embedder` (wires the real encoder into ADR-023), degrading
+  to an empty vector on backend failure. Validated on GPU: a fatigue query embeds at 0.483 to fatigue/ferritin
+  text vs 0.098 to an unrelated potassium-recipe sentence — real semantic recall. 4 unit + 1 GPU integration
+  test; clippy/fmt clean. Embeddings = recall; grounding (ADR-005) stays strict.

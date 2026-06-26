@@ -18,6 +18,7 @@ members = [
     "crates/helix-cohort",
     "crates/helix-visual",
     "crates/helix-llm",
+    "crates/helix-embed",
     "crates/helix-wasm",
 ]
 

@@ -1,0 +1,17 @@
+[package]
+name = "helix-embed"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-027: learned MiniLM text embeddings (local GPU) wired into helix-retrieval"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+ureq = "2"
+helix-provenance = { path = "../helix-provenance" }
+helix-retrieval = { path = "../helix-retrieval" }

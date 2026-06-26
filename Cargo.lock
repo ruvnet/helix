@@ -455,6 +455,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-embed"
+version = "0.1.0"
+dependencies = [
+ "helix-provenance",
+ "helix-retrieval",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "ureq",
+]
+
+[[package]]
 name = "helix-escalation"
 version = "0.1.0"
 dependencies = [

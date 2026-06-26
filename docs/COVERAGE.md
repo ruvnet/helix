@@ -46,6 +46,7 @@ remains the specification and the table notes the interface seam.
 | 024 | Privacy-preserving cohort primitive (federation) | ✅ Implemented | `helix-cohort` (k-anon + DP) |
 | 025 | Visual RAG over medical documents/images (rupixel) | ✅ Implemented + benchmarked | `helix-visual` (tile embeddings + MaxSim) |
 | 026 | On-device LLM analyst — grounded compose (local GPU) | ✅ Implemented + GPU-validated | `helix-llm` (ruvLLM default, ollama fallback, number-guard) |
+| 027 | Learned MiniLM text embeddings (local GPU) | ✅ Implemented + GPU-validated | `helix-embed` (all-MiniLM-L6-v2, wires into helix-retrieval) |
 
 Each integration realizes/strengthens a core ADR: 020→014 (ambient tier backend) + 009 (escalation);
 021→005/§7.4 (genome, user-owned); 022→012 (connector degradation, the primary lab path); 023→003/005
