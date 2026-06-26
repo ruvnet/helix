@@ -19,6 +19,7 @@ members = [
     "crates/helix-visual",
     "crates/helix-llm",
     "crates/helix-embed",
+    "crates/helix-vision",
     "crates/helix-wasm",
 ]
 

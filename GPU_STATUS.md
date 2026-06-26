@@ -32,3 +32,13 @@ regulatory/clinical sign-off.
   to an empty vector on backend failure. Validated on GPU: a fatigue query embeds at 0.483 to fatigue/ferritin
   text vs 0.098 to an unrelated potassium-recipe sentence — real semantic recall. 4 unit + 1 GPU integration
   test; clippy/fmt clean. Embeddings = recall; grounding (ADR-005) stays strict.
+
+- **Iter 3 (2026-06-26):** ADR-028 + `helix-vision` — learned visual encoder on the GPU (by composition):
+  a vision model (moondream) constrained to LAYOUT-ONLY description → MiniLM embedding (ADR-027). Encodes
+  appearance, never interpretation (ADR-025/010). **Value-guard** rejects any caption containing a digit and
+  falls back to a neutral token. GPU-validated end-to-end over the real medical corpus: the guard PROVABLY
+  fired — moondream tried to read lab-report values, the guard caught the digits and forced the neutral
+  fallback (the safety property working). Honest limitation: caption quality on the synthetic SVG images is
+  weak (moondream returns garbage on the synthetic x-ray), so retrieval is degenerate here; a true in-process
+  CLIP/ColPali encoder (candle, GPU) behind the same `VisionCaptioner`/embedder traits is the quality upgrade.
+  5 unit tests + 1 GPU integration test; clippy/fmt clean. base64 inlined (no new dep).

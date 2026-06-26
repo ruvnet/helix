@@ -616,6 +616,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-vision"
+version = "0.1.0"
+dependencies = [
+ "helix-embed",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "ureq",
+]
+
+[[package]]
 name = "helix-visual"
 version = "0.1.0"
 dependencies = [
