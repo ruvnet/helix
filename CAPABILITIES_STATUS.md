@@ -74,3 +74,11 @@ diagnosis, provenance-required, recall≠grounding). Pushed to ruvnet/helix main
   advisory (CYP2D6 poor only) + T2D risk (conf 0.4) + GINA privacy note. Headless-Chrome screenshots captured
   (sensing-demo.png, genome-demo.png) and embedded in docs/ui. Deep-link hooks #sensing/#genome. End-to-end
   adapter→wasm→UI validated. Pushed.
+
+- **Iter 8 (2026-06-26):** ADR-025 (visual RAG over medical documents/images, rupixel backend) + `helix-visual`.
+  ColPali-faithful: image → grid of tiles → perceptual descriptor (mean-subtracted, L2-normalized) → retrieval
+  by **MaxSim late interaction**. Pluggable `VisualEmbedder` (learned ColPali/MiniLM plugs in). Hard line:
+  **visual retrieval finds similar-looking documents, never interprets/diagnoses** (ADR-010/023). Benchmarked
+  on a REAL medical-image corpus (lab reports, trend chart, chest X-ray, ECG strip, skin photo, rendered to
+  PNG): querying the lipid lab report ranks the CBC lab report 2nd (0.484) above the X-ray (0.281) — groups by
+  appearance. Bench: embed 0.8 ms (ingest-time), maxsim 1.7 µs, retrieve 10.5 µs. 6 tests; clippy/fmt clean.

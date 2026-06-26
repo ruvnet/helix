@@ -16,6 +16,7 @@ members = [
     "crates/helix-ocr",
     "crates/helix-retrieval",
     "crates/helix-cohort",
+    "crates/helix-visual",
     "crates/helix-wasm",
 ]
 

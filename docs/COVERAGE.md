@@ -43,6 +43,8 @@ remains the specification and the table notes the interface seam.
 | 021 | Genome ingestion & pharmacogenomics (rvDNA) | ✅ Implemented | `helix-genome` (wasm: `genome_profile_json`) |
 | 022 | OCR lab-document ingestion (RuVector OCR) | ✅ Implemented | `helix-ocr` (wasm: `ocr_ingest_json`) |
 | 023 | Semantic retrieval over the health graph (RuVector HNSW/GraphRAG) | ✅ Implemented | `helix-retrieval` (Embedder/Index injected) |
+| 024 | Privacy-preserving cohort primitive (federation) | ✅ Implemented | `helix-cohort` (k-anon + DP) |
+| 025 | Visual RAG over medical documents/images (rupixel) | ✅ Implemented + benchmarked | `helix-visual` (tile embeddings + MaxSim) |
 
 Each integration realizes/strengthens a core ADR: 020→014 (ambient tier backend) + 009 (escalation);
 021→005/§7.4 (genome, user-owned); 022→012 (connector degradation, the primary lab path); 023→003/005

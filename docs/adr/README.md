@@ -45,6 +45,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [022](ADR-022-ocr-lab-ingestion.md) | OCR Lab-Document Ingestion (RuVector OCR backend) | Ingestion / integration |
 | [023](ADR-023-semantic-retrieval.md) | Semantic Retrieval over the Health Graph (RuVector HNSW/GraphRAG) | Retrieval / integration |
 | [024](ADR-024-privacy-preserving-cohort.md) | Privacy-Preserving Cohort Feature Extraction (federation primitive) | Privacy / federation |
+| [025](ADR-025-visual-rag-medical-documents.md) | Visual RAG over Medical Documents & Images (rupixel backend) | Visual retrieval / integration |
 
 ## Status
 
