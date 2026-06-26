@@ -21,7 +21,7 @@ from all three repos are integrated and validated.
 | # | Capability | Source | ADR | Crate | Status |
 |---|-----------|--------|-----|-------|--------|
 | 1 | WiFi-CSI ambient sensing + escalation | ruview | ADR-020 | `helix-sensing` | ✅ done |
-| 2 | Genome ingestion (VCF → records, GINA-aware) | rvdna | ADR-021 | `helix-genome` | ⬜ next |
+| 2 | Genome ingestion + pharmacogenomics (GINA-aware) | rvdna | ADR-021 | `helix-genome` | ✅ done |
 | 3 | OCR lab-PDF ingestion (connector degradation) | ruvector | ADR-022 | `helix-ocr` | ⬜ |
 | 4 | Vector / GraphRAG semantic retrieval | ruvector | ADR-023 | `helix-retrieval` | ⬜ |
 
@@ -32,7 +32,15 @@ from all three repos are integrated and validated.
   inactivity/apnea → Urgent; ambient context → none) to the Escalation Guardian (ADR-009); rejects unsigned/
   non-finite; non-diagnostic framing throughout. 94 tests green; clippy+fmt clean. Pushed to main.
 
+- **Iter 2 (2026-06-25):** ADR-021 (genome ingestion & pharmacogenomics, rvDNA backend) + `helix-genome`:
+  pharmacogenomic phenotypes (CYP2D6/CYP2C19 → Metabolizer) → ProvRecords (GENO-PGX-*, Derived, 0.6 conf) +
+  "verify with your prescriber" advisories (non-normal metabolizers only; decision-support, never a dosing
+  directive); biomarker risk → GENO-RISK-* records (0.4 conf, band + ancestry caveat); GINA-aware privacy
+  note; excluded from federation; rejects empty/out-of-range/NaN. 100 tests green; clippy+fmt clean. Pushed.
+
 ## Next picks
-1. ADR-021 + `helix-genome`: rvdna VCF/variant → ProvRecords; user-owned, GINA-aware, screening not diagnosis (§7.4).
-2. Expose helix-sensing + helix-neural via wasm; add a live "Ambient" data-source panel in the UI.
-3. ADR-022 OCR lab ingestion; ADR-023 semantic retrieval. Re-run audit after any new deps.
+1. ADR-022 OCR lab-PDF ingestion (ruvector ai-ocr) → `helix-ocr`: scanned lab → normalized records (connector
+   degradation, ADR-012). Re-run cargo audit if new deps.
+2. ADR-023 vector/GraphRAG semantic retrieval (ruvector HNSW) → `helix-retrieval`: similarity recall over the
+   health graph for the analyst's Retrieve step (ADR-003/005).
+3. Expose helix-sensing/neural/genome via wasm; add live "Ambient / Genome" panels in the UI; capture screenshots.

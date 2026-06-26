@@ -41,6 +41,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [018](ADR-018-darwin-mode-faithfulness-fitness.md) | Darwin Mode Self-Optimization with Faithfulness Fitness | Self-optimization |
 | [019](ADR-019-cost-aware-model-routing.md) | Cost-Aware Model Routing Under Privacy Constraints | Self-optimization |
 | [020](ADR-020-wifi-csi-ambient-sensing.md) | WiFi-CSI Contactless Ambient Sensing (RuView backend) | Sensing / integration |
+| [021](ADR-021-genome-ingestion-rvdna.md) | User-Owned Genome Ingestion & Pharmacogenomics (rvDNA backend) | Genomics / integration |
 
 ## Status
 

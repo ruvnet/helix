@@ -392,6 +392,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-genome"
+version = "0.1.0"
+dependencies = [
+ "helix-provenance",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-neural"
 version = "0.1.0"
 dependencies = [
