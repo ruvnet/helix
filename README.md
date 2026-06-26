@@ -3,6 +3,16 @@
 > Your entire body — every record, signal, and result — assembled into one living dossier.
 > **Private. Continual. Visual. And built so it can't make things up.**
 
+![Helix management console](docs/ui/screenshots/dashboard.png)
+
+<p align="center">
+  <img src="docs/ui/screenshots/answer.png" alt="Grounded, cited answer" width="49%" />
+  <img src="docs/ui/screenshots/mobile.png" alt="Helix mobile PWA" width="22%" />
+</p>
+
+<p align="center"><b><a href="https://ruvnet.github.io/helix/">▶ Live demo</a></b> · the UI runs the real Rust pipeline compiled to WebAssembly</p>
+
+
 Helix is a mobile-first *"functional-medicine specialist in your pocket."* It ingests
 everything a person can know about their own body — EMR records, pharmacy history, phone
 and wearable telemetry, genome, lab panels, sleep, recovery, nutrition, subjective logs,

@@ -64,6 +64,15 @@ async function boot() {
   renderSources();
   wireNav();
   wireModals();
+
+  // Deep-link hooks (used for headless screenshot capture & shareable states).
+  const h = location.hash;
+  if (h === "#ask") {
+    document.querySelector('.nav-item[data-view="ask"]').click();
+    runAsk();
+  } else if (h === "#guide") {
+    openModal(guideModal());
+  }
 }
 
 // ---- Score (real compose() in wasm) ----

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#070b14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Helix</title>
+  <link rel="stylesheet" href="./mobile.css" />
+</head>
+<body>
+  <div class="phone">
+    <!-- Home / dashboard -->
+    <section class="screen active" id="screen-home">
+      <header class="m-head">
+        <div>
+          <div class="greeting">Good morning</div>
+          <div class="sub" id="sync">everything's synced</div>
+        </div>
+        <span class="helix-dot" aria-hidden="true"></span>
+      </header>
+
+      <div class="score-wrap">
+        <svg viewBox="0 0 140 140" width="180" height="180" class="ring">
+          <circle cx="70" cy="70" r="60" class="ring-bg"></circle>
+          <circle cx="70" cy="70" r="60" class="ring-fg" id="m-ring"></circle>
+        </svg>
+        <div class="score-center"><span id="m-score">—</span><small>/100</small></div>
+        <div class="score-cap" id="m-trend">health score</div>
+      </div>
+
+      <div class="m-section-label">Your body · tap a system</div>
+      <div class="m-systems" id="m-systems"></div>
+
+      <button class="m-brief" id="m-brief">
+        <span class="brief-tag">TODAY</span>
+        <span id="brief-text">Low ferritin may be behind your afternoon energy dips. →</span>
+      </button>
+    </section>
+
+    <!-- Answer -->
+    <section class="screen" id="screen-answer">
+      <header class="m-head">
+        <button class="back" data-to="home">‹</button>
+        <div class="sub">Ask Helix</div><span></span>
+      </header>
+      <div class="m-q">Why am I tired in the afternoons?</div>
+      <div id="m-answer"></div>
+    </section>
+
+    <!-- bottom nav -->
+    <nav class="tabbar">
+      <button class="tab active" data-to="home"><span>◎</span>Home</button>
+      <button class="tab" id="ask-tab"><span>✦</span>Ask</button>
+      <button class="tab" id="guide-tab"><span>?</span>Guide</button>
+    </nav>
+
+    <!-- sheet (mobile modal) -->
+    <div class="sheet-host" id="sheet-host">
+      <div class="sheet" id="sheet"></div>
+    </div>
+
+    <div class="engine-badge" id="m-engine">engine…</div>
+  </div>
+  <script type="module" src="./mobile.js"></script>
+</body>
+</html>

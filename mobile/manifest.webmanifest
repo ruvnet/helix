@@ -1,0 +1,15 @@
+{
+  "name": "Helix — Personal Health Intelligence",
+  "short_name": "Helix",
+  "description": "Your entire body — every record, signal, and result — assembled into one private, grounded, visual dossier.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

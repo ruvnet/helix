@@ -6,6 +6,29 @@ WebAssembly (`helix-wasm`) — there is no business logic duplicated in
 JavaScript. `ui/app.js` is presentation and wiring only; every number and every
 grounded answer comes from the audited Rust crates.
 
+> The screenshots below are captured from the live UI running the WASM engine
+> (headless Chrome render of `ui/index.html`), not mockups.
+
+### Dashboard — a score you can open, a body you can tap
+![Helix dashboard](./screenshots/dashboard.png)
+
+### Ask Helix — grounded, cited answers (or an honest abstention)
+![Helix grounded answer](./screenshots/answer.png)
+
+The ferritin answer above is the real pipeline output: the deterministic engine
+computed the trend (`−38% vs first reading · crossed reference range`), every
+value is cited to its source and date, and it carries a **Tier 1 · Your data**
+evidence chip.
+
+### Step-by-step onboarding guide (modal)
+![Helix step-by-step guide](./screenshots/guide.png)
+
+### Mobile PWA (WASM, installable)
+<img src="./screenshots/mobile.png" alt="Helix mobile PWA" width="300" />
+
+---
+
+
 ## Run it locally
 
 ```bash
