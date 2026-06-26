@@ -505,6 +505,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-focus"
+version = "0.1.0"
+dependencies = [
+ "helix-numeric",
+ "helix-provenance",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-genome"
 version = "0.1.0"
 dependencies = [
@@ -617,6 +629,17 @@ dependencies = [
  "helix-escalation",
  "helix-provenance",
  "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "helix-timeline"
+version = "0.1.0"
+dependencies = [
+ "helix-numeric",
+ "helix-score",
  "serde",
  "serde_json",
  "thiserror",
