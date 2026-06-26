@@ -442,6 +442,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-sensing"
+version = "0.1.0"
+dependencies = [
+ "helix-escalation",
+ "helix-provenance",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-vault"
 version = "0.1.0"
 dependencies = [

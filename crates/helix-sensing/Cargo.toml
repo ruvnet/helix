@@ -1,0 +1,19 @@
+[package]
+name = "helix-sensing"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-020: RuView WiFi-CSI contactless ambient sensing -> Helix ProvRecords + escalation screening flags"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+helix-provenance = { path = "../helix-provenance" }
+helix-escalation = { path = "../helix-escalation" }
+
+[dev-dependencies]
+proptest.workspace = true

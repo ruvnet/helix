@@ -40,6 +40,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [017](ADR-017-mint-branded-harness-metaharness.md) | Mint Helix as a Branded Harness via MetaHarness | Self-optimization |
 | [018](ADR-018-darwin-mode-faithfulness-fitness.md) | Darwin Mode Self-Optimization with Faithfulness Fitness | Self-optimization |
 | [019](ADR-019-cost-aware-model-routing.md) | Cost-Aware Model Routing Under Privacy Constraints | Self-optimization |
+| [020](ADR-020-wifi-csi-ambient-sensing.md) | WiFi-CSI Contactless Ambient Sensing (RuView backend) | Sensing / integration |
 
 ## Status
 
