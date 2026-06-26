@@ -27,12 +27,24 @@ in a real browser.
 Note: `helix-vault` (crypto/getrandom) is intentionally NOT in the wasm binding — key custody on mobile uses
 platform secure storage; the wasm surface is the analytic pipeline only. helix-core does not depend on vault.
 
+## New integration request (2026-06-25): ruvnet/ruv-neural
+`ruv-neural` = Rust/WASM closed-loop gamma-entrainment (40 Hz) / EEG research harness, "research-grade,
+not a medical device". **Integration plan (faithful to Helix's ADRs):** treat ruv-neural's signed session
+evidence as a *data source* (like the Cognitum Seed, ADR-014) — EEG/entrainment metrics → ProvRecords with
+provenance + screening-not-diagnosis framing (ADR-006/009/010), surfaced as a "Neuro" subsystem in the
+health score (ADR-016) and a data-source card in the UI. New crate `helix-neural` (ingestion adapter +
+session→ProvRecord mapping). Do NOT claim clinical/therapeutic effect — research signal only.
+
 ## Ledger
-- **Iter 1 (2026-06-25):** repo `ruvnet/helix` created (public, 10 topics, description), branch pushed,
-  helix subtree pushed to main. Building `helix-wasm` binding + first `wasm-pack build`.
+- **Iter 1 (2026-06-25):** repo `ruvnet/helix` created (public, 10 topics, description); branch pushed;
+  helix subtree pushed to `main`. `helix-wasm` binding built — `wasm-pack build` GREEN, real pipeline runs
+  in-browser (analyze_json/compose_score_json), pkg committed at `ui/pkg` (169KB wasm). `.cargo/config.toml`
+  fixes the mold-linker-vs-rust-lld clash for wasm. 3 native binding tests green.
 
 ## Next picks
-1. Web UI: dashboard (health score ring + body systems), Ask panel (grounded answer/abstain/escalate), Records modal, onboarding guide.
-2. wasm-pack build into ui/pkg; serve locally; /browser screenshot + validate interactions.
-3. Mobile PWA: manifest, service worker, mobile layout; /browser mobile-viewport screenshot.
-4. docs/ui walkthrough with screenshots; final validation sweep; close loop.
+1. Web UI: dashboard (health score ring + body systems), Ask panel (grounded answer/abstain/escalate),
+   Records modal, onboarding guide. Loads `ui/pkg/helix.js`.
+2. Serve locally; /browser screenshot + validate interactions (real wasm pipeline).
+3. `helix-neural` crate: ruv-neural session evidence → ProvRecords (the integration request).
+4. Mobile PWA: manifest, service worker, mobile layout; /browser mobile-viewport screenshot.
+5. docs/ui walkthrough with screenshots; final validation sweep; close loop.
