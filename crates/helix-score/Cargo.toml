@@ -1,0 +1,16 @@
+[package]
+name = "helix-score"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-016: transparent, decomposable, non-diagnostic 0-100 health score for Helix"
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

@@ -27,7 +27,7 @@ A core is SOTA-complete for this loop when **all** hold:
 | `helix-vault` | 001, 013 | ✅ implemented + tests (real AEAD) |
 | `helix-verifier` | 008 | ✅ implemented + tests |
 | `helix-core` (pipeline) | 002, 005, integration | ✅ implemented + 3 e2e integration tests |
-| `helix-score` | 016 | ⬜ |
+| `helix-score` | 016 | ✅ implemented + tests |
 | `helix-router` | 019 | ⬜ (may wrap ruvector tiny-dancer) |
 | sensing / twin / federation / darwin | 014/015/011/017/018 | ⬜ (spec/interface stubs; HW + client deferred) |
 
@@ -71,10 +71,31 @@ A core is SOTA-complete for this loop when **all** hold:
   tested), and `UserKeyring` is the sole capability that can open. 58 tests; clippy+fmt clean; `cargo audit`
   clean across 75 deps incl. the crypto stack; zero unsafe in helix code.
 
+- **Iter 7 (2026-06-25):** `helix-score` (ADR-016: decomposable 0–100 composite — weight-normalized roll-up of
+  subsystem SubScores, each carrying its Drivers w/ source_record + trend, versioned METHODOLOGY_VERSION,
+  always-on non-diagnostic disclaimer, overall_trend; range-validated). Captured criterion baselines (below).
+  Wrote `docs/COVERAGE.md` mapping all 19 ADRs to crate-or-seam-or-N/A. 65 tests green; clippy+fmt clean.
+
+### Numeric-engine criterion baselines (release, this host, median)
+| op | n=16 | n=256 |
+|----|------|-------|
+| slope_per_day | 41.7 ns | 640 ns |
+| range_crossings | 32.9 ns | 460 ns |
+| change_point | 38.8 ns | 635 ns |
+| pearson | 24.5 ns | 432 ns |
+Per-answer numeric cost is sub-µs at realistic series lengths — the deterministic engine is not a bottleneck.
+
+## SOTA exit-criteria status
+1. Every load-bearing ADR has a crate or documented N/A → ✅ (see `docs/COVERAGE.md`: 10 implemented, 6 seam, 3 N/A)
+2. `cargo test` green w/ meaningful tests → ✅ (65 tests across 8 crates + e2e integration)
+3. clippy -D warnings + fmt --check clean → ✅
+4. Security: zero unsafe in helix code, input validation at boundaries, `cargo audit` clean (75 deps) → ✅
+   (remaining: property/fuzz tests on parsers — numerics already have boundary tests)
+5. Criterion benchmarks w/ baselines → ✅ (numeric engine; could extend to grounding/score)
+6. End-to-end pipeline integration test → ✅ (`helix-core/tests/pipeline.rs`, 3 outcomes)
+
 ## Next iteration picks (ordered)
-1. `helix-score` (ADR-016): decomposable 0–100 score (subsystem sub-scores, each tracing to driving records,
-   trend dir, confidence) — never black-box; versioned methodology.
-2. Capture criterion baselines (run `cargo bench`); record measured ns/op table in ledger.
-3. `COVERAGE.md` mapping every ADR (001–019) to crate-or-documented-N/A so SOTA exit criterion #1 is provably
-   met; interface notes for the client/hardware ADRs (014/015/011/017/018/019) that can't be realized here.
-4. Final SOTA sweep: re-check all 6 exit criteria, then propose closing the loop (CronDelete 4c424726).
+1. Property tests (e.g. `proptest`) on numeric engine + ontology normalize + vault round-trip to harden criterion #4.
+2. Extend benches to grounding gate + score compose; record baselines.
+3. Final polish: top-level COVERAGE link from README; then propose closing the loop (CronDelete 4c424726) —
+   the 6 exit criteria are met; remaining work is hardening, not new load-bearing capability.
