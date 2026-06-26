@@ -36,6 +36,7 @@ async function boot() {
   document.getElementById("m-ring").style.strokeDashoffset = 377 - (377 * score.value) / 100;
   document.getElementById("m-trend").textContent = `health score · ${Math.round(score.confidence * 100)}% conf`;
 
+  renderTwin();
   document.getElementById("m-systems").innerHTML = SYS.map((s) =>
     `<div class="m-sys"><div class="n">${s.n}</div><div class="v">${s.v}</div>
       <div class="bar"><i style="width:${s.v}%;background:${s.c}"></i></div></div>`).join("");
@@ -69,6 +70,24 @@ function renderAnswer(out) {
     <span class="m-tier">TIER 1 · YOUR DATA</span>
     ${out.recommendation ? `<p style="margin-top:8px;color:#d7e3f2;font-size:13px">${out.recommendation.text}</p>` : ""}
     <div class="m-disc">Not a diagnosis · every claim traces to a dated source.</div></div>`;
+}
+
+function statusColor(v) {
+  return v >= 80 ? "#34d399" : v >= 65 ? "#f6a623" : "#fb7185";
+}
+function renderTwin() {
+  const c = (i) => statusColor(SYS[i].v);
+  document.getElementById("m-twin").innerHTML = `
+    <svg viewBox="0 0 200 230" role="img" aria-label="Body systems map">
+      <circle cx="100" cy="28" r="16" class="body-stroke"/>
+      <path d="M78 52 Q100 46 122 52 L130 138 Q100 150 70 138 Z" class="body-stroke"/>
+      <g class="limb"><path d="M80 58 L54 120"/><path d="M120 58 L146 120"/>
+        <path d="M86 146 L80 210"/><path d="M114 146 L120 210"/></g>
+      <g class="organ"><circle class="halo" cx="100" cy="40" r="19" fill="${c(1)}"/><circle cx="100" cy="40" r="11" fill="${c(1)}"/></g>
+      <g class="organ"><circle class="halo" cx="90" cy="96" r="20" fill="${c(0)}"/><circle cx="90" cy="96" r="12" fill="${c(0)}"/></g>
+      <g class="organ"><circle class="halo" cx="112" cy="120" r="19" fill="${c(2)}"/><circle cx="112" cy="120" r="11" fill="${c(2)}"/></g>
+      <g class="organ"><circle class="halo" cx="100" cy="168" r="19" fill="${c(3)}"/><circle cx="100" cy="168" r="11" fill="${c(3)}"/></g>
+    </svg>`;
 }
 
 function show(id) {

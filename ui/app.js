@@ -112,6 +112,88 @@ function renderDashboard() {
     el.onclick = () => openSystemModal(s);
     sys.appendChild(el);
   });
+
+  renderTwin();
+  renderBriefing();
+}
+
+// Status colour for a sub-score (schematic, from the user's own data — ADR-015).
+function statusColor(v) {
+  if (v >= 80) return "#34d399"; // good
+  if (v >= 65) return "#f6a623"; // watch
+  return "#fb7185"; // attention
+}
+
+// Anatomical digital twin — organ dots coloured by the real subsystem scores.
+function renderTwin() {
+  const byKey = Object.fromEntries(SUBSYSTEMS.map((s) => [s.subsystem, s]));
+  // organ → subsystem mapping + position on the silhouette
+  const organs = [
+    { sys: "sleep", cx: 100, cy: 40, r: 11, label: "Brain · sleep" },
+    { sys: "cardiometabolic", cx: 90, cy: 96, r: 12, label: "Heart · cardiometabolic" },
+    { sys: "inflammation", cx: 112, cy: 120, r: 11, label: "Gut · inflammation" },
+    { sys: "fitness", cx: 100, cy: 168, r: 11, label: "Legs · fitness" },
+  ];
+  const dots = organs
+    .map((o) => {
+      const s = byKey[o.sys];
+      const c = statusColor(s.value);
+      return `<g class="organ" data-sys="${o.sys}">
+        <circle class="halo" cx="${o.cx}" cy="${o.cy}" r="${o.r + 8}" fill="${c}"></circle>
+        <circle cx="${o.cx}" cy="${o.cy}" r="${o.r}" fill="${c}"></circle></g>`;
+    })
+    .join("");
+  document.getElementById("twin").innerHTML = `
+    <svg viewBox="0 0 200 230" role="img" aria-label="Body systems map">
+      <circle cx="100" cy="28" r="16" class="body-stroke"/>
+      <path d="M78 52 Q100 46 122 52 L130 138 Q100 150 70 138 Z" class="body-stroke"/>
+      <g class="limb">
+        <path d="M80 58 L54 120"/><path d="M120 58 L146 120"/>
+        <path d="M86 146 L80 210"/><path d="M114 146 L120 210"/>
+      </g>
+      ${dots}
+    </svg>
+    <div class="twin-legend">
+      <span><i style="background:#34d399"></i>good</span>
+      <span><i style="background:#f6a623"></i>watch</span>
+      <span><i style="background:#fb7185"></i>attention</span>
+    </div>`;
+  document.querySelectorAll("#twin .organ").forEach((g) => {
+    g.onclick = () => {
+      const s = SUBSYSTEMS.find((x) => x.subsystem === g.dataset.sys);
+      openSystemModal(s);
+    };
+  });
+}
+
+// Dynamic "Today" briefing — the real grounded insight from the pipeline.
+function renderBriefing() {
+  const q = QUESTIONS[0]; // ferritin
+  const out = JSON.parse(
+    analyze_json(
+      JSON.stringify({
+        concept_code: q.code,
+        records: records.filter((r) => r.code === q.code),
+        now: NOW, staleness_window_days: 365, confidence_floor: 0.5,
+        reference_low: q.lo, reference_high: q.hi, flat_band_per_day: 0.01,
+      })
+    )
+  );
+  const el = document.getElementById("briefing");
+  if (out.outcome === "answered" && out.claims?.length) {
+    const tr = out.trend;
+    const e = out.claims[0].evidence[out.claims[0].evidence.length - 1];
+    el.innerHTML = `Low ferritin may be behind your afternoon energy dips — it's ${e.value} ${e.unit}
+      and ${tr.direction === "falling" ? "trending down" : tr.direction}.
+      <span class="b-cite">${e.concept} ${e.value} ${e.unit} · ${e.source}</span>
+      <span class="b-act" id="brief-ask">See the full answer →</span>`;
+    document.getElementById("brief-ask").onclick = () => {
+      document.querySelector('.nav-item[data-view="ask"]').click();
+      runAsk();
+    };
+  } else {
+    el.textContent = "Everything looks steady today.";
+  }
 }
 
 function overallTrend() {

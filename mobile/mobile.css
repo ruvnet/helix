@@ -43,6 +43,12 @@ body {
 .score-cap { position: absolute; bottom: 4px; color: var(--ok); font-size: 13px; font-weight: 600; }
 
 .m-section-label { color: var(--muted2); font-size: 11px; letter-spacing: 1.4px; font-weight: 700; }
+.m-twin { display: grid; place-items: center; }
+.m-twin svg { width: 124px; height: auto; }
+.m-twin .body-stroke { fill: #16314a; stroke: #2b5b74; stroke-width: 1.5; }
+.m-twin .limb { stroke: #2b5b74; stroke-width: 6; stroke-linecap: round; fill: none; }
+.m-twin .organ { cursor: pointer; }
+.m-twin .halo { opacity: .18; }
 .m-systems { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .m-sys { background: #0c1828; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
 .m-sys .n { font-size: 13px; font-weight: 700; }
