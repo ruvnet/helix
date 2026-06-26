@@ -43,6 +43,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [020](ADR-020-wifi-csi-ambient-sensing.md) | WiFi-CSI Contactless Ambient Sensing (RuView backend) | Sensing / integration |
 | [021](ADR-021-genome-ingestion-rvdna.md) | User-Owned Genome Ingestion & Pharmacogenomics (rvDNA backend) | Genomics / integration |
 | [022](ADR-022-ocr-lab-ingestion.md) | OCR Lab-Document Ingestion (RuVector OCR backend) | Ingestion / integration |
+| [023](ADR-023-semantic-retrieval.md) | Semantic Retrieval over the Health Graph (RuVector HNSW/GraphRAG) | Retrieval / integration |
 
 ## Status
 

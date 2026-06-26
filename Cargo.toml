@@ -14,6 +14,7 @@ members = [
     "crates/helix-sensing",
     "crates/helix-genome",
     "crates/helix-ocr",
+    "crates/helix-retrieval",
     "crates/helix-wasm",
 ]
 

@@ -455,6 +455,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-retrieval"
+version = "0.1.0"
+dependencies = [
+ "helix-provenance",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-score"
 version = "0.1.0"
 dependencies = [

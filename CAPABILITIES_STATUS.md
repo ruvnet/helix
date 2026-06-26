@@ -23,7 +23,7 @@ from all three repos are integrated and validated.
 | 1 | WiFi-CSI ambient sensing + escalation | ruview | ADR-020 | `helix-sensing` | ✅ done |
 | 2 | Genome ingestion + pharmacogenomics (GINA-aware) | rvdna | ADR-021 | `helix-genome` | ✅ done |
 | 3 | OCR lab-PDF ingestion (connector degradation) | ruvector | ADR-022 | `helix-ocr` | ✅ done |
-| 4 | Vector / GraphRAG semantic retrieval | ruvector | ADR-023 | `helix-retrieval` | ⬜ |
+| 4 | Vector / GraphRAG semantic retrieval | ruvector | ADR-023 | `helix-retrieval` | ✅ done |
 
 ## Ledger
 - **Iter 1 (2026-06-25):** reviewed ruvector + ruview. ADR-020 (WiFi-CSI ambient sensing, RuView backend) +
@@ -44,8 +44,19 @@ from all three repos are integrated and validated.
   OcrExtraction records with confidence capped at 0.8 (below a clean feed), code=None for later ADR-004
   normalization. Unblocks the real primary lab path (Quest/Labcorp have no consumer APIs). 107 tests; clean. Pushed.
 
-## Next picks
-1. ADR-023 vector/GraphRAG semantic retrieval (ruvector HNSW) → `helix-retrieval`: similarity recall over the
-   health graph for the analyst's Retrieve step (ADR-003/005).
-2. Expose helix-sensing/genome/ocr via wasm; add live "Ambient / Genome / Import" panels in the UI; screenshots.
-3. Re-run `cargo audit` + the property-test sweep across the new crates; refresh COVERAGE.md.
+- **Iter 4 (2026-06-25):** ADR-023 (semantic retrieval, RuVector HNSW/GraphRAG) + `helix-retrieval`. The
+  retrieval contract: direct concept-code matches + vector neighbours + one graph hop, fused + recency-blended
+  (180-day half-life) + deduped + top_k. Every result carries its score AND reason (direct/vector/graph) for
+  audit (ADR-005) + verifier (ADR-008). Hard line: **retrieval is recall, not grounding** — candidates still
+  pass the grounding gate. Embedder/Index injected (RuVector at edge), pure + testable. "Why am I tired?"
+  surfaces ferritin+sleep+vitamin-D though they share no code. 112 tests; clean. Pushed.
+
+## All 4 backlog capabilities integrated ✅
+ADR-020 sensing (ruview) · ADR-021 genome (rvdna) · ADR-022 OCR (ruvector) · ADR-023 retrieval (ruvector).
+Each: ADR + tested crate + clippy/fmt clean + anti-hallucination guardrails (capped confidence, screening-not-
+diagnosis, provenance-required, recall≠grounding). Pushed to ruvnet/helix main each iteration.
+
+## Remaining polish (SOTA hardening, not new load-bearing capability)
+1. `cargo audit` re-check + property tests on the new adapters (sensing/genome/ocr/retrieval).
+2. Expose the adapters via wasm; live "Ambient / Genome / Import" UI panels + screenshots.
+3. Refresh COVERAGE.md to map ADR-020..023 → crates; then close the loop.
