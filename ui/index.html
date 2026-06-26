@@ -56,6 +56,7 @@
       </div>
       <nav class="nav">
         <button class="nav-item active" data-view="dashboard"><span class="ni-dot"></span>Dashboard</button>
+        <button class="nav-item" data-view="report"><span class="ni-dot"></span>Health report</button>
         <button class="nav-item" data-view="ask"><span class="ni-dot"></span>Ask Helix</button>
         <button class="nav-item" data-view="records"><span class="ni-dot"></span>Records</button>
         <button class="nav-item" data-view="sources"><span class="ni-dot"></span>Data sources</button>
@@ -114,6 +115,32 @@
           <div class="card briefing-card">
             <div class="card-title">Today</div>
             <div class="briefing" id="briefing">Reading your dossier…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HEALTH REPORT (full medical dashboard) -->
+      <section class="view hidden" data-view="report">
+        <div class="grid report-grid">
+          <div class="card bioage-card">
+            <div class="card-title">Biological age <span class="info" data-modal="bioage-info">ⓘ</span></div>
+            <div class="bioage" id="bioage"></div>
+          </div>
+          <div class="card timeline-card">
+            <div class="card-title">Health score over time</div>
+            <div class="timeline" id="timeline"></div>
+          </div>
+          <div class="card vitals-card">
+            <div class="card-title">Vitals & key markers</div>
+            <table class="records" id="vitals-table"><tbody id="vitals-body"></tbody></table>
+          </div>
+          <div class="card focus-card">
+            <div class="card-title">Focus areas · worth attention</div>
+            <div id="focus-list"></div>
+          </div>
+          <div class="card recs-card">
+            <div class="card-title">Updates & recommendations</div>
+            <div id="recs-list"></div>
           </div>
         </div>
       </section>

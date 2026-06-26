@@ -129,6 +129,50 @@ pub fn ocr_ingest_json(document: &str, floor: f64) -> Result<String, JsValue> {
     serde_json::to_string(&gated).map_err(err)
 }
 
+/// Biological-age estimate (ADR-034): input PhenoInputs JSON → BioAge + disclaimer.
+#[wasm_bindgen]
+pub fn bioage_json(inputs: &str) -> Result<String, JsValue> {
+    let i: helix_bioage::PhenoInputs = serde_json::from_str(inputs).map_err(err)?;
+    let b = helix_bioage::phenoage(&i).map_err(err)?;
+    serde_json::to_string(&serde_json::json!({
+        "bioage": b, "disclaimer": helix_bioage::DISCLAIMER,
+    }))
+    .map_err(err)
+}
+
+/// Focus areas (ADR-032): input `{records, now, config}` JSON → ranked focus items.
+#[wasm_bindgen]
+pub fn focus_json(payload: &str) -> Result<String, JsValue> {
+    #[derive(serde::Deserialize)]
+    struct P {
+        records: Vec<ProvRecord>,
+        now: i64,
+        #[serde(default = "default_focus_cfg")]
+        config: helix_focus::FocusConfig,
+    }
+    fn default_focus_cfg() -> helix_focus::FocusConfig {
+        helix_focus::FocusConfig::default()
+    }
+    let p: P = serde_json::from_str(payload).map_err(err)?;
+    let items = helix_focus::select_focus(&p.records, p.now, &p.config);
+    serde_json::to_string(&items).map_err(err)
+}
+
+/// Score timeline (ADR-031): input `{snapshots, flat_band}` JSON → versioned
+/// ScorePoints + trend + change-point.
+#[wasm_bindgen]
+pub fn timeline_json(payload: &str) -> Result<String, JsValue> {
+    #[derive(serde::Deserialize)]
+    struct P {
+        snapshots: Vec<helix_timeline::Snapshot>,
+        #[serde(default)]
+        flat_band: f64,
+    }
+    let p: P = serde_json::from_str(payload).map_err(err)?;
+    let tl = helix_timeline::build_timeline(p.snapshots, p.flat_band).map_err(err)?;
+    serde_json::to_string(&tl).map_err(err)
+}
+
 /// Crate version string for the UI footer / diagnostics.
 #[wasm_bindgen]
 pub fn version() -> String {

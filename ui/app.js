@@ -8,6 +8,9 @@ import init, {
   version,
   sensing_reading_json,
   genome_profile_json,
+  bioage_json,
+  focus_json,
+  timeline_json,
 } from "./pkg/helix.js";
 
 const DAY = 86_400_000;
@@ -64,6 +67,7 @@ async function boot() {
   renderAskChips();
   renderRecords();
   renderSources();
+  renderReport();
   wireNav();
   wireModals();
 
@@ -80,6 +84,8 @@ async function boot() {
   } else if (h === "#genome") {
     document.querySelector('.nav-item[data-view="sources"]').click();
     runGenomeDemo();
+  } else if (h === "#report") {
+    document.querySelector('.nav-item[data-view="report"]').click();
   }
 }
 
@@ -306,6 +312,89 @@ function renderSources() {
   });
 }
 
+// ---- Health report (full medical dashboard: bio-age, timeline, vitals, focus, recs) ----
+function renderReport() {
+  // Bio-age (ADR-034) — real PhenoAge from a sample routine panel.
+  const pheno = {
+    albumin_g_l: 47, creatinine_umol_l: 80, glucose_mmol_l: 5.0, crp_mg_dl: 0.5,
+    lymphocyte_pct: 30, mcv_fl: 90, rdw_pct: 13, alk_phosphatase_u_l: 70,
+    wbc_1000_ul: 5.5, age_years: 50,
+  };
+  const ba = JSON.parse(bioage_json(JSON.stringify(pheno))).bioage;
+  const delta = ba.delta_years;
+  const younger = delta < 0;
+  document.getElementById("bioage").innerHTML = `
+    <div class="ba-num">${ba.phenoage_years.toFixed(1)}<small style="font-size:16px;color:var(--muted2)"> yrs</small></div>
+    <div class="ba-delta ${younger ? "younger" : "older"}">${younger ? "▼" : "▲"} ${Math.abs(delta).toFixed(1)} yrs ${younger ? "younger" : "older"} than your age (${ba.chronological_years})</div>
+    <div class="ba-sub">Estimate from routine labs (PhenoAge) — not a diagnosis</div>`;
+
+  // Timeline (ADR-031) — score over time from dated snapshots.
+  const snap = (d, v) => ({
+    at: NOW - d * DAY,
+    subscores: [{ subsystem: "sleep", value: v, weight: 1, confidence: 0.9,
+      drivers: [{ concept: "composite", points: v, trend: "stable", source_record: "r" }], trend: "stable" }],
+  });
+  const tl = JSON.parse(timeline_json(JSON.stringify({
+    snapshots: [snap(180, 71), snap(140, 69), snap(100, 73), snap(60, 78), snap(20, 76), snap(0, 82)],
+    flat_band: 0.001,
+  })));
+  document.getElementById("timeline").innerHTML = sparkline(tl);
+
+  // Vitals & key markers — latest value per concept from the dossier.
+  const byCode = {};
+  records.forEach((r) => { if (!byCode[r.code] || r.measured_at > byCode[r.code].measured_at) byCode[r.code] = r; });
+  document.getElementById("vitals-body").innerHTML = Object.values(byCode).map((r) => {
+    const out = r.value < r.reference_range.low ? "low" : r.value > r.reference_range.high ? "high" : "ok";
+    const col = out === "ok" ? "var(--ok)" : out === "low" ? "var(--vital2)" : "var(--warm)";
+    return `<tr><td>${r.concept}</td><td><b>${r.value}</b> ${r.unit}</td>
+      <td class="muted">${r.reference_range.low}–${r.reference_range.high}</td>
+      <td style="color:${col};font-weight:700">${out.toUpperCase()}</td></tr>`;
+  }).join("");
+
+  // Focus areas (ADR-032) — real rules over the records.
+  const focus = JSON.parse(focus_json(JSON.stringify({ records, now: NOW })));
+  const fl = document.getElementById("focus-list");
+  fl.innerHTML = focus.length ? focus.map((f) =>
+    `<div class="focus-item"><span class="focus-dot fd-${f.severity}"></span>
+      <div><div class="fi-msg">${f.message}</div>
+      <div class="fi-cite">${f.reason.replace("_", " ")} · ${f.cites.length} reading(s)</div></div></div>`).join("")
+    : `<div class="report-empty">Nothing needs attention right now.</div>`;
+
+  // Updates & recommendations (ADR-033) — grounded, evidence-tiered.
+  const ans = JSON.parse(analyze_json(JSON.stringify({
+    concept_code: "2276-4", records: records.filter((r) => r.code === "2276-4"),
+    now: NOW, staleness_window_days: 365, confidence_floor: 0.5,
+    reference_low: 30, reference_high: 400, flat_band_per_day: 0.01,
+  })));
+  const recs = [];
+  if (ans.outcome === "answered" && ans.recommendation)
+    recs.push({ tier: "TIER 1 · YOUR DATA", text: ans.recommendation.text });
+  focus.forEach((f) => recs.push({ tier: "TIER 1 · YOUR DATA", text: f.message }));
+  document.getElementById("recs-list").innerHTML = recs.length ? recs.map((r) =>
+    `<div class="rec-item"><span class="rec-tier">${r.tier}</span>${r.text}</div>`).join("")
+    : `<div class="report-empty">No new recommendations — everything's steady.</div>`;
+}
+
+// Render a small SVG sparkline for the score timeline.
+function sparkline(tl) {
+  const pts = tl.points;
+  const w = 520, h = 90, pad = 6;
+  const xs = pts.map((p) => p.at), ys = pts.map((p) => p.value);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const sx = (x) => pad + ((x - x0) / (x1 - x0 || 1)) * (w - 2 * pad);
+  const sy = (y) => h - pad - ((y - 40) / 60) * (h - 2 * pad); // 40..100 range
+  const line = pts.map((p, i) => `${i ? "L" : "M"}${sx(p.at).toFixed(1)},${sy(p.value).toFixed(1)}`).join(" ");
+  const area = `${line} L${sx(x1).toFixed(1)},${h - pad} L${sx(x0).toFixed(1)},${h - pad} Z`;
+  const dots = pts.map((p) => `<circle class="tl-dot" cx="${sx(p.at).toFixed(1)}" cy="${sy(p.value).toFixed(1)}" r="3"/>`).join("");
+  const cp = tl.change_point_at ? `<line class="tl-cp" x1="${sx(tl.change_point_at).toFixed(1)}" y1="${pad}" x2="${sx(tl.change_point_at).toFixed(1)}" y2="${h - pad}"/>` : "";
+  const dir = { rising: "▲ improving", falling: "▼ slipping", flat: "→ steady" }[tl.direction] || "";
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <defs><linearGradient id="tlg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34e0c4"/><stop offset="1" stop-color="#34e0c4" stop-opacity="0"/></linearGradient></defs>
+    <path class="tl-area" d="${area}"/><path class="tl-line" d="${line}"/>${cp}${dots}
+  </svg><div class="tl-cap">${dir} · ${pts.length} points${tl.change_point_at ? " · change-point detected" : ""}</div>`;
+}
+
 // Run a sample RuView WiFi-CSI reading through the real wasm adapter (ADR-020).
 function runSensingDemo() {
   const reading = {
@@ -359,6 +448,7 @@ function runGenomeDemo() {
 function wireNav() {
   const titles = {
     dashboard: ["Dashboard", "Your body, assembled into one living dossier."],
+    report: ["Health report", "Score over time, vitals, focus areas, and your biological age."],
     ask: ["Ask Helix", "Answered only from your data — with citations."],
     records: ["Records", "Every value, sourced and dated."],
     sources: ["Data sources", "Connect everything; it just works."],
@@ -382,6 +472,17 @@ function wireModals() {
   document.getElementById("open-guide").onclick = () => openModal(guideModal());
   document.getElementById("open-score-breakdown").onclick = () => openModal(breakdownModal());
   document.querySelectorAll("[data-modal='score-info']").forEach((el) => (el.onclick = () => openModal(scoreInfoModal())));
+  document.querySelectorAll("[data-modal='bioage-info']").forEach((el) => (el.onclick = () => openModal(bioageInfoModal())));
+}
+
+function bioageInfoModal() {
+  return `<h2>About biological age</h2>
+    <p>Computed with the peer-reviewed <b>PhenoAge</b> algorithm (Levine et al., 2018) from <b>9 routine
+    blood markers</b> + your age — no special test required.</p>
+    <p>It's an <b>estimate of how your labs compare to typical aging — not a measurement and not a
+    diagnosis</b>. The headline is the <i>difference</i> from your calendar age; it's population-derived
+    (ancestry-dependent). Discuss with a clinician.</p>
+    <p class="muted" style="font-size:12.5px;margin-top:10px">Computed deterministically in Rust/WASM (helix-bioage, ADR-034).</p>`;
 }
 function openModal(html) {
   document.getElementById("modal-content").innerHTML = html;

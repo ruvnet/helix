@@ -3,15 +3,25 @@
 
 /**
  * Run the grounded-answer pipeline. Input: an [`AnalyzePayload`] as JSON.
- * Output: a `helix_core::AnswerOutcome` as JSON (`abstained` or `answered`).
+ * Output: a `helix_pipeline::AnswerOutcome` as JSON (`abstained` or `answered`).
  */
 export function analyze_json(payload: string): string;
+
+/**
+ * Biological-age estimate (ADR-034): input PhenoInputs JSON → BioAge + disclaimer.
+ */
+export function bioage_json(inputs: string): string;
 
 /**
  * Compose a decomposable 0–100 health score. Input: an array of `SubScore` as
  * JSON. Output: a `HealthScore` as JSON.
  */
 export function compose_score_json(subscores: string): string;
+
+/**
+ * Focus areas (ADR-032): input `{records, now, config}` JSON → ranked focus items.
+ */
+export function focus_json(payload: string): string;
 
 /**
  * Ingest a user-owned genome profile (ADR-021): returns `{records, advisories}` —
@@ -50,6 +60,12 @@ export function redflag_registry_version(): string;
 export function sensing_reading_json(reading: string): string;
 
 /**
+ * Score timeline (ADR-031): input `{snapshots, flat_band}` JSON → versioned
+ * ScorePoints + trend + change-point.
+ */
+export function timeline_json(payload: string): string;
+
+/**
  * Crate version string for the UI footer / diagnostics.
  */
 export function version(): string;
@@ -59,13 +75,16 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly analyze_json: (a: number, b: number) => [number, number, number, number];
+    readonly bioage_json: (a: number, b: number) => [number, number, number, number];
     readonly compose_score_json: (a: number, b: number) => [number, number, number, number];
+    readonly focus_json: (a: number, b: number) => [number, number, number, number];
     readonly genome_profile_json: (a: number, b: number) => [number, number, number, number];
     readonly neural_disclaimer: () => [number, number];
     readonly neural_session_to_records_json: (a: number, b: number) => [number, number, number, number];
     readonly ocr_ingest_json: (a: number, b: number, c: number) => [number, number, number, number];
     readonly redflag_registry_version: () => [number, number];
     readonly sensing_reading_json: (a: number, b: number) => [number, number, number, number];
+    readonly timeline_json: (a: number, b: number) => [number, number, number, number];
     readonly version: () => [number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;

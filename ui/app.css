@@ -127,6 +127,34 @@ body {
   background: #0e2417; border: 1px solid #2e7d5b; color: #7fe9cf; margin-top: 8px; }
 .disclaimer { color: var(--muted2); font-size: 11.5px; margin-top: 10px; }
 
+/* Health report */
+.report-grid { grid-template-columns: 1fr 1.4fr; }
+.bioage-card, .timeline-card { min-height: 150px; }
+.bioage { text-align: center; padding: 6px 0; }
+.bioage .ba-num { font-size: 44px; font-weight: 800; }
+.bioage .ba-delta { font-size: 15px; font-weight: 700; margin-top: 2px; }
+.bioage .ba-delta.younger { color: var(--ok); } .bioage .ba-delta.older { color: var(--warm); }
+.bioage .ba-sub { color: var(--muted2); font-size: 12px; margin-top: 8px; }
+.timeline svg { width: 100%; height: 96px; }
+.timeline .tl-line { fill: none; stroke: url(#g); stroke-width: 2.5; }
+.timeline .tl-area { fill: url(#tlg); opacity: .25; }
+.timeline .tl-dot { fill: var(--vital); }
+.timeline .tl-cp { stroke: var(--warm); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.timeline .tl-cap { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.vitals-card, .focus-card, .recs-card { grid-column: span 1; }
+.recs-card, .focus-card { grid-column: 1 / -1; }
+.focus-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #14233a; }
+.focus-item:last-child { border: 0; }
+.focus-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; flex: 0 0 auto; }
+.fd-elevated { background: var(--danger); } .fd-watch { background: var(--warm); } .fd-info { background: var(--vital); }
+.focus-item .fi-msg { font-size: 13.5px; line-height: 1.45; }
+.focus-item .fi-cite { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--muted2); margin-top: 3px; }
+.rec-item { padding: 10px 0; border-bottom: 1px solid #14233a; font-size: 13.5px; }
+.rec-item:last-child { border: 0; }
+.rec-tier { display: inline-block; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px;
+  background: #0e2417; border: 1px solid #2e7d5b; color: #7fe9cf; margin-right: 8px; }
+.report-empty { color: var(--muted); }
+
 /* Records */
 .records { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .records th { text-align: left; color: var(--muted2); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: 12px; }

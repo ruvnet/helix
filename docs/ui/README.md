@@ -13,6 +13,9 @@ grounded answer comes from the audited Rust crates.
 ### Dashboard — a score you can open, a body you can tap
 [![Helix dashboard](./screenshots/dashboard.png)](https://ruvnet.github.io/helix/ui/)
 
+### Health report — score over time, vitals, focus areas, biological age
+[![Helix health report](./screenshots/health-report.png)](https://ruvnet.github.io/helix/ui/#report)
+
 ### Ask Helix — grounded, cited answers (or an honest abstention)
 [![Helix grounded answer](./screenshots/answer.png)](https://ruvnet.github.io/helix/ui/#ask)
 

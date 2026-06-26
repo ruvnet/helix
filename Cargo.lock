@@ -696,8 +696,10 @@ dependencies = [
 name = "helix-wasm"
 version = "0.1.0"
 dependencies = [
+ "helix-bioage",
  "helix-escalation",
  "helix-evidence",
+ "helix-focus",
  "helix-genome",
  "helix-neural",
  "helix-numeric",
@@ -707,6 +709,7 @@ dependencies = [
  "helix-provenance",
  "helix-score",
  "helix-sensing",
+ "helix-timeline",
  "serde",
  "serde_json",
  "wasm-bindgen",
