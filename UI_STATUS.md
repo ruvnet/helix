@@ -41,10 +41,15 @@ session→ProvRecord mapping). Do NOT claim clinical/therapeutic effect — rese
   in-browser (analyze_json/compose_score_json), pkg committed at `ui/pkg` (169KB wasm). `.cargo/config.toml`
   fixes the mold-linker-vs-rust-lld clash for wasm. 3 native binding tests green.
 
+- **Iter 2 (2026-06-25):** Web management UI built (`ui/index.html` + `app.css` + `app.js`) — modern dark
+  console: dashboard (decomposable score ring + body systems), Ask Helix (grounded/abstain/escalate from the
+  real wasm pipeline), Records, Data sources (incl. Cognitum Seed + ruv-neural cards), modals (score info,
+  breakdown, system detail, add-record), step-by-step onboarding guide. **Validated in Chrome against live
+  WASM:** score=76 from compose_score_json; grounded ferritin answer with 3 citations + deterministic trend
+  "−38% vs first reading · crossed reference range"; guide modal renders. `docs/ui/README.md` walkthrough.
+
 ## Next picks
-1. Web UI: dashboard (health score ring + body systems), Ask panel (grounded answer/abstain/escalate),
-   Records modal, onboarding guide. Loads `ui/pkg/helix.js`.
-2. Serve locally; /browser screenshot + validate interactions (real wasm pipeline).
-3. `helix-neural` crate: ruv-neural session evidence → ProvRecords (the integration request).
-4. Mobile PWA: manifest, service worker, mobile layout; /browser mobile-viewport screenshot.
-5. docs/ui walkthrough with screenshots; final validation sweep; close loop.
+1. `helix-neural` crate: ruv-neural session evidence → ProvRecords (the integration request) + a "Neuro" subsystem.
+2. Mobile PWA: manifest, service worker, mobile-first layout reusing the wasm; /browser mobile-viewport screenshot.
+3. Validate abstain + escalate outcomes in-browser; capture screenshots into docs/ui/.
+4. Final validation sweep; close loop.

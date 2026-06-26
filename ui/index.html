@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B1322" />
+  <title>Helix — Personal Health Intelligence · Console</title>
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="helix-mark" aria-hidden="true"></span>
+        <div>
+          <div class="brand-name">HELIX</div>
+          <div class="brand-sub">Health Intelligence</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard"><span class="ni-dot"></span>Dashboard</button>
+        <button class="nav-item" data-view="ask"><span class="ni-dot"></span>Ask Helix</button>
+        <button class="nav-item" data-view="records"><span class="ni-dot"></span>Records</button>
+        <button class="nav-item" data-view="sources"><span class="ni-dot"></span>Data sources</button>
+      </nav>
+      <button class="guide-btn" id="open-guide">Step-by-step guide</button>
+      <div class="engine-pill" id="engine-pill" title="WebAssembly engine status">
+        <span class="dot"></span><span id="engine-text">loading engine…</span>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="view-title">Dashboard</h1>
+          <p class="muted" id="view-sub">Your body, assembled into one living dossier.</p>
+        </div>
+        <div class="chips">
+          <span class="chip ok">private</span>
+          <span class="chip ok">hallucination-free</span>
+          <span class="chip warm">visual</span>
+        </div>
+      </header>
+
+      <!-- DASHBOARD -->
+      <section class="view" data-view="dashboard">
+        <div class="grid">
+          <div class="card score-card">
+            <div class="score-ring" id="score-ring">
+              <svg viewBox="0 0 120 120" width="160" height="160">
+                <circle cx="60" cy="60" r="52" class="ring-bg"></circle>
+                <circle cx="60" cy="60" r="52" class="ring-fg" id="ring-fg"></circle>
+              </svg>
+              <div class="score-num"><span id="score-value">—</span><small>/100</small></div>
+            </div>
+            <div class="score-meta">
+              <div class="score-label">Health score <span class="info" data-modal="score-info">ⓘ</span></div>
+              <div class="score-trend" id="score-trend">tap to see what drives it</div>
+              <button class="link" id="open-score-breakdown">View breakdown →</button>
+            </div>
+          </div>
+
+          <div class="card systems-card">
+            <div class="card-title">Body systems · tap a card</div>
+            <div class="systems" id="systems"></div>
+          </div>
+
+          <div class="card briefing-card">
+            <div class="card-title">Today</div>
+            <div class="briefing" id="briefing">Run "Ask Helix" to generate a grounded, cited insight from your records.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ASK -->
+      <section class="view hidden" data-view="ask">
+        <div class="ask-shell">
+          <div class="ask-input">
+            <label class="muted">Pick a question — answered <b>only</b> from your data, with citations.</label>
+            <div class="ask-chips" id="ask-chips"></div>
+            <button class="primary" id="run-ask">Ask Helix</button>
+          </div>
+          <div class="answer" id="answer">
+            <div class="answer-empty">Your answer will appear here — grounded, evidence-tiered, and traceable to your own records. If the data is missing or stale, Helix says so instead of guessing.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECORDS -->
+      <section class="view hidden" data-view="records">
+        <div class="card">
+          <div class="card-title">Records in this session <button class="link" id="add-record">+ Add record</button></div>
+          <table class="records" id="records-table">
+            <thead><tr><th>Concept</th><th>Value</th><th>Date</th><th>Source</th><th>Range</th></tr></thead>
+            <tbody id="records-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SOURCES -->
+      <section class="view hidden" data-view="sources">
+        <div class="grid sources-grid" id="sources-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal host -->
+  <div class="modal-host hidden" id="modal-host">
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
