@@ -69,6 +69,20 @@ fn main() {
         ),
     ];
 
+    // Helix's REAL shipping defaults (what the UI/pipeline actually uses today).
+    let shipping = Params {
+        confidence_floor: 0.5,
+        staleness_window_days: 365,
+        flat_band_per_day: 0.01,
+    };
+    let ship_fit = fitness(&shipping, &cases, &reg);
+    let ship_res = evolve(shipping, &Bounds::default(), &cases, &reg, 300, 42);
+    println!(
+        "REAL DEFAULTS {shipping:?}\n  fitness {:.2}  ->  evolved fitness {:.2}  (improvement +{:.2})\n  evolved: {:?}\n",
+        ship_fit.score, ship_res.best_fitness.score, ship_res.improvement(), ship_res.best_params
+    );
+
+    // A deliberately-bad strawman baseline, to demonstrate the mechanism can move.
     let baseline = Params {
         confidence_floor: 0.5,
         staleness_window_days: 365,
