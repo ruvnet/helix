@@ -66,12 +66,12 @@ body {
 .score-ring svg { transform: rotate(-90deg); }
 .ring-bg { fill: none; stroke: #1e3450; stroke-width: 10; }
 .ring-fg { fill: none; stroke: url(#g); stroke-width: 10; stroke-linecap: round;
-  stroke: var(--vital); stroke-dasharray: 327; stroke-dashoffset: 327; transition: stroke-dashoffset 1s ease; }
+  stroke-dasharray: 327; stroke-dashoffset: 327; transition: stroke-dashoffset 1s ease; }
 .score-num { position: absolute; text-align: center; }
 .score-num span { font-size: 40px; font-weight: 800; }
 .score-num small { color: var(--muted2); font-size: 12px; display: block; }
 .score-label { font-weight: 700; font-size: 14px; }
-.score-trend { color: var(--ok); font-size: 13px; margin: 6px 0 10px; }
+.score-trend { color: var(--ok); font-size: 13px; margin: 6px 0 10px; white-space: nowrap; }
 .info { cursor: pointer; color: var(--vital2); font-size: 13px; }
 .link { background: 0; border: 0; color: var(--vital2); cursor: pointer; font-weight: 700; font-size: 13px; padding: 0; }
 
@@ -163,7 +163,24 @@ body {
 
 @media (max-width: 880px) {
   #app { grid-template-columns: 1fr; }
-  .sidebar { flex-direction: row; flex-wrap: wrap; align-items: center; }
-  .guide-btn { margin: 0; }
+  /* Sidebar becomes a clean horizontal top bar (brand · nav pills · guide). */
+  .sidebar { flex-direction: row; align-items: center; gap: 12px;
+    padding: 10px 14px; border-right: 0; border-bottom: 1px solid var(--line);
+    overflow-x: auto; position: sticky; top: 0; z-index: 10;
+    background: #0a1018; }
+  .brand { flex: 0 0 auto; }
+  .brand-sub { display: none; }
+  .nav { flex-direction: row; margin: 0; gap: 4px; flex: 1; min-width: 0; }
+  .nav-item { white-space: nowrap; padding: 8px 12px; }
+  .guide-btn { margin: 0; white-space: nowrap; flex: 0 0 auto; padding: 9px 12px; }
+  .engine-pill { display: none; }
+  .topbar { flex-direction: column; gap: 12px; align-items: flex-start; }
   .grid, .ask-shell, .sources-grid { grid-template-columns: 1fr; }
+  .main { padding: 20px 16px 48px; }
+  .twin-card { order: 3; }
+}
+@media (max-width: 560px) {
+  .chips { display: none; }
+  .topbar h1 { font-size: 21px; }
+  .score-card { flex-direction: column; text-align: center; }
 }
