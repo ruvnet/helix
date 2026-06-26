@@ -360,6 +360,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-cohort"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-core"
 version = "0.1.0"
 dependencies = [

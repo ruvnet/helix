@@ -44,6 +44,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [021](ADR-021-genome-ingestion-rvdna.md) | User-Owned Genome Ingestion & Pharmacogenomics (rvDNA backend) | Genomics / integration |
 | [022](ADR-022-ocr-lab-ingestion.md) | OCR Lab-Document Ingestion (RuVector OCR backend) | Ingestion / integration |
 | [023](ADR-023-semantic-retrieval.md) | Semantic Retrieval over the Health Graph (RuVector HNSW/GraphRAG) | Retrieval / integration |
+| [024](ADR-024-privacy-preserving-cohort.md) | Privacy-Preserving Cohort Feature Extraction (federation primitive) | Privacy / federation |
 
 ## Status
 

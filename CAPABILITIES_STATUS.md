@@ -60,3 +60,10 @@ diagnosis, provenance-required, recall≠grounding). Pushed to ruvnet/helix main
 1. `cargo audit` re-check + property tests on the new adapters (sensing/genome/ocr/retrieval).
 2. Expose the adapters via wasm; live "Ambient / Genome / Import" UI panels + screenshots.
 3. Refresh COVERAGE.md to map ADR-020..023 → crates; then close the loop.
+
+- **Iter 6 (2026-06-26):** ADR-024 (privacy-preserving cohort feature extraction — the ADR-011 federation
+  primitive) + `helix-cohort`: generalize → cell-suppression (local k-anonymity proxy) → Laplace DP noise
+  (ε budget split across features) → refuse-when-nothing-safe. Genomic features excluded by default
+  (ADR-021/GINA); quasi-identifiers need a 2k cell; injected NoiseSource (CSPRNG in prod, deterministic in
+  tests). Elevates ADR-011 from documented-N/A to "the hard anonymization primitive is built + tested".
+  119 tests green; clippy+fmt clean. Pushed.

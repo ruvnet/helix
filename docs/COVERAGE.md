@@ -23,7 +23,7 @@ remains the specification and the table notes the interface seam.
 | 008 | Verifier/critic + swarm consensus | ✅ Implemented | `helix-verifier` |
 | 009 | Red-flag escalation & clinician-in-the-loop | ✅ Implemented | `helix-escalation` + `helix-core` |
 | 010 | Wellness positioning vs. SaMD boundary | ✅ Encoded as policy | non-diagnostic framing enforced in `helix-escalation` (screening language) + `helix-score` (disclaimer) |
-| 011 | Federation for opt-in PII-stripped cohort intel | ⬜ N/A (networked) | spec-only; raw records never leave the vault (`helix-vault` is the boundary it builds on) |
+| 011 | Federation for opt-in PII-stripped cohort intel | ◑ Privacy primitive implemented | `helix-cohort` (ADR-024: generalize + cell-suppression + DP); network transport still out of scope |
 | 012 | Connector abstraction with graceful degradation | ◑ Interface modeled | `helix-ontology` review-queue is the un-mappable seam; live connectors are I/O-bound integration work |
 | 013 | On-device inference where feasible | ✅ Boundary implemented | `helix-vault` (local key custody); model routing in `helix-core` seam + ADR-019 |
 | 014 | Ambient passive sensing (Cognitum Seed, mmWave) | ◑ Signal modeled | screening-grade thresholds in `helix-escalation` (`SEED-REI`); radar firmware is hardware-bound |
@@ -52,7 +52,7 @@ provenance-required, recall≠grounding.
 ## Tally
 - **Fully implemented + tested crates:** 001, 004, 005, 006, 007, 008, 009, 010, 013, 016, **020, 021, 022, 023** (14)
 - **Core/seam modeled here:** 002, 003, 012, 014, 018, 019 (6)
-- **Documented N/A (client/hardware/networked):** 011, 015, 017 (3)
+- **Documented N/A (client/hardware/networked):** 015, 017 (2) — 011's privacy primitive is now built (`helix-cohort`, ADR-024)
 
 Every ADR is accounted for: a crate, a modeled seam, or a documented out-of-scope rationale.
 15 crates · 112 tests · `cargo audit` clean (130 deps) · the four ruvnet-ecosystem integrations are
