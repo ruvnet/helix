@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#070b14" />
+  <title>Helix — Personal Health Intelligence · private, grounded, visual</title>
+
+  <meta name="description" content="Helix assembles every health record, signal, and result into one private, local-first dossier — and answers questions only from your own data, with citations. Anti-hallucination by architecture, built in Rust + WebAssembly on the ruvnet stack." />
+  <meta name="keywords" content="personal health intelligence, health records, anti-hallucination, local-first, privacy, Rust, WebAssembly, RuVector, Ruflo, health AI, grounded AI, digital twin, FHIR, LOINC" />
+  <meta name="author" content="ISO Vision LLC" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://ruvnet.github.io/helix/" />
+  <link rel="icon" type="image/svg+xml" href="./mobile/icon.svg" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Helix" />
+  <meta property="og:title" content="Helix — Personal Health Intelligence" />
+  <meta property="og:description" content="Your entire body — every record, signal, and result — assembled into one private, grounded, visual dossier. Built so it can't make things up." />
+  <meta property="og:url" content="https://ruvnet.github.io/helix/" />
+  <meta property="og:image" content="https://ruvnet.github.io/helix/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Helix — Personal Health Intelligence" />
+  <meta name="twitter:description" content="Private, local-first, anti-hallucination personal health intelligence. Every answer grounded in your own data, with citations." />
+  <meta name="twitter:image" content="https://ruvnet.github.io/helix/og-image.png" />
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Helix — Personal Health Intelligence","applicationCategory":"HealthApplication","operatingSystem":"Web (WASM)","description":"Private, local-first, anti-hallucination personal health intelligence platform. Grounded answers from the user's own data, with citations.","offers":{"@type":"Offer","price":"0"}}
+  </script>
+
+  <style>
+    :root { --bg:#070b14; --text:#eaf2ff; --muted:#9db0cc; --vital:#34e0c4; --vital2:#38bdf8; --line:#1c2c45; }
+    *{box-sizing:border-box} html,body{margin:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--text);
+      background:radial-gradient(1200px 600px at 80% -10%,#10233a 0%,var(--bg) 55%);min-height:100vh}
+    .wrap{max-width:1040px;margin:0 auto;padding:64px 24px 80px}
+    .eyebrow{color:#7d8fae;letter-spacing:3px;font-size:13px;font-weight:700}
+    h1{font-size:54px;margin:14px 0 6px;letter-spacing:-1px}
+    .tag{font-size:20px;background:linear-gradient(90deg,var(--vital),var(--vital2));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+    .lede{color:var(--muted);font-size:17px;max-width:620px;line-height:1.6;margin:18px 0 26px}
+    .cta{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{padding:13px 22px;border-radius:12px;font-weight:800;text-decoration:none;font-size:15px}
+    .btn.primary{background:linear-gradient(135deg,var(--vital),var(--vital2));color:#04121a}
+    .btn.ghost{background:#11203a;color:var(--text);border:1px solid #26415f}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0}
+    .chip{font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;border:1px solid #235066;background:#0e2030;color:#7fe9d6}
+    .shot{margin-top:42px;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .shot img{display:block;width:100%}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:42px}
+    .feat{background:#0e1726;border:1px solid var(--line);border-radius:14px;padding:18px}
+    .feat h3{margin:0 0 6px;font-size:16px} .feat p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+    footer{color:#56708f;font-size:13px;margin-top:50px;border-top:1px solid var(--line);padding-top:20px}
+    @media(max-width:760px){h1{font-size:38px}.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="eyebrow">ISO VISION LLC · BUILT ON THE ruvnet STACK</div>
+    <h1>HELIX</h1>
+    <div class="tag">Personal Health Intelligence</div>
+    <p class="lede">Your entire body — every record, signal, and result — assembled into one
+      <b>private, local-first dossier</b>, with a multi-agent analyst on top that answers
+      <b>only from your own data, with citations</b>. Anti-hallucination by architecture,
+      built in Rust and compiled to WebAssembly.</p>
+
+    <div class="cta">
+      <a class="btn primary" href="./ui/">▶ Open the console</a>
+      <a class="btn ghost" href="./mobile/">📱 Mobile app</a>
+      <a class="btn ghost" href="https://github.com/ruvnet/helix">★ GitHub</a>
+    </div>
+
+    <div class="chips">
+      <span class="chip">private</span><span class="chip">hallucination-free</span>
+      <span class="chip">continual</span><span class="chip">visual</span>
+      <span class="chip">Rust + WASM</span><span class="chip">local-first</span>
+    </div>
+
+    <div class="shot"><img src="./og-image.png" alt="Helix management console — dashboard with a decomposable health score and body systems" /></div>
+
+    <div class="grid">
+      <div class="feat"><h3>Grounded, never invented</h3><p>Every claim resolves to a stored record with source, date, units, and a reference range. No backing datum → no claim.</p></div>
+      <div class="feat"><h3>It says "I don't know"</h3><p>Missing or stale data triggers an honest gap notice instead of a guess — abstention is a feature.</p></div>
+      <div class="feat"><h3>Deterministic numbers</h3><p>Trends, deltas, and range crossings are computed in Rust, not by an LLM. The math is reproducible.</p></div>
+      <div class="feat"><h3>Red-flag safety</h3><p>Dangerous values suppress optimization and route to "see a clinician now." Screening, not diagnosis.</p></div>
+      <div class="feat"><h3>Your keys, your vault</h3><p>The canonical corpus is encrypted with a key only you hold. The company can't read or sell it.</p></div>
+      <div class="feat"><h3>One engine, every surface</h3><p>The console and the mobile app run the same audited Rust crates compiled to WebAssembly.</p></div>
+    </div>
+
+    <footer>
+      Helix is a decision-support and wellness tool — not a diagnostic authority, and not medical or legal advice.
+      © ISO Vision LLC. Source: <a href="https://github.com/ruvnet/helix" style="color:#6fd3f2">github.com/ruvnet/helix</a>.
+    </footer>
+  </main>
+</body>
+</html>
