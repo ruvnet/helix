@@ -17,4 +17,5 @@ getrandom = "0.2"
 zeroize = { version = "1", features = ["derive"] }
 
 [dev-dependencies]
+proptest.workspace = true
 serde_json.workspace = true

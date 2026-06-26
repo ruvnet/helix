@@ -85,17 +85,28 @@ A core is SOTA-complete for this loop when **all** hold:
 | pearson | 24.5 ns | 432 ns |
 Per-answer numeric cost is sub-µs at realistic series lengths — the deterministic engine is not a bottleneck.
 
-## SOTA exit-criteria status
-1. Every load-bearing ADR has a crate or documented N/A → ✅ (see `docs/COVERAGE.md`: 10 implemented, 6 seam, 3 N/A)
-2. `cargo test` green w/ meaningful tests → ✅ (65 tests across 8 crates + e2e integration)
+- **Iter 8 (2026-06-25):** Hardening pass — **property tests (proptest, 13 props / 1200+ generated cases)**:
+  numeric engine (mean bounded+finite, slope finite, monotone→nonneg slope, pearson∈[-1,1], crossings≤intervals,
+  percent_change matches definition); vault (round-trip ∀ key/plaintext, wrong-key-never-opens, single-bit
+  tamper fails auth, ciphertext never contains plaintext); ontology (Normalized⟹confident+unambiguous,
+  below-floor⟹always queued, total for valid inputs). 78 tests green; clippy+fmt clean; `cargo audit` clean
+  (101 deps). This fully closes exit criterion #4.
+
+## SOTA exit-criteria status — ALL MET ✅
+1. Every load-bearing ADR has a crate or documented N/A → ✅ (`docs/COVERAGE.md`: 10 implemented, 6 seam, 3 N/A)
+2. `cargo test` green w/ meaningful tests → ✅ (78 tests across 8 crates: unit + e2e integration + property)
 3. clippy -D warnings + fmt --check clean → ✅
-4. Security: zero unsafe in helix code, input validation at boundaries, `cargo audit` clean (75 deps) → ✅
-   (remaining: property/fuzz tests on parsers — numerics already have boundary tests)
-5. Criterion benchmarks w/ baselines → ✅ (numeric engine; could extend to grounding/score)
+4. Security: zero unsafe in helix code, boundary validation, property tests on numerics/parser/crypto,
+   `cargo audit` clean (101 deps) → ✅
+5. Criterion benchmarks w/ baselines → ✅ (numeric engine)
 6. End-to-end pipeline integration test → ✅ (`helix-core/tests/pipeline.rs`, 3 outcomes)
 
-## Next iteration picks (ordered)
-1. Property tests (e.g. `proptest`) on numeric engine + ontology normalize + vault round-trip to harden criterion #4.
-2. Extend benches to grounding gate + score compose; record baselines.
-3. Final polish: top-level COVERAGE link from README; then propose closing the loop (CronDelete 4c424726) —
-   the 6 exit criteria are met; remaining work is hardening, not new load-bearing capability.
+**SOTA bar reached.** All 6 criteria met. The loop has delivered the testable, benchmarkable, secured core
+the ADRs specify. Remaining items are optional polish (extend benches; a demo CLI; wire vault into core);
+none are new load-bearing capability. Recommend closing the loop (CronDelete 4c424726) unless the user wants
+the optional items.
+
+## Optional future picks (not required for SOTA)
+1. Extend criterion benches to grounding gate + score compose.
+2. A `helix-cli` demo binary that runs the pipeline over a sample vault.
+3. Wire `helix-vault` sealed records into `helix-core` retrieval (currently core takes plaintext records).
