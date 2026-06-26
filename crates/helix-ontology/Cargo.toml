@@ -1,0 +1,14 @@
+[package]
+name = "helix-ontology"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-004: canonical ontology normalization (LOINC/RxNorm/SNOMED/ICD-10/UCUM) for Helix"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true

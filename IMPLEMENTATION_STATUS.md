@@ -23,7 +23,7 @@ A core is SOTA-complete for this loop when **all** hold:
 | `helix-numeric` | 007 | ✅ implemented + tests |
 | `helix-evidence` | 006 | ✅ implemented + tests |
 | `helix-escalation` | 009 | ✅ implemented + tests |
-| `helix-ontology` | 004 | ⬜ |
+| `helix-ontology` | 004 | ✅ implemented + tests |
 | `helix-vault` | 001, 013 | ⬜ |
 | `helix-verifier` | 008 | ⬜ |
 | `helix-core` (pipeline) | 002, 005, integration | ✅ implemented + 3 e2e integration tests |
@@ -50,9 +50,17 @@ A core is SOTA-complete for this loop when **all** hold:
   37 tests total green; clippy+fmt clean. Confirmed: parent workspace independent of helix even after the
   linter dropped the exclude lines (parent uses explicit members; helix has its own [workspace]).
 
+- **Iter 4 (2026-06-25):** `helix-ontology` (ADR-004: CodeSystem enum w/ FHIR URIs, Domain→canonical-system
+  map, `normalize()` gate that returns Normalized or Queued(LowConfidence/Ambiguous/NoCandidate) — never
+  silently coerces, FHIR Coding round-trip). Added criterion bench `engine` for the numeric hot path
+  (slope/range_crossings/change_point/pearson @ n=16/256/4096). **Security pass:** zero `unsafe` across all
+  crates; `cargo audit` clean (54 deps, exit 0, no RUSTSEC); release profile lto+codegen-units=1. 44 tests
+  green; clippy+fmt clean; bench compiles.
+
 ## Next iteration picks (ordered)
-1. `helix-ontology` (ADR-004): canonical code-system enum (LOINC/RxNorm/SNOMED/ICD-10/UCUM) + normalization
-   result + un-mappable→review-queue policy + a worked mapping.
-2. Add criterion benchmarks (numeric engine, grounding gate, pipeline) with recorded baselines; CI workflow; `cargo audit`.
-3. `helix-vault` (ADR-001/013) interface: sealed-record trait + encryption boundary (XChaCha20-Poly1305 via trait).
-4. `helix-verifier` (ADR-008): independent re-derivation of a GroundedAnswer's claims from source + tier check.
+1. `helix-verifier` (ADR-008): independent re-derivation of a GroundedAnswer's claims from source + tier
+   check + cross-family-model invariant doc; "different model family than synthesizer" encoded as a config type.
+2. `helix-vault` (ADR-001/013) interface: sealed-record trait + encryption boundary (AEAD via trait), key-custody model.
+3. `helix-score` (ADR-016): decomposable 0–100 score (subsystem sub-scores, each tracing to driving records, trend dir, confidence) — never black-box.
+4. CI workflow (.github/workflows): fmt+clippy+test+audit gate. Record criterion baselines into the repo.
+5. Run criterion to capture baseline numbers; add a doc table of measured ns/op to the ledger.
