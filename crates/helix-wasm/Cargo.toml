@@ -30,6 +30,7 @@ helix-bioage = { path = "../helix-bioage", version = "0.1.0" }
 helix-focus = { path = "../helix-focus", version = "0.1.0" }
 helix-timeline = { path = "../helix-timeline", version = "0.1.0" }
 helix-connect = { path = "../helix-connect", version = "0.1.0" }
+helix-visual = { path = "../helix-visual", version = "0.1.0" }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

@@ -13,7 +13,14 @@ import init, {
   timeline_json,
   fhir_import_json,
   ocr_ingest_json,
+  apple_health_import_json,
+  genome_raw_import_json,
+  visual_encode_json,
+  visual_maxsim_json,
 } from "./pkg/helix.js";
+
+// previously-encoded image embeddings, for the OCR "looks similar" preview
+const visualMemory = [];
 
 const DAY = 86_400_000;
 const NOW = Date.UTC(2026, 5, 25); // fixed "now" for reproducible demos
@@ -95,6 +102,8 @@ async function boot() {
     document.querySelector('.nav-item[data-view="import"]').click();
     importFhir(SAMPLE_FHIR);
     importCsv(SAMPLE_CSV);
+    importApple(SAMPLE_APPLE, "export.xml");
+    importGenome(SAMPLE_GENOME, "23andMe-v5.txt");
   }
 }
 
@@ -292,9 +301,11 @@ function renderRecords() {
   body.innerHTML = "";
   records.forEach((r) => {
     const tr = document.createElement("tr");
+    const rr = r.reference_range;
+    const range = rr && (rr.low != null || rr.high != null) ? `${rr.low ?? "·"}–${rr.high ?? "·"}` : "—";
     tr.innerHTML = `<td>${r.concept}</td><td>${r.value} ${r.unit}</td>
       <td>${fmtDate(r.measured_at)}</td><td>${r.source}</td>
-      <td>${r.reference_range.low}–${r.reference_range.high}</td>`;
+      <td>${range}</td>`;
     body.appendChild(tr);
   });
   document.getElementById("add-record").onclick = () => openModal(addRecordModal());
@@ -351,12 +362,16 @@ function renderReport() {
 
   // Vitals & key markers — latest value per concept from the dossier.
   const byCode = {};
-  records.forEach((r) => { if (!byCode[r.code] || r.measured_at > byCode[r.code].measured_at) byCode[r.code] = r; });
+  records.forEach((r) => { if (r.code && (!byCode[r.code] || r.measured_at > byCode[r.code].measured_at)) byCode[r.code] = r; });
   document.getElementById("vitals-body").innerHTML = Object.values(byCode).map((r) => {
-    const out = r.value < r.reference_range.low ? "low" : r.value > r.reference_range.high ? "high" : "ok";
+    const rr = r.reference_range;          // may be null (vitals/devices/derived have no range)
+    const lo = rr && rr.low != null ? rr.low : null;
+    const hi = rr && rr.high != null ? rr.high : null;
+    const out = lo != null && r.value < lo ? "low" : hi != null && r.value > hi ? "high" : "ok";
     const col = out === "ok" ? "var(--ok)" : out === "low" ? "var(--vital2)" : "var(--warm)";
+    const range = lo != null || hi != null ? `${lo ?? "·"}–${hi ?? "·"}` : `<span class="muted">—</span>`;
     return `<tr><td>${r.concept}</td><td><b>${r.value}</b> ${r.unit}</td>
-      <td class="muted">${r.reference_range.low}–${r.reference_range.high}</td>
+      <td class="muted">${range}</td>
       <td style="color:${col};font-weight:700">${out.toUpperCase()}</td></tr>`;
   }).join("");
 
@@ -448,6 +463,19 @@ const SAMPLE_FHIR = JSON.stringify({
   ],
 }, null, 2);
 const SAMPLE_CSV = "Vitamin B12, 2132-9, 540, pg/mL, 200, 900\nHbA1c, 4548-4, 5.4, %, 4.0, 5.6";
+const SAMPLE_APPLE = `<?xml version="1.0"?>
+<HealthData>
+ <Record type="HKQuantityTypeIdentifierRestingHeartRate" unit="count/min" startDate="2026-06-20 06:00:00 +0000" value="54"/>
+ <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" unit="ms" startDate="2026-06-20 06:00:00 +0000" value="48"/>
+ <Record type="HKQuantityTypeIdentifierBodyMass" unit="kg" startDate="2026-06-21 08:00:00 +0000" value="72.5"/>
+ <Record type="HKQuantityTypeIdentifierOxygenSaturation" unit="%" startDate="2026-06-21 23:00:00 +0000" value="97"/>
+</HealthData>`;
+const SAMPLE_GENOME = `# 23andMe raw data file
+# rsid\tchromosome\tposition\tgenotype
+rs4477212\t1\t82154\tAA
+rs4244285\t10\t96541616\tAG
+rs1801133\t1\t11856378\tCT
+rs4988235\t2\t136608646\tGG`;
 
 function wireImport() {
   document.getElementById("fhir-in").value = SAMPLE_FHIR;
@@ -472,6 +500,42 @@ function wireImport() {
 
   // ③ CSV
   document.getElementById("csv-import").onclick = () => importCsv(document.getElementById("csv-in").value);
+
+  // ④ Apple Health export.xml  ·  ⑤ 23andMe raw .txt
+  wireDrop("apple-drop", "apple-file", importApple);
+  wireDrop("geno-drop", "geno-file", importGenome);
+}
+
+// Wire a dropzone + hidden file input to a text handler.
+function wireDrop(dropId, fileId, handler) {
+  const drop = document.getElementById(dropId);
+  const fileIn = document.getElementById(fileId);
+  const read = (f) => { const r = new FileReader(); r.onload = () => handler(r.result, f.name); r.readAsText(f); };
+  drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("drag"); };
+  drop.ondragleave = () => drop.classList.remove("drag");
+  drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("drag"); if (e.dataTransfer.files[0]) read(e.dataTransfer.files[0]); };
+  fileIn.onchange = (e) => { if (e.target.files[0]) read(e.target.files[0]); };
+}
+
+function importApple(xml, name) {
+  const status = document.getElementById("apple-status");
+  try {
+    const recs = JSON.parse(apple_health_import_json(xml, "Apple Health"));
+    if (recs.length) { addImportedRecords(recs, "Apple Health"); status.innerHTML = `<span class="ok">✓ ${recs.length} record(s) from ${name || "export.xml"}</span>`; }
+    else status.innerHTML = `<span class="warn">No recognized HealthKit records found.</span>`;
+  } catch (e) { status.innerHTML = `<span class="warn">Couldn't parse that file: ${e.message}</span>`; }
+}
+
+function importGenome(text, name) {
+  const status = document.getElementById("geno-status");
+  try {
+    const r = JSON.parse(genome_raw_import_json(text, name || "23andMe"));
+    if (r.records.length) addImportedRecords(r.records, "Genome");
+    const findings = r.findings.map((f) => `${f.gene} ${f.label}: ${f.genotype} (${f.effect_allele_copies} copy)`).join("; ");
+    status.innerHTML = r.findings.length
+      ? `<span class="ok">✓ ${r.total_variants.toLocaleString()} variants scanned · ${r.findings.length} finding(s)</span><div class="muted small" style="margin-top:6px">${findings}</div><div class="muted small" style="margin-top:4px">${r.caveat}</div>`
+      : `<span class="warn">${r.total_variants.toLocaleString()} variants scanned · no annotated SNPs in this file.</span>`;
+  } catch (e) { status.innerHTML = `<span class="warn">Couldn't parse that file: ${e.message}</span>`; }
 }
 
 function importFhir(text) {
@@ -501,21 +565,58 @@ function importCsv(text) {
   if (recs.length) addImportedRecords(recs, "CSV"); else flashImport("No valid rows parsed.");
 }
 
+// Thumbnail + perceptual fingerprint (helix-visual) for a dropped image. Returns
+// a short "looks like" note comparing it to previously-imported images.
+async function visualPreview(file) {
+  const prev = document.getElementById("ocr-preview");
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+  // downscale to a small grayscale buffer for the perceptual encoder
+  const W = 96, H = Math.max(1, Math.round((img.height / img.width) * 96));
+  const cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d");
+  ctx.drawImage(img, 0, 0, W, H);
+  const rgba = ctx.getImageData(0, 0, W, H).data;
+  const gray = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) gray[i] = (0.299 * rgba[i * 4] + 0.587 * rgba[i * 4 + 1] + 0.114 * rgba[i * 4 + 2]) | 0;
+  prev.innerHTML = `<img class="ocr-thumb" src="${url}" alt="preview"/><div class="ocr-vis" id="ocr-vis">perceptual fingerprint…</div>`;
+  let note = "";
+  try {
+    const emb = visual_encode_json(W, H, gray);
+    let best = 0, bestName = "";
+    for (const m of visualMemory) {
+      const s = visual_maxsim_json(emb, m.emb);
+      if (s > best) { best = s; bestName = m.name; }
+    }
+    visualMemory.push({ name: file.name || "image", emb });
+    note = bestName
+      ? `🔎 visually ${Math.round(best * 100)}% similar to “${bestName}”`
+      : `🔎 visual fingerprint captured (${visualMemory.length === 1 ? "first image" : "no prior match"})`;
+    document.getElementById("ocr-vis").textContent = note;
+  } catch (e) { document.getElementById("ocr-vis").textContent = "visual fingerprint unavailable"; }
+  return url;
+}
+
 // In-browser OCR of a lab image (tesseract.js from CDN), then the helix-ocr safety gate.
 async function ocrImage(file) {
   const status = document.getElementById("ocr-status");
   status.innerHTML = "Loading on-device OCR…";
+  let url;
   try {
+    url = await visualPreview(file); // thumbnail + helix-visual fingerprint
     const { default: Tesseract } = await import("https://esm.sh/tesseract.js@5");
     status.innerHTML = "Reading the image…";
-    const url = URL.createObjectURL(file);
     const { data } = await Tesseract.recognize(url, "eng");
     URL.revokeObjectURL(url);
     const candidates = extractAnalytes(data.text);
     if (!candidates.length) { status.innerHTML = `<span class="warn">No values found in that image.</span>`; return; }
     const doc = { doc_label: file.name || "lab-image", imported_at: NOW, candidates };
     const gated = JSON.parse(ocr_ingest_json(JSON.stringify(doc), 0.5));
-    const accepted = gated.filter((g) => g.status === "accepted").map((g) => g.record);
+    // `Gated` is internally tagged: an accepted item spreads the ProvRecord fields
+    // onto the object alongside status:"accepted". Strip status → the record.
+    const accepted = gated.filter((g) => g.status === "accepted").map(({ status, ...rec }) => rec);
     let queued = 0;
     gated.forEach((g) => { if (g.status === "queued") { queued++; logQueued(g.candidate.label, g.reason); } });
     if (accepted.length) addImportedRecords(accepted, "OCR");

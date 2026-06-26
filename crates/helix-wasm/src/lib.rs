@@ -198,6 +198,40 @@ pub fn fhir_import_json(bundle: &str, source: &str) -> Result<String, JsValue> {
     serde_json::to_string(&serde_json::json!({ "records": records, "queued": queued })).map_err(err)
 }
 
+/// Import an Apple Health `export.xml` (ADR-029): parse known HealthKit records
+/// into provenance records. Bounded to 100k records. Returns the records JSON.
+#[wasm_bindgen]
+pub fn apple_health_import_json(xml: &str, source: &str) -> Result<String, JsValue> {
+    let recs = helix_connect::parse_apple_health(xml, source, 100_000);
+    serde_json::to_string(&recs).map_err(err)
+}
+
+/// Import a 23andMe-style raw genotype file (ADR-021): surfaces a few documented
+/// single-SNP findings (NOT a full diplotype call). Returns the RawGenomeResult.
+#[wasm_bindgen]
+pub fn genome_raw_import_json(text: &str, source: &str) -> Result<String, JsValue> {
+    let r = helix_genome::parse_23andme_raw(text, source);
+    serde_json::to_string(&r).map_err(err)
+}
+
+/// Visual encode (ADR-025/028): grayscale pixels (row-major, w*h bytes) → the
+/// perceptual tile embedding (DocEmbedding JSON). For OCR/visual previews.
+#[wasm_bindgen]
+pub fn visual_encode_json(w: u32, h: u32, px: &[u8]) -> Result<String, JsValue> {
+    use helix_visual::{Gray, PerceptualEmbedder, VisualEmbedder};
+    let g = Gray::new(w, h, px.to_vec()).map_err(err)?;
+    let emb = PerceptualEmbedder::default().embed(&g).map_err(err)?;
+    serde_json::to_string(&emb).map_err(err)
+}
+
+/// Visual similarity (ADR-025): MaxSim between two DocEmbeddings (JSON) → score.
+#[wasm_bindgen]
+pub fn visual_maxsim_json(a: &str, b: &str) -> Result<f32, JsValue> {
+    let ea: helix_visual::DocEmbedding = serde_json::from_str(a).map_err(err)?;
+    let eb: helix_visual::DocEmbedding = serde_json::from_str(b).map_err(err)?;
+    helix_visual::maxsim(&ea, &eb).map_err(err)
+}
+
 /// Crate version string for the UI footer / diagnostics.
 #[wasm_bindgen]
 pub fn version() -> String {

@@ -291,3 +291,165 @@ mod tests {
         assert!(GENOME_DISCLAIMER.contains("not a diagnosis"));
     }
 }
+
+// --- 23andMe raw-genotype import (ADR-021) -----------------------------------
+
+/// One curated, well-documented single-SNP annotation. **Single variants only —
+/// NOT full star-allele diplotype calling** (that needs phasing / a proper PGx
+/// panel, e.g. rvDNA). Informational, verify with a clinician.
+struct SnpAnno {
+    rsid: &'static str,
+    gene: &'static str,
+    label: &'static str,
+    /// The allele whose copies are counted (the minor/effect allele).
+    effect_allele: char,
+    note: &'static str,
+}
+
+/// A small, conservative annotation table. Each entry is a single, widely-cited
+/// variant; the import counts effect-allele copies (0–2) and attaches the note.
+const ANNOTATIONS: &[SnpAnno] = &[
+    SnpAnno { rsid: "rs4244285", gene: "CYP2C19", label: "CYP2C19*2 (loss-of-function)", effect_allele: 'A',
+        note: "Reduced CYP2C19 activity affects some drugs (e.g. clopidogrel). Single variant — not a full PGx panel." },
+    SnpAnno { rsid: "rs1799853", gene: "CYP2C9", label: "CYP2C9*2", effect_allele: 'T',
+        note: "Reduced CYP2C9 activity can affect warfarin/NSAID metabolism. Single variant." },
+    SnpAnno { rsid: "rs1057910", gene: "CYP2C9", label: "CYP2C9*3", effect_allele: 'C',
+        note: "Reduced CYP2C9 activity. Single variant." },
+    SnpAnno { rsid: "rs1801133", gene: "MTHFR", label: "MTHFR C677T", effect_allele: 'T',
+        note: "Reduced MTHFR enzyme activity; common. Informational only." },
+    SnpAnno { rsid: "rs4988235", gene: "LCT/MCM6", label: "Lactase persistence", effect_allele: 'G',
+        note: "Associated with adult lactase persistence (dairy tolerance). Informational." },
+];
+
+/// A finding from an annotated SNP.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SnpFinding {
+    pub rsid: String,
+    pub gene: String,
+    pub label: String,
+    pub genotype: String,
+    /// Copies of the effect allele present (0, 1, or 2).
+    pub effect_allele_copies: u8,
+    pub note: String,
+}
+
+/// Result of importing a 23andMe raw genotype file.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RawGenomeResult {
+    /// Total genotype rows parsed (a coverage indicator).
+    pub total_variants: u32,
+    /// Annotated findings → provenance records.
+    pub records: Vec<ProvRecord>,
+    pub findings: Vec<SnpFinding>,
+    /// Standing caveat for the whole import.
+    pub caveat: String,
+}
+
+/// Parse a 23andMe-style raw genotype file (`rsid\tchrom\tpos\tgenotype`, `#`
+/// comments). The raw file stays user-owned and local (§7.4/ADR-001); this only
+/// surfaces a few well-documented single-variant findings, **not** a full
+/// pharmacogenomic diplotype call.
+pub fn parse_23andme_raw(text: &str, source_file: &str) -> RawGenomeResult {
+    let mut total = 0u32;
+    let mut found: std::collections::BTreeMap<&str, String> = Default::default();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let mut cols = line.split('\t');
+        let Some(rsid) = cols.next() else { continue };
+        // genotype is the last column
+        let Some(genotype) = line.split('\t').next_back() else {
+            continue;
+        };
+        if genotype.is_empty() || rsid == genotype {
+            continue;
+        }
+        total += 1;
+        if ANNOTATIONS.iter().any(|a| a.rsid == rsid) {
+            found.insert(
+                ANNOTATIONS.iter().find(|a| a.rsid == rsid).unwrap().rsid,
+                genotype.to_string(),
+            );
+        }
+    }
+
+    let mut records = Vec::new();
+    let mut findings = Vec::new();
+    for a in ANNOTATIONS {
+        if let Some(gt) = found.get(a.rsid) {
+            let copies = gt.chars().filter(|&c| c == a.effect_allele).count() as u8;
+            findings.push(SnpFinding {
+                rsid: a.rsid.into(),
+                gene: a.gene.into(),
+                label: a.label.into(),
+                genotype: gt.clone(),
+                effect_allele_copies: copies,
+                note: a.note.into(),
+            });
+            records.push(ProvRecord {
+                id: RecordId::from(format!("geno-snp-{source_file}-{}", a.rsid)),
+                source: "rvdna".to_string(),
+                measured_at: 0,
+                method: MeasurementMethod::Derived,
+                code: Some(format!("GENO-SNP-{}", a.rsid.to_uppercase())),
+                concept: format!("{} — {} ({})", a.gene, a.label, gt),
+                value: copies as f64,
+                unit: "effect-allele-copies".to_string(),
+                reference_range: None,
+                confidence: Confidence::new(0.5),
+            });
+        }
+    }
+
+    RawGenomeResult {
+        total_variants: total,
+        records,
+        findings,
+        caveat: "Single-variant findings only — not a full pharmacogenomic diplotype call (needs a proper PGx panel). \
+                 Informational, not a diagnosis; your raw file stays on your device (ADR-001). Verify with a clinician."
+            .to_string(),
+    }
+}
+
+#[cfg(test)]
+mod raw_tests {
+    use super::*;
+
+    const SAMPLE: &str = "# 23andMe raw data\n# rsid\tchromosome\tposition\tgenotype\n\
+rs4477212\t1\t82154\tAA\n\
+rs4244285\t10\t96541616\tAG\n\
+rs1801133\t1\t11856378\tTT\n\
+rs9999999\t2\t12345\tCC\n";
+
+    #[test]
+    fn counts_variants_and_annotates_known_snps() {
+        let r = parse_23andme_raw(SAMPLE, "23andMe-v5");
+        assert_eq!(r.total_variants, 4);
+        // CYP2C19*2 (AG → 1 A copy) and MTHFR (TT → 2 T copies)
+        assert_eq!(r.findings.len(), 2);
+        let cyp = r.findings.iter().find(|f| f.gene == "CYP2C19").unwrap();
+        assert_eq!(cyp.effect_allele_copies, 1);
+        let mthfr = r.findings.iter().find(|f| f.gene == "MTHFR").unwrap();
+        assert_eq!(mthfr.effect_allele_copies, 2);
+    }
+
+    #[test]
+    fn records_are_geno_snp_capped_and_caveated() {
+        let r = parse_23andme_raw(SAMPLE, "f");
+        assert_eq!(r.records.len(), 2);
+        for rec in &r.records {
+            assert!(rec.code.as_ref().unwrap().starts_with("GENO-SNP-"));
+            assert!(rec.confidence.get() <= 0.5);
+        }
+        assert!(r.caveat.contains("not a full pharmacogenomic"));
+    }
+
+    #[test]
+    fn no_known_snps_still_counts() {
+        let r = parse_23andme_raw("rs0000\t1\t1\tGG\n", "f");
+        assert_eq!(r.total_variants, 1);
+        assert!(r.findings.is_empty());
+    }
+}

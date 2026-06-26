@@ -171,6 +171,10 @@ body {
 .dropzone:hover, .dropzone.drag { border-color: var(--vital); color: var(--text); background: #0c1828; }
 .import-status { font-size: 12.5px; color: var(--muted); min-height: 18px; }
 .import-status .ok { color: var(--ok); } .import-status .warn { color: var(--warm); }
+.ocr-preview { display: flex; gap: 12px; align-items: center; margin: 4px 0 8px; }
+.ocr-preview:empty { display: none; }
+.ocr-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line2); }
+.ocr-vis { font-size: 12px; color: var(--vital2); }
 .imp-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #14233a; font-size: 13px; }
 .imp-row:last-child { border: 0; }
 .imp-row .imp-src { color: var(--muted2); font-size: 11.5px; }

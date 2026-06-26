@@ -28,6 +28,36 @@ export function analyze_json(payload) {
 }
 
 /**
+ * Import an Apple Health `export.xml` (ADR-029): parse known HealthKit records
+ * into provenance records. Bounded to 100k records. Returns the records JSON.
+ * @param {string} xml
+ * @param {string} source
+ * @returns {string}
+ */
+export function apple_health_import_json(xml, source) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passStringToWasm0(xml, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(source, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.apple_health_import_json(ptr0, len0, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
+        if (ret[3]) {
+            ptr3 = 0; len3 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+    }
+}
+
+/**
  * Biological-age estimate (ADR-034): input PhenoInputs JSON → BioAge + disclaimer.
  * @param {string} inputs
  * @returns {string}
@@ -161,6 +191,36 @@ export function genome_profile_json(profile) {
         return getStringFromWasm0(ptr2, len2);
     } finally {
         wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Import a 23andMe-style raw genotype file (ADR-021): surfaces a few documented
+ * single-SNP findings (NOT a full diplotype call). Returns the RawGenomeResult.
+ * @param {string} text
+ * @param {string} source
+ * @returns {string}
+ */
+export function genome_raw_import_json(text, source) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passStringToWasm0(text, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(source, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.genome_raw_import_json(ptr0, len0, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
+        if (ret[3]) {
+            ptr3 = 0; len3 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
     }
 }
 
@@ -325,6 +385,53 @@ export function version() {
         wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
     }
 }
+
+/**
+ * Visual encode (ADR-025/028): grayscale pixels (row-major, w*h bytes) → the
+ * perceptual tile embedding (DocEmbedding JSON). For OCR/visual previews.
+ * @param {number} w
+ * @param {number} h
+ * @param {Uint8Array} px
+ * @returns {string}
+ */
+export function visual_encode_json(w, h, px) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArray8ToWasm0(px, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.visual_encode_json(w, h, ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Visual similarity (ADR-025): MaxSim between two DocEmbeddings (JSON) → score.
+ * @param {string} a
+ * @param {string} b
+ * @returns {number}
+ */
+export function visual_maxsim_json(a, b) {
+    const ptr0 = passStringToWasm0(a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(b, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.visual_maxsim_json(ptr0, len0, ptr1, len1);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return ret[0];
+}
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
@@ -359,6 +466,13 @@ function getUint8ArrayMemory0() {
         cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
     }
     return cachedUint8ArrayMemory0;
+}
+
+function passArray8ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 1, 1) >>> 0;
+    getUint8ArrayMemory0().set(arg, ptr / 1);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
 }
 
 function passStringToWasm0(arg, malloc, realloc) {

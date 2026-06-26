@@ -8,6 +8,12 @@
 export function analyze_json(payload: string): string;
 
 /**
+ * Import an Apple Health `export.xml` (ADR-029): parse known HealthKit records
+ * into provenance records. Bounded to 100k records. Returns the records JSON.
+ */
+export function apple_health_import_json(xml: string, source: string): string;
+
+/**
  * Biological-age estimate (ADR-034): input PhenoInputs JSON → BioAge + disclaimer.
  */
 export function bioage_json(inputs: string): string;
@@ -35,6 +41,12 @@ export function focus_json(payload: string): string;
  * GENO-* records plus "verify with your prescriber" pharmacogenomic advisories.
  */
 export function genome_profile_json(profile: string): string;
+
+/**
+ * Import a 23andMe-style raw genotype file (ADR-021): surfaces a few documented
+ * single-SNP findings (NOT a full diplotype call). Returns the RawGenomeResult.
+ */
+export function genome_raw_import_json(text: string, source: string): string;
 
 /**
  * The non-diagnostic disclaimer that must accompany any ruv-neural signal.
@@ -77,16 +89,29 @@ export function timeline_json(payload: string): string;
  */
 export function version(): string;
 
+/**
+ * Visual encode (ADR-025/028): grayscale pixels (row-major, w*h bytes) → the
+ * perceptual tile embedding (DocEmbedding JSON). For OCR/visual previews.
+ */
+export function visual_encode_json(w: number, h: number, px: Uint8Array): string;
+
+/**
+ * Visual similarity (ADR-025): MaxSim between two DocEmbeddings (JSON) → score.
+ */
+export function visual_maxsim_json(a: string, b: string): number;
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly analyze_json: (a: number, b: number) => [number, number, number, number];
+    readonly apple_health_import_json: (a: number, b: number, c: number, d: number) => [number, number, number, number];
     readonly bioage_json: (a: number, b: number) => [number, number, number, number];
     readonly compose_score_json: (a: number, b: number) => [number, number, number, number];
     readonly fhir_import_json: (a: number, b: number, c: number, d: number) => [number, number, number, number];
     readonly focus_json: (a: number, b: number) => [number, number, number, number];
     readonly genome_profile_json: (a: number, b: number) => [number, number, number, number];
+    readonly genome_raw_import_json: (a: number, b: number, c: number, d: number) => [number, number, number, number];
     readonly neural_disclaimer: () => [number, number];
     readonly neural_session_to_records_json: (a: number, b: number) => [number, number, number, number];
     readonly ocr_ingest_json: (a: number, b: number, c: number) => [number, number, number, number];
@@ -94,6 +119,8 @@ export interface InitOutput {
     readonly sensing_reading_json: (a: number, b: number) => [number, number, number, number];
     readonly timeline_json: (a: number, b: number) => [number, number, number, number];
     readonly version: () => [number, number];
+    readonly visual_encode_json: (a: number, b: number, c: number, d: number) => [number, number, number, number];
+    readonly visual_maxsim_json: (a: number, b: number, c: number, d: number) => [number, number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

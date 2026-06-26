@@ -399,3 +399,157 @@ mod tests {
         assert!(format!("{:?}", OAuthTokenRedacted(&t)).contains("redacted"));
     }
 }
+
+// --- Apple Health export.xml import (ADR-029) ---------------------------------
+
+/// Map a curated set of Apple HealthKit quantity identifiers to (concept, LOINC
+/// code, default unit). Unknown types are skipped (returned to review upstream).
+fn hk_map(hk_type: &str) -> Option<(&'static str, &'static str)> {
+    let t = hk_type
+        .strip_prefix("HKQuantityTypeIdentifier")
+        .unwrap_or(hk_type);
+    Some(match t {
+        "HeartRate" => ("Heart rate", "8867-4"),
+        "RestingHeartRate" => ("Resting heart rate", "40443-4"),
+        "HeartRateVariabilitySDNN" => ("Heart rate variability (SDNN)", "80404-7"),
+        "StepCount" => ("Steps", "55423-8"),
+        "BodyMass" => ("Body weight", "29463-7"),
+        "BodyMassIndex" => ("Body mass index", "39156-5"),
+        "OxygenSaturation" => ("Oxygen saturation (SpO2)", "59408-5"),
+        "BloodPressureSystolic" => ("Systolic blood pressure", "8480-6"),
+        "BloodPressureDiastolic" => ("Diastolic blood pressure", "8462-4"),
+        "RespiratoryRate" => ("Respiratory rate", "9279-1"),
+        "BodyTemperature" => ("Body temperature", "8310-5"),
+        "BloodGlucose" => ("Blood glucose", "2339-0"),
+        "VO2Max" => ("VO2 max", "84376-3"),
+        _ => return None,
+    })
+}
+
+/// Read the value of attribute `name` from a `<Record ...>` element body.
+fn attr<'a>(elem: &'a str, name: &str) -> Option<&'a str> {
+    let key = format!("{name}=\"");
+    let start = elem.find(&key)? + key.len();
+    let rest = &elem[start..];
+    let end = rest.find('"')?;
+    Some(&rest[..end])
+}
+
+/// Parse Apple Health's `startDate`/`creationDate` format
+/// `YYYY-MM-DD HH:MM:SS ±ZZZZ` (or ISO `T`) into epoch millis. Timezone offset is
+/// applied if present.
+fn parse_apple_date(s: &str) -> Option<EpochMillis> {
+    let s = s.trim();
+    if s.len() < 19 {
+        return parse_iso_millis(s);
+    }
+    let date = &s[..10];
+    let time = &s[11..19];
+    let base = parse_iso_millis(&format!("{date}T{time}"))?;
+    // optional " +0530" / " -0700" offset at the tail
+    let off_ms = s.get(20..).and_then(|tz| {
+        let tz = tz.trim();
+        let sign = match tz.chars().next()? {
+            '+' => 1,
+            '-' => -1,
+            _ => return None,
+        };
+        let hh: i64 = tz.get(1..3)?.parse().ok()?;
+        let mm: i64 = tz.get(3..5)?.parse().ok()?;
+        Some(sign * (hh * 3600 + mm * 60) * 1000)
+    });
+    // stored time is local; subtract offset to get UTC epoch
+    Some(base - off_ms.unwrap_or(0))
+}
+
+/// Parse an Apple Health `export.xml` string into provenance records. Scans
+/// `<Record ...>` elements, maps known HealthKit types (ADR-004), and skips
+/// unknown/invalid ones. Bounded by `max_records` to avoid huge exports blowing
+/// memory.
+pub fn parse_apple_health(xml: &str, source: &str, max_records: usize) -> Vec<ProvRecord> {
+    let mut out = Vec::new();
+    let mut idx = 0usize;
+    while let Some(rel) = xml[idx..].find("<Record ") {
+        let start = idx + rel;
+        let end = match xml[start..].find('>') {
+            Some(e) => start + e,
+            None => break,
+        };
+        let elem = &xml[start..end];
+        idx = end + 1;
+
+        let (Some(ty), Some(val_s)) = (attr(elem, "type"), attr(elem, "value")) else {
+            continue;
+        };
+        let Some((concept, code)) = hk_map(ty) else {
+            continue;
+        };
+        let Ok(value) = val_s.parse::<f64>() else {
+            continue;
+        };
+        if !value.is_finite() {
+            continue;
+        }
+        let unit = attr(elem, "unit").unwrap_or("").to_string();
+        let measured_at = attr(elem, "startDate")
+            .or_else(|| attr(elem, "creationDate"))
+            .and_then(parse_apple_date)
+            .unwrap_or(0);
+
+        out.push(ProvRecord {
+            id: RecordId::from(format!("apple-{source}-{}-{measured_at}", code)),
+            source: source.to_string(),
+            measured_at,
+            method: MeasurementMethod::Device,
+            code: Some(code.to_string()),
+            concept: concept.to_string(),
+            value,
+            unit,
+            reference_range: None,
+            confidence: Confidence::new(0.9),
+        });
+        if out.len() >= max_records {
+            break;
+        }
+    }
+    out
+}
+
+#[cfg(test)]
+mod apple_tests {
+    use super::*;
+
+    const SAMPLE: &str = r#"<?xml version="1.0"?>
+<HealthData>
+ <Record type="HKQuantityTypeIdentifierHeartRate" unit="count/min" startDate="2026-06-01 10:00:00 -0700" value="62"/>
+ <Record type="HKQuantityTypeIdentifierRestingHeartRate" unit="count/min" startDate="2026-06-01 06:00:00 -0700" value="54"/>
+ <Record type="HKQuantityTypeIdentifierBodyMass" unit="kg" startDate="2026-06-02 08:00:00 +0000" value="72.5"/>
+ <Record type="HKQuantityTypeIdentifierSomethingUnknown" unit="x" startDate="2026-06-02" value="1"/>
+ <Record type="HKQuantityTypeIdentifierStepCount" unit="count" startDate="2026-06-02" value="not_a_number"/>
+</HealthData>"#;
+
+    #[test]
+    fn parses_known_records_skips_unknown_and_bad() {
+        let recs = parse_apple_health(SAMPLE, "Apple Health", 1000);
+        assert_eq!(recs.len(), 3); // HR, RHR, BodyMass; unknown + non-numeric skipped
+        let hr = &recs[0];
+        assert_eq!(hr.concept, "Heart rate");
+        assert_eq!(hr.code.as_deref(), Some("8867-4"));
+        assert_eq!(hr.value, 62.0);
+        assert_eq!(hr.method, MeasurementMethod::Device);
+        assert!(hr.measured_at > 0);
+    }
+
+    #[test]
+    fn respects_max_records() {
+        assert_eq!(parse_apple_health(SAMPLE, "s", 1).len(), 1);
+    }
+
+    #[test]
+    fn apple_date_applies_offset() {
+        // 10:00 -0700 → 17:00 UTC
+        let utc = parse_apple_date("2026-06-01 10:00:00 -0700").unwrap();
+        let utc_ref = parse_apple_date("2026-06-01 17:00:00 +0000").unwrap();
+        assert_eq!(utc, utc_ref);
+    }
+}

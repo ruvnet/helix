@@ -188,7 +188,24 @@
             <p class="muted small">Drop a photo/scan of a lab report. It's OCR'd in-browser, then each value passes the safety gate (implausible/unit-less values are held for review — never auto-trusted).</p>
             <label class="dropzone" id="ocr-drop"><input type="file" id="ocr-file" accept="image/*" hidden>
               <span id="ocr-drop-label">📷 Drop a lab image, or click to choose</span></label>
+            <div class="ocr-preview" id="ocr-preview"></div>
             <div class="import-status" id="ocr-status"></div>
+          </div>
+
+          <div class="card import-card">
+            <div class="card-title">④ Apple Health · export.xml</div>
+            <p class="muted small">Export from the Health app (Profile → Export All Health Data) and drop the <code>export.xml</code>. Steps, heart rate, HRV, weight, SpO₂, BP and more become dated records.</p>
+            <label class="dropzone" id="apple-drop"><input type="file" id="apple-file" accept=".xml,text/xml" hidden>
+              <span> Drop export.xml, or click to choose</span></label>
+            <div class="import-status" id="apple-status"></div>
+          </div>
+
+          <div class="card import-card">
+            <div class="card-title">⑤ Genome · 23andMe raw (user-owned)</div>
+            <p class="muted small">Drop your 23andMe raw <code>.txt</code>. Your file stays on your device; only a few documented single-variant findings are surfaced — <b>not</b> a full pharmacogenomic panel.</p>
+            <label class="dropzone" id="geno-drop"><input type="file" id="geno-file" accept=".txt,text/plain" hidden>
+              <span>🧬 Drop 23andMe raw .txt, or click to choose</span></label>
+            <div class="import-status" id="geno-status"></div>
           </div>
 
           <div class="card import-card">

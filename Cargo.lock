@@ -711,6 +711,7 @@ dependencies = [
  "helix-score",
  "helix-sensing",
  "helix-timeline",
+ "helix-visual",
  "serde",
  "serde_json",
  "wasm-bindgen",
