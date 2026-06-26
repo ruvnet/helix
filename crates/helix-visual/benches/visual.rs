@@ -16,7 +16,9 @@ const CORPUS: &[(&str, &[u8])] = &[
 ];
 
 fn load(bytes: &[u8]) -> Gray {
-    let img = image::load_from_memory(bytes).expect("decode png").to_luma8();
+    let img = image::load_from_memory(bytes)
+        .expect("decode png")
+        .to_luma8();
     let (w, h) = img.dimensions();
     Gray::new(w, h, img.into_raw()).expect("gray")
 }
@@ -39,16 +41,31 @@ fn bench_visual(c: &mut Criterion) {
         eprintln!("    {:<14} score {:.3}", r.doc_id, r.score);
     }
     // Sanity: the other lab report should outrank the x-ray for a lab query.
-    let lab_cbc = results.iter().find(|r| r.doc_id == "lab-cbc").unwrap().score;
-    let xray = results.iter().find(|r| r.doc_id == "xray-chest").unwrap().score;
-    eprintln!("    [check] lab-cbc ({lab_cbc:.3}) > xray-chest ({xray:.3}): {}\n", lab_cbc > xray);
+    let lab_cbc = results
+        .iter()
+        .find(|r| r.doc_id == "lab-cbc")
+        .unwrap()
+        .score;
+    let xray = results
+        .iter()
+        .find(|r| r.doc_id == "xray-chest")
+        .unwrap()
+        .score;
+    eprintln!(
+        "    [check] lab-cbc ({lab_cbc:.3}) > xray-chest ({xray:.3}): {}\n",
+        lab_cbc > xray
+    );
 
     let big = &imgs[3].1; // the x-ray (largest)
-    c.bench_function("embed/xray-chest", |b| b.iter(|| emb.embed(black_box(big)).unwrap()));
+    c.bench_function("embed/xray-chest", |b| {
+        b.iter(|| emb.embed(black_box(big)).unwrap())
+    });
 
     let qe = emb.embed(&imgs[0].1).unwrap();
     let de = emb.embed(&imgs[1].1).unwrap();
-    c.bench_function("maxsim/pair", |b| b.iter(|| maxsim(black_box(&qe), black_box(&de)).unwrap()));
+    c.bench_function("maxsim/pair", |b| {
+        b.iter(|| maxsim(black_box(&qe), black_box(&de)).unwrap())
+    });
 
     c.bench_function("retrieve/corpus-6", |b| {
         b.iter(|| index.retrieve(black_box(&qe), 6).unwrap())

@@ -7,13 +7,14 @@ JavaScript. `ui/app.js` is presentation and wiring only; every number and every
 grounded answer comes from the audited Rust crates.
 
 > The screenshots below are captured from the live UI running the WASM engine
-> (headless Chrome render of `ui/index.html`), not mockups.
+> (headless Chrome render of `ui/index.html`), not mockups — and **each one is a
+> clickable link to that exact state in the [live demo](https://ruvnet.github.io/helix/)**.
 
 ### Dashboard — a score you can open, a body you can tap
-![Helix dashboard](./screenshots/dashboard.png)
+[![Helix dashboard](./screenshots/dashboard.png)](https://ruvnet.github.io/helix/ui/)
 
 ### Ask Helix — grounded, cited answers (or an honest abstention)
-![Helix grounded answer](./screenshots/answer.png)
+[![Helix grounded answer](./screenshots/answer.png)](https://ruvnet.github.io/helix/ui/#ask)
 
 The ferritin answer above is the real pipeline output: the deterministic engine
 computed the trend (`−38% vs first reading · crossed reference range`), every
@@ -21,19 +22,19 @@ value is cited to its source and date, and it carries a **Tier 1 · Your data**
 evidence chip.
 
 ### Step-by-step onboarding guide (modal)
-![Helix step-by-step guide](./screenshots/guide.png)
+[![Helix step-by-step guide](./screenshots/guide.png)](https://ruvnet.github.io/helix/ui/#guide)
 
 ### Mobile PWA (WASM, installable)
-<img src="./screenshots/mobile.png" alt="Helix mobile PWA" width="300" />
+<a href="https://ruvnet.github.io/helix/mobile/"><img src="./screenshots/mobile.png" alt="Helix mobile PWA" width="300" /></a>
 
 ### Live integrations — ruvnet ecosystem adapters running in the UI
 The Data Sources view runs the real Rust integration crates through WASM:
 
 **RuView WiFi-CSI (ADR-020)** — contactless vitals + escalation screening flags:
-![RuView sensing demo](./screenshots/sensing-demo.png)
+[![RuView sensing demo](./screenshots/sensing-demo.png)](https://ruvnet.github.io/helix/ui/#sensing)
 
 **rvDNA genome (ADR-021)** — pharmacogenomics + prescriber advisory + GINA privacy note:
-![rvDNA genome demo](./screenshots/genome-demo.png)
+[![rvDNA genome demo](./screenshots/genome-demo.png)](https://ruvnet.github.io/helix/ui/#genome)
 
 ---
 

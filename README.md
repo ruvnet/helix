@@ -3,12 +3,14 @@
 > Your entire body — every record, signal, and result — assembled into one living dossier.
 > **Private. Continual. Visual. And built so it can't make things up.**
 
-![Helix management console](docs/ui/screenshots/dashboard.png)
+[![Helix management console](docs/ui/screenshots/dashboard.png)](https://ruvnet.github.io/helix/ui/)
 
 <p align="center">
-  <img src="docs/ui/screenshots/answer.png" alt="Grounded, cited answer" width="49%" />
-  <img src="docs/ui/screenshots/mobile.png" alt="Helix mobile PWA" width="22%" />
+  <a href="https://ruvnet.github.io/helix/ui/#ask"><img src="docs/ui/screenshots/answer.png" alt="Grounded, cited answer — open the live demo" width="49%" /></a>
+  <a href="https://ruvnet.github.io/helix/mobile/"><img src="docs/ui/screenshots/mobile.png" alt="Helix mobile PWA — open the live demo" width="22%" /></a>
 </p>
+
+<p align="center"><sub>↑ the screenshots are clickable — they open the <a href="https://ruvnet.github.io/helix/">live demo</a> (real Rust pipeline in WebAssembly)</sub></p>
 
 <p align="center"><b><a href="https://ruvnet.github.io/helix/">▶ Live demo</a></b> · the UI runs the real Rust pipeline compiled to WebAssembly</p>
 

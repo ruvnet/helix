@@ -98,7 +98,11 @@ impl VisualEmbedder for PerceptualEmbedder {
                 tiles.push(tile_descriptor(img, x0, x1, y0, y1, c));
             }
         }
-        Ok(DocEmbedding { tiles, grid: g, cells: c })
+        Ok(DocEmbedding {
+            tiles,
+            grid: g,
+            cells: c,
+        })
     }
 }
 
@@ -204,7 +208,11 @@ impl VisualIndex {
     }
 
     /// Rank documents by MaxSim against `query`, return the top `k`.
-    pub fn retrieve(&self, query: &DocEmbedding, k: usize) -> Result<Vec<VisualMatch>, VisualError> {
+    pub fn retrieve(
+        &self,
+        query: &DocEmbedding,
+        k: usize,
+    ) -> Result<Vec<VisualMatch>, VisualError> {
         let mut scored: Vec<VisualMatch> = self
             .docs
             .iter()
@@ -212,8 +220,9 @@ impl VisualIndex {
                 maxsim(query, emb).map(|score| VisualMatch {
                     doc_id: id.clone(),
                     score,
-                    note: "visual similarity — a document that looks like this, not an interpretation"
-                        .to_string(),
+                    note:
+                        "visual similarity — a document that looks like this, not an interpretation"
+                            .to_string(),
                 })
             })
             .collect::<Result<_, _>>()?;
@@ -289,7 +298,12 @@ mod tests {
         assert_eq!(out.len(), 3);
         assert!(out[0].doc_id.starts_with("lab"), "top: {}", out[0].doc_id);
         let xray = out.iter().find(|m| m.doc_id == "xray").unwrap();
-        assert!(out[0].score > xray.score, "doc {} vs xray {}", out[0].score, xray.score);
+        assert!(
+            out[0].score > xray.score,
+            "doc {} vs xray {}",
+            out[0].score,
+            xray.score
+        );
         assert!(out[0].note.contains("not an interpretation"));
     }
 
@@ -316,7 +330,10 @@ mod tests {
     fn bad_inputs_rejected() {
         assert_eq!(Gray::new(2, 2, vec![0, 0, 0]), Err(VisualError::BadImage));
         let bad = PerceptualEmbedder { grid: 0, cells: 4 };
-        assert_eq!(bad.embed(&doc_image(10, 10, 0)), Err(VisualError::BadConfig));
+        assert_eq!(
+            bad.embed(&doc_image(10, 10, 0)),
+            Err(VisualError::BadConfig)
+        );
     }
 
     #[test]
