@@ -1,0 +1,6 @@
+# The parent ruvector workspace forces the `mold` linker via build.rustflags,
+# but the wasm linker (rust-lld) does not understand `-fuse-ld=mold`. Target-
+# specific rustflags fully replace build.rustflags for that target, so this
+# drops the mold flag for wasm builds while leaving native builds untouched.
+[target.wasm32-unknown-unknown]
+rustflags = []

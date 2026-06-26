@@ -1,0 +1,27 @@
+[package]
+name = "helix-wasm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "WASM binding exposing the Helix analytic pipeline to the web/mobile UI"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+wasm-bindgen = "0.2"
+helix-provenance = { path = "../helix-provenance" }
+helix-numeric = { path = "../helix-numeric" }
+helix-evidence = { path = "../helix-evidence" }
+helix-escalation = { path = "../helix-escalation" }
+helix-ontology = { path = "../helix-ontology" }
+helix-core = { path = "../helix-core" }
+helix-score = { path = "../helix-score" }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

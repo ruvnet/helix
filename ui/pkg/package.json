@@ -1,0 +1,24 @@
+{
+  "name": "helix-wasm",
+  "type": "module",
+  "collaborators": [
+    "ISO Vision LLC"
+  ],
+  "description": "WASM binding exposing the Helix analytic pipeline to the web/mobile UI",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ruvnet/helix"
+  },
+  "files": [
+    "helix_bg.wasm",
+    "helix.js",
+    "helix.d.ts"
+  ],
+  "main": "helix.js",
+  "types": "helix.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
