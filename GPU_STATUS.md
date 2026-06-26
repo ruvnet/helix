@@ -50,3 +50,17 @@ regulatory/clinical sign-off.
   Debug, expiry/scopes); and the **degradation ladder** made executable (`fallback_for`: auth/rate-limit →
   user-export, parse-fail → PDF/OCR). `FhirConnector::pull_observations` imports or degrades. 8 tests; clean.
   Elevates ADR-012 from modeled-seam to core-implemented. (Real partner network/auth still needs onboarding.)
+
+- **Iter 5 (2026-06-26):** ADR-030 + `helix-fed` — federation transport, privacy structurally unbypassable.
+  The ONLY thing that can leave is a `helix_cohort::CohortVector` (ADR-024 gate output: generalized + DP-noised)
+  — no API accepts raw records/embeddings/features, so they cannot be sent. Per-contribution expiring `Consent`
+  (opt-out default); genomics re-excluded at the door (defense in depth); `FedTransport` trait (in-memory agg
+  in tests, Ruflo Ed25519 signed dispatch later); returns only aggregate `CohortSignal`s (cohort size +
+  aggregate + ε), refused below a min-cohort re-identification guard. Elevates ADR-011 to client-implemented.
+  5 tests; clean.
+
+## ALL 5 DIRECTIVE ITEMS COMPLETE ✅
+1. On-device LLM analyst (ADR-026, ruvLLM GPU) · 2. Learned MiniLM text embedder (ADR-027, GPU) ·
+3. Learned visual encoder (ADR-028, GPU, safety-verified) · 4. FHIR connector core (ADR-029) ·
+5. Federation transport (ADR-030). Real model inference validated on the RTX 5080; connectors/federation
+built behind transport traits (real partner auth / aggregator network are the only genuinely external pieces).

@@ -1,0 +1,18 @@
+[package]
+name = "helix-fed"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-030: federation transport — opt-in, DP-gated cohort contribution over the helix-cohort privacy primitive"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+helix-cohort = { path = "../helix-cohort" }
+
+[dev-dependencies]
+proptest.workspace = true

@@ -50,9 +50,10 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [027](ADR-027-learned-text-embeddings.md) | Learned MiniLM Text Embeddings for Semantic Retrieval (local GPU) | Embeddings / on-device |
 | [028](ADR-028-learned-visual-encoder.md) | Learned Visual Encoder for Medical-Document Retrieval (local GPU) | Visual encoder / on-device |
 | [029](ADR-029-connector-clients.md) | Live Connector Clients — FHIR/SMART + Wearables (Rust, sandbox-first) | Connectors / ingestion |
+| [030](ADR-030-federation-transport.md) | Federation Transport — Opt-In Cohort Contribution (Rust, privacy-gated) | Federation / privacy |
 
 ## Status
 
-All 19 ADRs are **Proposed** (v1.0.0). They are derived from the v1.0.0 product spec and
+All 30 ADRs are **Proposed** (v1.0.0). They are derived from the v1.0.0 product spec and
 grounded by multi-source research; they have not yet been ratified against an
 implementation or reviewed by regulatory counsel / a clinical advisory board.

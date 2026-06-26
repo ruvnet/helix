@@ -21,6 +21,7 @@ members = [
     "crates/helix-embed",
     "crates/helix-vision",
     "crates/helix-connect",
+    "crates/helix-fed",
     "crates/helix-wasm",
 ]
 

@@ -497,6 +497,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-fed"
+version = "0.1.0"
+dependencies = [
+ "helix-cohort",
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-genome"
 version = "0.1.0"
 dependencies = [
