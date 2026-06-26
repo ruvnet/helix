@@ -299,6 +299,43 @@ export function ocr_ingest_json(document, floor) {
 }
 
 /**
+ * Number of analytes the population-reference fallback covers.
+ * @returns {number}
+ */
+export function population_range_coverage() {
+    const ret = wasm.population_range_coverage();
+    return ret >>> 0;
+}
+
+/**
+ * Population reference interval (NHANES-derived fallback) for a LOINC code.
+ * Returns `{low, high, median, name, unit, source}` or `null` if not covered.
+ * FALLBACK only — never overrides a lab's own range (ADR-006 tiering).
+ * @param {string} loinc
+ * @returns {string}
+ */
+export function population_range_json(loinc) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(loinc, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.population_range_json(ptr0, len0);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * The red-flag threshold registry version currently in force (ADR-009).
  * @returns {string}
  */

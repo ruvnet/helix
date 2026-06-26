@@ -615,6 +615,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-refranges"
+version = "0.1.1"
+dependencies = [
+ "helix-provenance",
+]
+
+[[package]]
 name = "helix-retrieval"
 version = "0.1.1"
 dependencies = [
@@ -720,6 +727,7 @@ dependencies = [
  "helix-ontology",
  "helix-pipeline",
  "helix-provenance",
+ "helix-refranges",
  "helix-score",
  "helix-sensing",
  "helix-timeline",

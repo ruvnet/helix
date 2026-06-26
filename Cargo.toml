@@ -26,6 +26,7 @@ members = [
     "crates/helix-focus",
     "crates/helix-timeline",
     "crates/helix-evolve",
+    "crates/helix-refranges",
     "crates/helix-wasm",
 ]
 

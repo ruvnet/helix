@@ -17,6 +17,7 @@ import init, {
   genome_raw_import_json,
   visual_encode_json,
   visual_maxsim_json,
+  population_range_json,
 } from "./pkg/helix.js";
 
 // previously-encoded image embeddings, for the OCR "looks similar" preview
@@ -422,7 +423,24 @@ function sparkline(tl) {
 // ---- Import (FHIR / OCR image / CSV → real records into the live dossier) ----
 let importedCount = 0;
 
+// Fill a population reference-range fallback (NHANES, helix-refranges) for records
+// that arrived without one — labeled so it never reads as the lab's own range.
+function fillPopRanges(recs) {
+  recs.forEach((r) => {
+    const rr = r.reference_range;
+    const hasRange = rr && (rr.low != null || rr.high != null);
+    if (!hasRange && r.code) {
+      const pop = JSON.parse(population_range_json(r.code));
+      if (pop) {
+        r.reference_range = { low: pop.low, high: pop.high };
+        r.range_source = "population"; // tag for honest labeling
+      }
+    }
+  });
+}
+
 function addImportedRecords(recs, badge = "imported") {
+  fillPopRanges(recs);
   recs.forEach((r) => records.push(r));
   importedCount += recs.length;
   // re-render everything that consumes records

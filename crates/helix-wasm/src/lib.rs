@@ -203,6 +203,27 @@ pub fn fhir_import_json(bundle: &str, source: &str) -> Result<String, JsValue> {
     serde_json::to_string(&serde_json::json!({ "records": records, "queued": queued })).map_err(err)
 }
 
+/// Population reference interval (NHANES-derived fallback) for a LOINC code.
+/// Returns `{low, high, median, name, unit, source}` or `null` if not covered.
+/// FALLBACK only — never overrides a lab's own range (ADR-006 tiering).
+#[wasm_bindgen]
+pub fn population_range_json(loinc: &str) -> Result<String, JsValue> {
+    match helix_refranges::lookup(loinc) {
+        Some(r) => serde_json::to_string(&serde_json::json!({
+            "low": r.low, "high": r.high, "median": r.median,
+            "name": r.name, "unit": r.unit, "source": helix_refranges::SOURCE,
+        }))
+        .map_err(err),
+        None => Ok("null".to_string()),
+    }
+}
+
+/// Number of analytes the population-reference fallback covers.
+#[wasm_bindgen]
+pub fn population_range_coverage() -> usize {
+    helix_refranges::coverage()
+}
+
 /// Import an Apple Health `export.xml` (ADR-029): parse known HealthKit records
 /// into provenance records. Bounded to 100k records. Returns the records JSON.
 #[wasm_bindgen]

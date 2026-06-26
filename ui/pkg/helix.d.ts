@@ -68,6 +68,18 @@ export function neural_session_to_records_json(session: string): string;
 export function ocr_ingest_json(document: string, floor: number): string;
 
 /**
+ * Number of analytes the population-reference fallback covers.
+ */
+export function population_range_coverage(): number;
+
+/**
+ * Population reference interval (NHANES-derived fallback) for a LOINC code.
+ * Returns `{low, high, median, name, unit, source}` or `null` if not covered.
+ * FALLBACK only — never overrides a lab's own range (ADR-006 tiering).
+ */
+export function population_range_json(loinc: string): string;
+
+/**
  * The red-flag threshold registry version currently in force (ADR-009).
  */
 export function redflag_registry_version(): string;
@@ -115,6 +127,8 @@ export interface InitOutput {
     readonly neural_disclaimer: () => [number, number];
     readonly neural_session_to_records_json: (a: number, b: number) => [number, number, number, number];
     readonly ocr_ingest_json: (a: number, b: number, c: number) => [number, number, number, number];
+    readonly population_range_coverage: () => number;
+    readonly population_range_json: (a: number, b: number) => [number, number, number, number];
     readonly redflag_registry_version: () => [number, number];
     readonly sensing_reading_json: (a: number, b: number) => [number, number, number, number];
     readonly timeline_json: (a: number, b: number) => [number, number, number, number];

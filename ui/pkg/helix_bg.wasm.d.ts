@@ -12,6 +12,8 @@ export const genome_raw_import_json: (a: number, b: number, c: number, d: number
 export const neural_disclaimer: () => [number, number];
 export const neural_session_to_records_json: (a: number, b: number) => [number, number, number, number];
 export const ocr_ingest_json: (a: number, b: number, c: number) => [number, number, number, number];
+export const population_range_coverage: () => number;
+export const population_range_json: (a: number, b: number) => [number, number, number, number];
 export const redflag_registry_version: () => [number, number];
 export const sensing_reading_json: (a: number, b: number) => [number, number, number, number];
 export const timeline_json: (a: number, b: number) => [number, number, number, number];
