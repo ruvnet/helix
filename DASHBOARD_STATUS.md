@@ -30,3 +30,16 @@ clippy/fmt/audit clean; pushed to ruvnet/helix main; live UI updated (Pages rebu
 2. Add a "Dashboard" view to ui/ + mobile: score-over-time SVG sparkline, vitals table, focus cards,
    bio-age delta card, recommendations feed. Wire to the new wasm fns.
 3. Rebuild wasm pkg, headless-screenshot validate, push, let Pages redeploy.
+
+- **Iter 2 (2026-06-26):** Wired the dashboard end to end. helix-wasm now exposes bioage_json/focus_json/
+  timeline_json. New **"Health report" view** in the console (+ deep-link #report): biological-age card
+  (PhenoAge delta, e.g. 42.5 yrs / 7.5 younger, + non-diagnostic modal), health-score-over-time SVG sparkline
+  with trend + change-point marker, vitals table (LOW/OK/HIGH vs range), focus-area cards (real ADR-032
+  rules), and Tier-1 grounded recommendations. wasm rebuilt; validated in headless Chrome (all panels render
+  real pipeline data); screenshot committed + embedded in docs/ui. 168 tests; clippy/fmt clean; audit clean
+  (200 deps). Pushed to main → Pages redeploying.
+
+## Status: dashboard COMPLETE — deployment propagating
+Implemented ✅ · tested ✅ (168) · secure ✅ (audit clean) · pushed to ruvnet/helix main ✅ · UI updated ✅.
+Live Pages CDN was still building at end of iter 2 (external lag); next fire verifies the live #report URL,
+then closes the loop.
