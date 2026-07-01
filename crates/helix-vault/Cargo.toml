@@ -15,7 +15,22 @@ helix-provenance = { path = "../helix-provenance", version = "0.1.0" }
 chacha20poly1305 = "0.10"
 getrandom = "0.2"
 zeroize = { version = "1", features = ["derive"] }
+# Disk persistence backend. Optional + off by default so the standard build and
+# any wasm target never compile redb/filesystem code (ADR-001 wasm-safety).
+redb = { version = "2", optional = true }
+# Argon2id passphrase KDF for the CredentialVault. Optional + off by default for
+# the same reason: the standard build and wasm target never pull in the KDF.
+argon2 = { version = "0.5", optional = true }
+# JSON encoding of a `Credential` before it is sealed. Optional + persist-gated;
+# the default build already carries serde_json only as a dev-dependency.
+serde_json = { workspace = true, optional = true }
 
 [dev-dependencies]
 proptest.workspace = true
 serde_json.workspace = true
+tempfile = "3"
+
+[features]
+# Non-default: enables the disk-backed, encrypted-at-rest `PersistentVaultStore`
+# and the passphrase-unlocked `CredentialVault` (Argon2id KDF).
+persist = ["dep:redb", "dep:argon2", "dep:serde_json"]

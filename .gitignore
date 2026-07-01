@@ -29,3 +29,25 @@ data/
 .claude-flow/
 ruvector.db
 *.db
+
+# ═══════════════════════════════════════════════════════════════════
+# PRIVATE HEALTH DATA — NEVER COMMIT. THIS IS A PUBLIC REPO.
+# Real PHI: Apple Health exports, clinical & pharmacy records,
+# derived intelligence, personal vector stores. Best practice is to
+# keep this OUTSIDE the repo entirely (see docs/Helix-Build-Spec.md).
+# ═══════════════════════════════════════════════════════════════════
+/Stu Health Data/
+Stu Health Data/
+**/Stu Health Data/
+# Defense-in-depth: PHI file types anywhere in the working tree
+Health Records*.json
+HealthAutoExport*.zip
+*_apple_health_export.json
+*immunization*.pdf
+prescriptions*.pdf
+claw_health_*.json
+claw_health_*.md
+claw_swarm_memory.db*
+ros3-agentdb.db
+# Convention for any future private data — put it under private/
+/private/
