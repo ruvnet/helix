@@ -18,8 +18,9 @@ fn fixture_path() -> PathBuf {
 }
 
 fn load() -> serde_json::Value {
-    let raw = std::fs::read_to_string(fixture_path())
-        .expect("ui/demo-dossier.json must exist — run `cargo run -p helix-demo --example generate`");
+    let raw = std::fs::read_to_string(fixture_path()).expect(
+        "ui/demo-dossier.json must exist — run `cargo run -p helix-demo --example generate`",
+    );
     serde_json::from_str(&raw).expect("fixture is valid JSON")
 }
 
