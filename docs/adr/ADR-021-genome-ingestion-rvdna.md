@@ -96,3 +96,12 @@ pharmacogenomic rule set (not Darwin-mutable).
 - Helix ADR-001 / §7.4 (the 23andMe lesson), ADR-005, ADR-010, ADR-011. **[A]**
 
 > Architectural/product guidance, not legal or medical advice. Genomic risk/pharmacogenomics is decision-support; engage clinical and legal counsel.
+
+---
+
+## Amendment (2026-07-01, ref. ADR-052)
+
+Pharmacogenomic advisories (Decision 5) surface inside the Proof/Reasoning-Trace panel
+(ADR-052) alongside the medication they flag — not as a separate genome screen — so a
+non-normal metabolizer phenotype appears exactly where the user is already looking at
+"why," using the same source/tier/verification layout as every other claim.

@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Helix — Living Twin · Personal Health Intelligence</title>
+<meta name="description" content="Helix — a private, local-first, anti-hallucination daily functional-medicine companion. Living Twin concept mockup (sample data)." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Hanken+Grotesk:ital,wght@0,300..700;1,400..500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   HELIX — "LIVING TWIN"  ·  organic / warm-dark / wellness
+   Display: Bricolage Grotesque   Body: Hanken Grotesk
+   ============================================================ */
+
+:root{
+  --bg:        #08110d;
+  --bg-2:      #0b1712;
+  --forest:    #0e1c16;
+  --panel:     rgba(24, 40, 32, 0.46);
+  --panel-2:   rgba(19, 33, 27, 0.62);
+  --panel-solid:#12211a;
+
+  --ink:       #f3ede0;
+  --ink-soft:  #cdd6c8;
+  --ink-mute:  #92a08f;
+  --ink-faint: #6a7a68;
+
+  --green:     #83e6a6;
+  --green-lo:  #37c98a;
+  --green-deep:#1f9d6d;
+  --amber:     #f6bd7c;
+  --amber-lo:  #ef9f55;
+  --teal:      #7fd8cf;
+
+  --line:      rgba(243, 237, 224, 0.09);
+  --line-2:    rgba(243, 237, 224, 0.05);
+
+  --shadow:    0 26px 60px -30px rgba(0,0,0,0.75), 0 8px 22px -14px rgba(0,0,0,0.6);
+  --glow-green: 0 0 44px -6px rgba(56,201,138,0.45);
+  --r-lg: 30px;
+  --r-md: 22px;
+  --r-sm: 15px;
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  font-family:"Hanken Grotesk", ui-sans-serif, sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+
+/* ---------- Atmosphere: gradient mesh + drifting bloom + grain ---------- */
+.atmos{ position:fixed; inset:0; z-index:-3; overflow:hidden; pointer-events:none; }
+.atmos::before{
+  content:""; position:absolute; inset:-20%;
+  background:
+    radial-gradient(38% 44% at 22% 18%, rgba(31,157,109,0.30), transparent 62%),
+    radial-gradient(40% 40% at 82% 26%, rgba(246,189,124,0.18), transparent 60%),
+    radial-gradient(52% 50% at 68% 88%, rgba(31,120,90,0.24), transparent 66%),
+    radial-gradient(46% 46% at 12% 82%, rgba(127,216,207,0.10), transparent 64%);
+  filter:blur(20px);
+  animation:drift 34s var(--ease) infinite alternate;
+}
+.atmos::after{
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(120% 90% at 50% -10%, transparent 40%, rgba(0,0,0,0.55) 100%);
+}
+@keyframes drift{
+  0%  { transform:translate3d(0,0,0) scale(1);   }
+  50% { transform:translate3d(2.5%, -1.5%, 0) scale(1.06); }
+  100%{ transform:translate3d(-2%, 2%, 0) scale(1.03); }
+}
+.grain{
+  position:fixed; inset:0; z-index:-2; pointer-events:none; opacity:0.05;
+  mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Sample / synthetic banner ---------- */
+.sample-banner{
+  position:relative; z-index:6;
+  display:flex; gap:12px; align-items:center; justify-content:center;
+  flex-wrap:wrap;
+  padding:9px 20px;
+  font-size:12.5px; letter-spacing:0.04em;
+  color:#1a1206; font-weight:600;
+  background:linear-gradient(100deg, var(--amber) 0%, #f4cf9a 55%, var(--amber-lo) 100%);
+  text-align:center;
+}
+.sample-banner b{ font-weight:800; }
+.sample-banner .dot{ width:6px; height:6px; border-radius:50%; background:#1a1206; opacity:.45; }
+
+/* ---------- Shell ---------- */
+.wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+
+/* ---------- Nav ---------- */
+header.nav{
+  position:sticky; top:0; z-index:5;
+  backdrop-filter:blur(14px) saturate(1.1);
+  background:linear-gradient(180deg, rgba(8,17,13,0.82), rgba(8,17,13,0.42));
+  border-bottom:1px solid var(--line-2);
+}
+.nav-inner{ display:flex; align-items:center; justify-content:space-between; padding:15px 24px; max-width:1180px; margin:0 auto; }
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand .mark{ width:30px; height:30px; flex:none; filter:drop-shadow(0 4px 10px rgba(56,201,138,0.4)); }
+.brand .name{ font-family:"Bricolage Grotesque"; font-weight:700; font-size:20px; letter-spacing:-0.02em; }
+.brand .name span{ color:var(--green); }
+.nav-links{ display:flex; gap:28px; align-items:center; }
+.nav-links a{ color:var(--ink-soft); text-decoration:none; font-size:14.5px; font-weight:500; transition:color .25s; }
+.nav-links a:hover{ color:var(--ink); }
+.pill-device{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:7px 13px; border-radius:999px;
+  font-size:12.5px; font-weight:600; color:var(--green);
+  background:rgba(31,157,109,0.12); border:1px solid rgba(56,201,138,0.28);
+}
+.pill-device .pulse{ width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 0 0 rgba(131,230,166,0.6); animation:pulseDot 2.6s infinite; }
+@keyframes pulseDot{ 0%{box-shadow:0 0 0 0 rgba(131,230,166,0.55);} 70%{box-shadow:0 0 0 9px rgba(131,230,166,0);} 100%{box-shadow:0 0 0 0 rgba(131,230,166,0);} }
+
+/* ---------- Reveal on load / scroll ---------- */
+.reveal{ opacity:0; transform:translateY(26px); }
+.reveal.in{ opacity:1; transform:none; transition:opacity .9s var(--ease), transform 1.05s var(--ease); }
+.stagger > *{ opacity:0; transform:translateY(22px); animation:rise .95s var(--ease) forwards; }
+@keyframes rise{ to{ opacity:1; transform:none; } }
+
+/* ---------- Hero ---------- */
+.hero{ position:relative; padding:56px 0 26px; }
+.hero-grid{ display:flex; gap:40px; align-items:center; }
+.hero-copy{ flex:1 1 46%; min-width:300px; }
+.eyebrow{
+  display:inline-flex; align-items:center; gap:9px;
+  font-size:12.5px; letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--ink-mute); font-weight:600; margin-bottom:20px;
+}
+.eyebrow .stitch{ width:26px; height:1px; background:linear-gradient(90deg, var(--green), transparent); }
+.hero h1{
+  font-family:"Bricolage Grotesque"; font-weight:600;
+  font-size:clamp(38px, 6vw, 60px); line-height:1.02;
+  letter-spacing:-0.03em; margin:0 0 18px;
+}
+.hero h1 em{ font-style:normal; color:var(--green); }
+.hero p.lede{ font-size:clamp(16px,2vw,18.5px); color:var(--ink-soft); max-width:38ch; margin:0 0 26px; }
+.hero-cta{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+.btn{
+  font-family:"Hanken Grotesk"; font-weight:600; font-size:15px;
+  padding:13px 22px; border-radius:999px; cursor:pointer; border:none;
+  transition:transform .3s var(--ease), box-shadow .3s var(--ease), background .3s;
+}
+.btn-primary{ color:#08120c; background:linear-gradient(120deg, var(--green) 0%, var(--green-lo) 100%); box-shadow:var(--glow-green); }
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 0 60px -8px rgba(56,201,138,0.6); }
+.btn-ghost{ color:var(--ink); background:transparent; border:1px solid var(--line); }
+.btn-ghost:hover{ transform:translateY(-2px); border-color:rgba(243,237,224,0.24); }
+
+.hero-stats{ display:flex; gap:26px; margin-top:30px; flex-wrap:wrap; }
+.hero-stat .n{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:24px; letter-spacing:-0.02em; }
+.hero-stat .n.up{ color:var(--green); }
+.hero-stat .l{ font-size:12.5px; color:var(--ink-mute); }
+
+/* ---------- Twin (3D / fallback) ---------- */
+.twin-stage{ flex:1 1 52%; min-width:300px; position:relative; }
+.twin-frame{
+  position:relative; border-radius:var(--r-lg);
+  height:clamp(400px, 52vh, 540px);
+  background:
+    radial-gradient(60% 60% at 50% 42%, rgba(31,157,109,0.16), transparent 70%),
+    linear-gradient(180deg, rgba(20,33,26,0.5), rgba(10,18,14,0.35));
+  border:1px solid var(--line);
+  box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,0.04);
+  overflow:hidden;
+}
+.twin-frame canvas{ display:block; width:100% !important; height:100% !important; }
+/* breathing body-glow behind the twin */
+.twin-frame::before{
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(42% 46% at 50% 46%, rgba(56,201,138,0.32), transparent 66%),
+             radial-gradient(30% 34% at 62% 40%, rgba(246,189,124,0.18), transparent 70%);
+  animation:breathe 6.5s ease-in-out infinite;
+}
+@keyframes breathe{ 0%,100%{ opacity:.72; transform:scale(1);} 50%{ opacity:1; transform:scale(1.05);} }
+.twin-cap{
+  position:absolute; left:20px; bottom:18px; z-index:2;
+  display:flex; align-items:center; gap:10px;
+  font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-soft);
+  background:rgba(8,17,13,0.5); border:1px solid var(--line); backdrop-filter:blur(8px);
+  padding:8px 13px; border-radius:999px;
+}
+.twin-cap .d{ width:8px; height:8px; border-radius:50%; }
+.twin-cap .d.g{ background:var(--green); } .twin-cap .d.a{ background:var(--amber); }
+.twin-badge{
+  position:absolute; right:18px; top:18px; z-index:2;
+  font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--green);
+  background:rgba(31,157,109,0.12); border:1px solid rgba(56,201,138,0.3);
+  padding:6px 11px; border-radius:999px;
+}
+/* fallback svg helix (shown until three.js is ready) */
+.twin-fallback{ position:absolute; inset:0; z-index:1; display:grid; place-items:center; transition:opacity 1s ease; }
+.twin-3d-ready .twin-fallback{ opacity:0; pointer-events:none; }
+.twin-fallback svg{ width:70%; max-width:280px; height:auto; }
+@keyframes spinY{ to{ transform:rotate(360deg);} }
+
+/* ---------- Section head ---------- */
+.section{ padding:44px 0; }
+.sec-head{ margin-bottom:26px; }
+.sec-kicker{ font-size:12.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--green-lo); font-weight:600; }
+.sec-title{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:clamp(26px,3.6vw,36px); letter-spacing:-0.025em; margin:8px 0 6px; }
+.sec-sub{ color:var(--ink-mute); font-size:15px; max-width:56ch; }
+
+/* ---------- Vitals band: composite ring + subscores ---------- */
+.vitals{ display:flex; gap:22px; flex-wrap:wrap; }
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md);
+  box-shadow:var(--shadow); backdrop-filter:blur(12px);
+  padding:26px;
+}
+.ring-card{ flex:1 1 320px; display:flex; gap:26px; align-items:center; flex-wrap:wrap; }
+.ring-wrap{ position:relative; width:190px; height:190px; flex:none; margin:0 auto; }
+.ring-wrap svg{ transform:rotate(-90deg); }
+.ring-track{ fill:none; stroke:rgba(243,237,224,0.08); stroke-width:14; }
+.ring-prog{ fill:none; stroke:url(#ringGrad); stroke-width:14; stroke-linecap:round;
+  stroke-dasharray:597; stroke-dashoffset:597; transition:stroke-dashoffset 1.8s var(--ease);
+  filter:drop-shadow(0 0 8px rgba(56,201,138,0.4)); }
+.ring-center{ position:absolute; inset:0; display:grid; place-content:center; text-align:center; }
+.ring-center .score{ font-family:"Bricolage Grotesque"; font-weight:700; font-size:52px; letter-spacing:-0.03em; line-height:1; }
+.ring-center .of{ font-size:13px; color:var(--ink-mute); }
+.ring-center .delta{ margin-top:6px; font-size:12.5px; font-weight:600; color:var(--green);
+  background:rgba(31,157,109,0.13); border-radius:999px; padding:3px 10px; display:inline-block; }
+.ring-meta h3{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:21px; margin:0 0 6px; letter-spacing:-0.02em; }
+.ring-meta p{ color:var(--ink-mute); font-size:14px; margin:0 0 16px; max-width:26ch; }
+.bioage{ display:flex; gap:14px; }
+.bioage .b{ background:var(--panel-2); border:1px solid var(--line-2); border-radius:var(--r-sm); padding:11px 14px; }
+.bioage .b .v{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:22px; letter-spacing:-0.02em; }
+.bioage .b .k{ font-size:11.5px; color:var(--ink-mute); }
+.bioage .b .v .arrow{ color:var(--green); font-size:15px; }
+
+.sub-card{ flex:1 1 320px; }
+.sub-card h3{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:18px; margin:0 0 4px; }
+.sub-card .hint{ font-size:13px; color:var(--ink-faint); margin:0 0 18px; }
+.sub{ margin-bottom:14px; }
+.sub-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+.sub-name{ font-size:14px; color:var(--ink-soft); display:flex; align-items:center; gap:8px; }
+.sub-name .d{ width:8px; height:8px; border-radius:50%; }
+.sub-val{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:15px; }
+.bar{ height:9px; border-radius:999px; background:rgba(243,237,224,0.07); overflow:hidden; }
+.bar > span{ display:block; height:100%; width:0; border-radius:999px; transition:width 1.5s var(--ease); }
+.fill-hi{ background:linear-gradient(90deg, var(--green-deep), var(--green)); }
+.fill-mid{ background:linear-gradient(90deg, var(--green-deep), var(--amber)); }
+.fill-lo{ background:linear-gradient(90deg, var(--amber-lo), var(--amber)); }
+
+/* ---------- Nudges ---------- */
+.nudges{ display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:22px; }
+.nudge{
+  position:relative; background:var(--panel); border:1px solid var(--line);
+  border-radius:var(--r-md); padding:24px; box-shadow:var(--shadow); backdrop-filter:blur(12px);
+  transition:transform .4s var(--ease), border-color .4s;
+}
+.nudge:hover{ transform:translateY(-4px); border-color:rgba(56,201,138,0.28); }
+.nudge-ico{ width:44px; height:44px; border-radius:14px; display:grid; place-items:center; margin-bottom:16px;
+  background:rgba(31,157,109,0.14); border:1px solid rgba(56,201,138,0.24); }
+.nudge-ico.amber{ background:rgba(246,189,124,0.13); border-color:rgba(246,189,124,0.28); }
+.nudge h3{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:19px; line-height:1.2; letter-spacing:-0.02em; margin:0 0 8px; }
+.nudge .body{ color:var(--ink-soft); font-size:14.5px; margin:0 0 16px; }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.chip{ font-size:11.5px; font-weight:600; padding:5px 10px; border-radius:999px;
+  background:var(--panel-2); border:1px solid var(--line-2); color:var(--ink-soft); }
+.chip.own{ color:var(--teal); border-color:rgba(127,216,207,0.28); }
+.chip.tierA{ color:#0c130d; background:var(--green); }
+.chip.tierB{ color:#1a1206; background:var(--amber); }
+
+.why-btn{
+  display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+  font-family:"Hanken Grotesk"; font-weight:600; font-size:13.5px; color:var(--green);
+  background:transparent; border:1px solid rgba(56,201,138,0.3); border-radius:999px; padding:8px 14px;
+  transition:background .3s, transform .3s;
+}
+.why-btn:hover{ background:rgba(31,157,109,0.1); }
+.why-btn .chev{ transition:transform .4s var(--ease); }
+.why-btn[aria-expanded="true"] .chev{ transform:rotate(180deg); }
+
+.proof{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .55s var(--ease), margin-top .4s; margin-top:0; }
+.proof.open{ grid-template-rows:1fr; margin-top:16px; }
+.proof-inner{ overflow:hidden; }
+.proof-box{ border:1px dashed rgba(56,201,138,0.28); border-radius:var(--r-sm); padding:16px; background:rgba(9,18,14,0.5); }
+.proof-row{ padding:11px 0; border-bottom:1px solid var(--line-2); }
+.proof-row:last-child{ border-bottom:none; padding-bottom:2px; }
+.proof-row:first-child{ padding-top:2px; }
+.proof-lab{ font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--green-lo); font-weight:700; margin-bottom:5px; display:flex; align-items:center; gap:7px; }
+.proof-lab.amber{ color:var(--amber-lo); }
+.proof-txt{ font-size:13.5px; color:var(--ink-soft); }
+.proof-txt b{ color:var(--ink); }
+.spark{ display:flex; align-items:center; gap:10px; margin-top:6px; }
+.spark svg{ flex:none; }
+.spark .series{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:13px; color:var(--ink); }
+.cite{ font-size:12.5px; color:var(--ink-mute); font-style:italic; }
+.cite b{ font-style:normal; color:var(--ink-soft); }
+
+/* ---------- Journey strip ---------- */
+.journey-card{ padding:26px 0 18px; }
+.journey-head{ display:flex; justify-content:space-between; align-items:baseline; padding:0 26px; flex-wrap:wrap; gap:10px; }
+.journey-scroll{
+  margin-top:20px; overflow-x:auto; overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  mask-image:linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+}
+.journey-track{ min-width:760px; padding:0 26px 8px; position:relative; }
+.months{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-faint); letter-spacing:0.08em; margin-bottom:6px; }
+.today-line{ position:absolute; right:26px; top:22px; bottom:14px; width:2px;
+  background:linear-gradient(180deg, var(--green), transparent); opacity:.6; }
+.lane{ display:flex; align-items:center; gap:14px; height:44px; }
+.lane-label{ width:118px; flex:none; font-size:12.5px; color:var(--ink-soft); display:flex; align-items:center; gap:9px; }
+.lane-label .d{ width:9px; height:9px; border-radius:50%; flex:none; }
+.lane-track{ position:relative; flex:1; height:100%; }
+.lane-track::before{ content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--line-2); }
+.evt{ position:absolute; top:50%; transform:translate(-50%,-50%); }
+.evt .dot{ width:13px; height:13px; border-radius:50%; border:2px solid var(--bg-2); cursor:pointer;
+  transition:transform .3s var(--ease), box-shadow .3s; }
+.evt:hover .dot{ transform:scale(1.35); }
+.evt .tip{
+  position:absolute; bottom:150%; left:50%; transform:translateX(-50%) translateY(6px);
+  white-space:nowrap; font-size:11.5px; padding:6px 10px; border-radius:9px;
+  background:var(--panel-solid); border:1px solid var(--line); color:var(--ink);
+  opacity:0; pointer-events:none; transition:opacity .3s, transform .3s; box-shadow:var(--shadow); z-index:3;
+}
+.evt:hover .tip{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ---------- Privacy reassurance ---------- */
+.privacy{
+  display:flex; gap:26px; align-items:center; flex-wrap:wrap;
+  background:
+    radial-gradient(60% 120% at 12% 0%, rgba(31,157,109,0.14), transparent 60%),
+    var(--panel);
+  border:1px solid var(--line); border-radius:var(--r-lg); padding:34px; box-shadow:var(--shadow);
+  backdrop-filter:blur(12px);
+}
+.privacy .lock{ width:64px; height:64px; flex:none; display:grid; place-items:center; border-radius:20px;
+  background:rgba(31,157,109,0.12); border:1px solid rgba(56,201,138,0.28); }
+.privacy .ptxt{ flex:1 1 320px; }
+.privacy h3{ font-family:"Bricolage Grotesque"; font-weight:600; font-size:24px; letter-spacing:-0.02em; margin:0 0 8px; }
+.privacy p{ color:var(--ink-soft); font-size:15px; margin:0; max-width:60ch; }
+.privacy .ptags{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+.ptag{ font-size:12px; font-weight:600; color:var(--green); background:rgba(31,157,109,0.1);
+  border:1px solid rgba(56,201,138,0.24); padding:6px 12px; border-radius:999px; display:inline-flex; gap:7px; align-items:center; }
+
+/* ---------- Footer ---------- */
+footer{ padding:44px 0 60px; border-top:1px solid var(--line-2); margin-top:26px; }
+.foot-inner{ display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:flex-start; }
+.foot-brand{ font-family:"Bricolage Grotesque"; font-weight:700; font-size:19px; }
+.foot-brand span{ color:var(--green); }
+.foot-note{ font-size:12.5px; color:var(--ink-faint); max-width:44ch; margin-top:8px; }
+.foot-links{ display:flex; gap:22px; flex-wrap:wrap; }
+.foot-links a{ color:var(--ink-mute); text-decoration:none; font-size:13.5px; }
+.foot-links a:hover{ color:var(--ink); }
+
+/* ---------- Focus & a11y ---------- */
+a:focus-visible, button:focus-visible, .evt .dot:focus-visible{
+  outline:2px solid var(--green); outline-offset:3px; border-radius:8px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 880px){
+  .nav-links{ display:none; }
+  .hero-grid{ flex-direction:column; }
+  .hero-copy, .twin-stage{ flex:1 1 100%; width:100%; }
+  .ring-card{ justify-content:center; text-align:center; }
+  .ring-meta p{ margin-left:auto; margin-right:auto; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  .atmos::before, .twin-frame::before, .pill-device .pulse{ animation:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="atmos" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ===== SAMPLE BANNER ===== -->
+<div class="sample-banner" role="note">
+  <span><b>SAMPLE · SYNTHETIC DATA</b></span>
+  <span class="dot" aria-hidden="true"></span>
+  <span>Public-repo demo · not real PHI · persona “Alex Rivera” is fictional</span>
+</div>
+
+<!-- ===== NAV ===== -->
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="mkA" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#83e6a6"/><stop offset="1" stop-color="#1f9d6d"/>
+          </linearGradient>
+          <linearGradient id="mkB" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#f6bd7c"/><stop offset="1" stop-color="#ef9f55"/>
+          </linearGradient>
+        </defs>
+        <path d="M9 3 C 22 9, 10 15, 23 21 M9 11 C 22 17, 10 23, 23 29" stroke="url(#mkA)" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M23 3 C 10 9, 22 15, 9 21 M23 11 C 10 17, 22 23, 9 29" stroke="url(#mkB)" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <span class="name">Helix<span>.</span></span>
+    </div>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#twin">Twin</a>
+      <a href="#score">Score</a>
+      <a href="#today">Today</a>
+      <a href="#journey">Journey</a>
+      <a href="#privacy">Privacy</a>
+    </nav>
+    <span class="pill-device"><span class="pulse" aria-hidden="true"></span>On-device</span>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <!-- ===== HERO / TWIN ===== -->
+  <section class="hero" id="twin">
+    <div class="hero-grid">
+      <div class="hero-copy stagger">
+        <span class="eyebrow" style="animation-delay:.05s"><span class="stitch"></span> Good morning, Alex</span>
+        <h1 style="animation-delay:.15s">Two strands,<br><em>one living twin.</em></h1>
+        <p class="lede" style="animation-delay:.28s">
+          Overnight your twin wove together everything you’ve measured with what it means.
+          Every word below shows its work and cites its source — gently, never a diagnosis.
+        </p>
+        <div class="hero-cta" style="animation-delay:.4s">
+          <button class="btn btn-primary">See today’s read</button>
+          <button class="btn btn-ghost">How the twin thinks</button>
+        </div>
+        <div class="hero-stats" style="animation-delay:.52s">
+          <div class="hero-stat"><div class="n up">74<span style="font-size:14px;color:var(--ink-mute)">/100</span></div><div class="l">Composite score · ▲ 6</div></div>
+          <div class="hero-stat"><div class="n">47<span style="font-size:14px;color:var(--ink-mute)">yr</span></div><div class="l">Biological age · improving</div></div>
+          <div class="hero-stat"><div class="n up">12</div><div class="l">day movement streak</div></div>
+        </div>
+      </div>
+
+      <div class="twin-stage reveal" style="transition-delay:.2s">
+        <div class="twin-frame" id="twinFrame">
+          <span class="twin-badge">Living twin</span>
+          <div class="twin-fallback" aria-hidden="true">
+            <!-- animated SVG double-helix fallback (shown until three.js is ready) -->
+            <svg viewBox="0 0 120 220" fill="none">
+              <g style="transform-origin:60px 110px; animation:spinY 14s linear infinite;">
+                <path d="M30 10 C 90 40, 30 70, 90 100 C 30 130, 90 160, 30 190" stroke="#83e6a6" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+                <path d="M90 10 C 30 40, 90 70, 30 100 C 90 130, 30 160, 90 190" stroke="#f6bd7c" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+                <g stroke="rgba(243,237,224,0.35)" stroke-width="2">
+                  <line x1="34" y1="26" x2="86" y2="26"/><line x1="80" y1="52" x2="40" y2="52"/>
+                  <line x1="34" y1="82" x2="86" y2="82"/><line x1="80" y1="112" x2="40" y2="112"/>
+                  <line x1="34" y1="142" x2="86" y2="142"/><line x1="80" y1="172" x2="40" y2="172"/>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <span class="twin-cap"><span class="d g" aria-hidden="true"></span> Data <span aria-hidden="true">×</span> <span class="d a" aria-hidden="true"></span> Intelligence</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMPOSITE SCORE + SUBSCORES ===== -->
+  <section class="section" id="score">
+    <div class="sec-head reveal">
+      <div class="sec-kicker">Composite Health Score</div>
+      <h2 class="sec-title">Where you are today — and what makes it up</h2>
+      <p class="sec-sub">One number, honestly decomposable. Tap any strand to see how your twin weighs it.</p>
+    </div>
+
+    <div class="vitals">
+      <!-- ring -->
+      <div class="card ring-card reveal">
+        <div class="ring-wrap">
+          <svg width="190" height="190" viewBox="0 0 190 190" aria-hidden="true">
+            <defs>
+              <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#37c98a"/>
+                <stop offset="0.7" stop-color="#83e6a6"/>
+                <stop offset="1" stop-color="#f6bd7c"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="95" cy="95" r="80"></circle>
+            <circle class="ring-prog" id="ringProg" cx="95" cy="95" r="80"></circle>
+          </svg>
+          <div class="ring-center">
+            <div class="score" id="scoreNum">74</div>
+            <div class="of">of 100</div>
+            <div class="delta">▲ 6 this month</div>
+          </div>
+        </div>
+        <div class="ring-meta">
+          <h3>Trending upward</h3>
+          <p>Up from 68. Activity and body composition are carrying you; sleep is the soft spot.</p>
+          <div class="bioage">
+            <div class="b"><div class="v">47<span class="arrow" aria-hidden="true">↓</span></div><div class="k">Biological age</div></div>
+            <div class="b"><div class="v">45</div><div class="k">Chronological</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- subscores -->
+      <div class="card sub-card reveal" style="transition-delay:.12s">
+        <h3>Six strands of the composite</h3>
+        <p class="hint">Each contributes to the 74. Greener is stronger; amber wants attention.</p>
+
+        <div class="sub"><div class="sub-top"><span class="sub-name"><span class="d" style="background:var(--green)"></span>Activity</span><span class="sub-val">88</span></div><div class="bar"><span class="fill-hi" data-w="88"></span></div></div>
+        <div class="sub"><div class="sub-top"><span class="sub-name"><span class="d" style="background:var(--green)"></span>Body composition</span><span class="sub-val">78</span></div><div class="bar"><span class="fill-hi" data-w="78"></span></div></div>
+        <div class="sub"><div class="sub-top"><span class="sub-name"><span class="d" style="background:var(--green-lo)"></span>Metabolic</span><span class="sub-val">71</span></div><div class="bar"><span class="fill-mid" data-w="71"></span></div></div>
+        <div class="sub"><div class="sub-top"><span class="sub-name"><span class="d" style="background:var(--amber)"></span>Nutrition</span><span class="sub-val">70</span></div><div class="bar"><span class="fill-mid" data-w="70"></span></div></div>
+        <div class="sub"><div class="sub-top"><span class="sub-name"><span class="d" style="background:var(--amber)"></span>Cardiovascular</span><span class="sub-val">66</span></div><div class="bar"><span class="fill-lo" data-w="66"></span></div></div>
+        <div class="sub"><div class="sub-top"><span class="sub-name"><span class="d" style="background:var(--amber-lo)"></span>Sleep</span><span class="sub-val">62</span></div><div class="bar"><span class="fill-lo" data-w="62"></span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NUDGES ===== -->
+  <section class="section" id="today">
+    <div class="sec-head reveal">
+      <div class="sec-kicker">Today’s gentle nudges</div>
+      <h2 class="sec-title">Four small things, each with its receipts</h2>
+      <p class="sec-sub">Wellness guidance, never a medical claim. Open any “why” to see your own data, the evidence tier, and the citation.</p>
+    </div>
+
+    <div class="nudges">
+
+      <!-- Nudge 1: sleep -->
+      <article class="nudge reveal">
+        <div class="nudge-ico amber" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" stroke="#f6bd7c" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Your deep sleep dipped this week — let’s protect it.</h3>
+        <p class="body">Deep sleep averaged 42 min/night and slipped 18% over the last 7 nights. A steady wind-down tonight is the kindest lever.</p>
+        <div class="chips"><span class="chip own">Own · Apple Watch</span><span class="chip tierB">Tier B</span><span class="chip">Ref</span></div>
+        <button class="why-btn" aria-expanded="false" aria-controls="proof-1">Show the proof trail <span class="chev" aria-hidden="true">▾</span></button>
+        <div class="proof" id="proof-1"><div class="proof-inner"><div class="proof-box">
+          <div class="proof-row">
+            <div class="proof-lab amber"><span>◆</span> Your data</div>
+            <div class="proof-txt">Apple Watch sleep stages, last 7 nights · deep-sleep avg <b>42 min</b> (target 90+), <b>down 18%</b> vs prior week.</div>
+            <div class="spark">
+              <svg width="120" height="30" viewBox="0 0 120 30"><polyline points="0,10 20,9 40,12 60,14 80,18 100,20 120,22" fill="none" stroke="#f6bd7c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="series">51 → 42 min</span>
+            </div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab amber"><span>◆</span> Evidence tier · B</div>
+            <div class="proof-txt">Observational / mechanistic support. Consistent association, not a controlled result for you personally.</div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab amber"><span>◆</span> Reference</div>
+            <div class="cite"><b>Slow-wave sleep &amp; glucose regulation.</b> Deep sleep supports overnight metabolic recovery. <i>(deep-sleep ↔ glucose regulation)</i></div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab amber"><span>◆</span> Suggested action <span style="color:var(--ink-faint);font-weight:500;text-transform:none;letter-spacing:0">· non-diagnostic</span></div>
+            <div class="proof-txt">A consistent wind-down — same time, dim light, screens down 45 min before bed.</div>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- Nudge 2: ferritin -->
+      <article class="nudge reveal" style="transition-delay:.08s">
+        <div class="nudge-ico" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M6 8l6-5 6 5M7 14c0 2.8 2.2 5 5 5s5-2.2 5-5" stroke="#83e6a6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Your ferritin is climbing back up.</h3>
+        <p class="body">Three draws in a row moving the right way — 22 → 26 → 29 ng/mL. Whatever you’re doing with iron-rich meals, it’s landing.</p>
+        <div class="chips"><span class="chip own">Own · Quest labs</span><span class="chip tierA">Tier A</span><span class="chip">Ref</span></div>
+        <button class="why-btn" aria-expanded="false" aria-controls="proof-2">Show the proof trail <span class="chev" aria-hidden="true">▾</span></button>
+        <div class="proof" id="proof-2"><div class="proof-inner"><div class="proof-box">
+          <div class="proof-row">
+            <div class="proof-lab"><span>◆</span> Your data</div>
+            <div class="proof-txt">Quest serum ferritin, 3 draws · <b>22 → 26 → 29 ng/mL</b> (low-normal, improving).</div>
+            <div class="spark">
+              <svg width="120" height="30" viewBox="0 0 120 30"><polyline points="0,22 60,14 120,8" fill="none" stroke="#83e6a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="0" cy="22" r="2.6" fill="#83e6a6"/><circle cx="60" cy="14" r="2.6" fill="#83e6a6"/><circle cx="120" cy="8" r="2.6" fill="#83e6a6"/></svg>
+              <span class="series">+7 ng/mL</span>
+            </div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab"><span>◆</span> Evidence tier · A</div>
+            <div class="proof-txt">Direct measurement of your own labs, trended over time — the strongest signal your twin can cite.</div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab"><span>◆</span> Reference</div>
+            <div class="cite"><b>Iron status &amp; fatigue / endurance.</b> Rising ferritin tracks with restored energy and aerobic capacity. <i>(iron ↔ fatigue/endurance)</i></div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab"><span>◆</span> Suggested action <span style="color:var(--ink-faint);font-weight:500;text-transform:none;letter-spacing:0">· non-diagnostic</span></div>
+            <div class="proof-txt">Keep the iron-rich meals going; a recheck in ~8 weeks would confirm the trend.</div>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- Nudge 3: LDL -->
+      <article class="nudge reveal" style="transition-delay:.16s">
+        <div class="nudge-ico" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 12s-4-7-8-7-8 7-8 7 4 7 8 7 8-7 8-7Z" stroke="#83e6a6" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.4" stroke="#83e6a6" stroke-width="1.7"/></svg>
+        </div>
+        <h3>Your LDL is heading the right way.</h3>
+        <p class="body">Down from 135 to 128 mg/dL — still borderline, but the direction is good, and your saturated-fat intake is trending down too.</p>
+        <div class="chips"><span class="chip own">Own · Labs + Lose It</span><span class="chip tierA">Tier A</span><span class="chip">Ref</span></div>
+        <button class="why-btn" aria-expanded="false" aria-controls="proof-3">Show the proof trail <span class="chev" aria-hidden="true">▾</span></button>
+        <div class="proof" id="proof-3"><div class="proof-inner"><div class="proof-box">
+          <div class="proof-row">
+            <div class="proof-lab"><span>◆</span> Your data</div>
+            <div class="proof-txt">Lipid panel <b>135 → 128 mg/dL</b> · Lose It saturated-fat log <b>trending ↓</b> over the same window.</div>
+            <div class="spark">
+              <svg width="120" height="30" viewBox="0 0 120 30"><polyline points="0,8 120,17" fill="none" stroke="#83e6a6" stroke-width="2" stroke-linecap="round"/><circle cx="0" cy="8" r="2.6" fill="#f6bd7c"/><circle cx="120" cy="17" r="2.6" fill="#83e6a6"/></svg>
+              <span class="series">−7 mg/dL</span>
+            </div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab"><span>◆</span> Evidence tier · A</div>
+            <div class="proof-txt">Two of your own sources agreeing — lab result plus dietary log — reinforcing one another.</div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab"><span>◆</span> Reference</div>
+            <div class="cite"><b>Lipids, fiber &amp; activity.</b> Higher fiber and regular movement associate with lower LDL. <i>(lipids ↔ fiber/activity)</i></div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab"><span>◆</span> Suggested action <span style="color:var(--ink-faint);font-weight:500;text-transform:none;letter-spacing:0">· non-diagnostic</span></div>
+            <div class="proof-txt">Keep the fiber and the movement going — you’re already doing the thing that’s working.</div>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- Nudge 4: body comp -->
+      <article class="nudge reveal" style="transition-delay:.24s">
+        <div class="nudge-ico amber" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="#f6bd7c" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Body composition is trending leaner.</h3>
+        <p class="body">Body fat moved 26% → 23.5% alongside a 12-day movement streak. Steady, sustainable, and yours.</p>
+        <div class="chips"><span class="chip own">Own · RENPHO</span><span class="chip tierB">Tier B</span><span class="chip">Streak</span></div>
+        <button class="why-btn" aria-expanded="false" aria-controls="proof-4">Show the proof trail <span class="chev" aria-hidden="true">▾</span></button>
+        <div class="proof" id="proof-4"><div class="proof-inner"><div class="proof-box">
+          <div class="proof-row">
+            <div class="proof-lab amber"><span>◆</span> Your data</div>
+            <div class="proof-txt">RENPHO body-fat <b>26% → 23.5%</b> · movement <b>12-day streak</b> logged in parallel.</div>
+            <div class="spark">
+              <svg width="120" height="30" viewBox="0 0 120 30"><polyline points="0,8 40,11 80,15 120,20" fill="none" stroke="#83e6a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="series">−2.5% BF</span>
+            </div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab amber"><span>◆</span> Evidence tier · B</div>
+            <div class="proof-txt">Consumer scale bio-impedance — great for trend, less so for a single-day absolute. Read the slope, not the point.</div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab amber"><span>◆</span> Reference</div>
+            <div class="cite"><b>Consistency &amp; body composition.</b> Sustained activity streaks associate with gradual fat-mass reduction. <i>(activity ↔ body composition)</i></div>
+          </div>
+          <div class="proof-row">
+            <div class="proof-lab amber"><span>◆</span> Suggested action <span style="color:var(--ink-faint);font-weight:500;text-transform:none;letter-spacing:0">· non-diagnostic</span></div>
+            <div class="proof-txt">Protect the streak — showing up beats intensity. Same time each day helps it stick.</div>
+          </div>
+        </div></div></div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ===== JOURNEY STRIP ===== -->
+  <section class="section" id="journey">
+    <div class="sec-head reveal">
+      <div class="sec-kicker">90-day journey</div>
+      <h2 class="sec-title">Your holistic event map</h2>
+      <p class="sec-sub">Labs, meds, sleep, weight and workouts on one flowing timeline. Hover a marker to read the moment.</p>
+    </div>
+
+    <div class="card journey-card reveal">
+      <div class="journey-head">
+        <strong style="font-family:'Bricolage Grotesque';font-weight:600;font-size:17px;">Last 90 days</strong>
+        <span style="font-size:12.5px;color:var(--ink-mute)">◀ scroll · today at right ▶</span>
+      </div>
+      <div class="journey-scroll">
+        <div class="journey-track">
+          <div class="today-line" aria-hidden="true"></div>
+          <div class="months"><span>Apr</span><span>May</span><span>Jun</span><span>Today</span></div>
+
+          <!-- Labs -->
+          <div class="lane">
+            <div class="lane-label"><span class="d" style="background:var(--amber)"></span>Labs</div>
+            <div class="lane-track">
+              <div class="evt" style="left:8%"><span class="dot" style="background:var(--amber)" tabindex="0"></span><span class="tip">Lipid panel · LDL 135</span></div>
+              <div class="evt" style="left:14%"><span class="dot" style="background:var(--amber)" tabindex="0"></span><span class="tip">Ferritin 22 ng/mL</span></div>
+              <div class="evt" style="left:48%"><span class="dot" style="background:var(--amber)" tabindex="0"></span><span class="tip">Ferritin 26 ng/mL</span></div>
+              <div class="evt" style="left:88%"><span class="dot" style="background:var(--green)" tabindex="0"></span><span class="tip">Ferritin 29 · LDL 128</span></div>
+            </div>
+          </div>
+          <!-- Meds -->
+          <div class="lane">
+            <div class="lane-label"><span class="d" style="background:var(--green)"></span>Meds &amp; supp.</div>
+            <div class="lane-track">
+              <div class="evt" style="left:18%"><span class="dot" style="background:var(--green)" tabindex="0"></span><span class="tip">Started gentle iron</span></div>
+              <div class="evt" style="left:30%"><span class="dot" style="background:var(--green)" tabindex="0"></span><span class="tip">Added Vitamin D</span></div>
+            </div>
+          </div>
+          <!-- Sleep -->
+          <div class="lane">
+            <div class="lane-label"><span class="d" style="background:var(--teal)"></span>Sleep</div>
+            <div class="lane-track">
+              <div class="evt" style="left:26%"><span class="dot" style="background:var(--teal)" tabindex="0"></span><span class="tip">Deep sleep 55 min avg</span></div>
+              <div class="evt" style="left:58%"><span class="dot" style="background:var(--teal)" tabindex="0"></span><span class="tip">Steady stretch — 51 min</span></div>
+              <div class="evt" style="left:92%"><span class="dot" style="background:var(--amber-lo)" tabindex="0"></span><span class="tip">Deep sleep dip −18% · 42 min</span></div>
+            </div>
+          </div>
+          <!-- Weight -->
+          <div class="lane">
+            <div class="lane-label"><span class="d" style="background:var(--green-lo)"></span>Weight / body</div>
+            <div class="lane-track">
+              <div class="evt" style="left:6%"><span class="dot" style="background:var(--amber)" tabindex="0"></span><span class="tip">Body fat 26.0%</span></div>
+              <div class="evt" style="left:50%"><span class="dot" style="background:var(--green-lo)" tabindex="0"></span><span class="tip">Body fat 24.8%</span></div>
+              <div class="evt" style="left:95%"><span class="dot" style="background:var(--green)" tabindex="0"></span><span class="tip">Body fat 23.5%</span></div>
+            </div>
+          </div>
+          <!-- Workouts -->
+          <div class="lane">
+            <div class="lane-label"><span class="d" style="background:var(--amber-lo)"></span>Workouts</div>
+            <div class="lane-track">
+              <div class="evt" style="left:20%"><span class="dot" style="background:var(--amber-lo)" tabindex="0"></span><span class="tip">3×/week rhythm begins</span></div>
+              <div class="evt" style="left:60%"><span class="dot" style="background:var(--amber-lo)" tabindex="0"></span><span class="tip">Strength block added</span></div>
+              <div class="evt" style="left:95%"><span class="dot" style="background:var(--green)" tabindex="0"></span><span class="tip">12-day movement streak</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRIVACY ===== -->
+  <section class="section" id="privacy">
+    <div class="privacy reveal">
+      <div class="lock" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="3" stroke="#83e6a6" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="#83e6a6" stroke-width="1.7"/><circle cx="12" cy="15.5" r="1.6" fill="#83e6a6"/></svg>
+      </div>
+      <div class="ptxt">
+        <h3>Your data stays with you.</h3>
+        <p>Helix runs on your device. Your labs, wearables and logs are woven into your twin locally — nothing is uploaded, sold, or seen by anyone else unless you explicitly choose to share it. The intelligence comes to your data, never the other way around.</p>
+        <div class="ptags">
+          <span class="ptag"><span aria-hidden="true">●</span> Local-first</span>
+          <span class="ptag"><span aria-hidden="true">●</span> On-device processing</span>
+          <span class="ptag"><span aria-hidden="true">●</span> No PHI leaves</span>
+          <span class="ptag"><span aria-hidden="true">●</span> You hold the keys</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <div class="foot-brand">Helix<span>.</span></div>
+      <p class="foot-note">Personal Health Intelligence Platform · ISO Vision LLC. Wellness guidance, not medical advice. Data shown is synthetic sample data for demonstration.</p>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="#twin">Twin</a><a href="#score">Score</a><a href="#today">Today</a><a href="#journey">Journey</a><a href="#privacy">Privacy</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- ===== three.js (living twin) ===== -->
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+try {
+  const THREE = await import('three');
+  const frame = document.getElementById('twinFrame');
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 100);
+  camera.position.set(0, 0, 10);
+
+  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  frame.appendChild(renderer.domElement);
+
+  function resize(){
+    const w = frame.clientWidth, h = frame.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  resize();
+
+  // lights
+  scene.add(new THREE.AmbientLight(0xbfe8cf, 0.7));
+  const lg = new THREE.PointLight(0x39c98a, 60, 60); lg.position.set(-6, 4, 6); scene.add(lg);
+  const la = new THREE.PointLight(0xf6bd7c, 42, 60); la.position.set(6, -3, 5); scene.add(la);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  // helix geometry
+  const N = 44, turns = 2.35, height = 8.4, R = 1.55;
+  const cGreen = new THREE.Color(0x8ef0b3), cGreenE = new THREE.Color(0x2fbf82);
+  const cAmber = new THREE.Color(0xffcf92), cAmberE = new THREE.Color(0xef9f55);
+  const sphereGeo = new THREE.SphereGeometry(0.16, 20, 20);
+
+  function strand(color, emissive, phase){
+    const mat = new THREE.MeshStandardMaterial({ color, emissive, emissiveIntensity:0.85, roughness:0.32, metalness:0.0 });
+    const nodes = [];
+    for(let i=0;i<N;i++){
+      const t = i/(N-1);
+      const a = t*turns*Math.PI*2 + phase;
+      const m = new THREE.Mesh(sphereGeo, mat);
+      const s = 0.7 + 0.5*Math.sin(t*Math.PI); // taper ends slightly
+      m.scale.setScalar(s);
+      m.position.set(Math.cos(a)*R, (t-0.5)*height, Math.sin(a)*R);
+      group.add(m); nodes.push(m);
+    }
+    return nodes;
+  }
+  const A = strand(cAmber, cAmberE, 0);
+  const B = strand(cGreen, cGreenE, Math.PI);
+
+  // rungs
+  const rungMat = new THREE.MeshStandardMaterial({ color:0xdfe9d8, emissive:0x2a5f45, emissiveIntensity:0.3, roughness:0.5, transparent:true, opacity:0.6 });
+  const rungGeo = new THREE.CylinderGeometry(0.028, 0.028, 1, 8);
+  for(let i=0;i<N;i+=3){
+    const p1 = A[i].position, p2 = B[i].position;
+    const mid = p1.clone().add(p2).multiplyScalar(0.5);
+    const dir = p2.clone().sub(p1); const len = dir.length();
+    const r = new THREE.Mesh(rungGeo, rungMat);
+    r.position.copy(mid); r.scale.y = len;
+    r.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize());
+    group.add(r);
+  }
+
+  // additive body-glow sprites
+  function glowTex(){
+    const c = document.createElement('canvas'); c.width=c.height=128;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(64,64,0,64,64,64);
+    g.addColorStop(0,'rgba(255,255,255,0.9)'); g.addColorStop(0.4,'rgba(255,255,255,0.35)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,128,128);
+    return new THREE.CanvasTexture(c);
+  }
+  const gt = glowTex();
+  function glow(color, x, scale){
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map:gt, color, blending:THREE.AdditiveBlending, transparent:true, depthWrite:false, opacity:0.55 }));
+    sp.scale.setScalar(scale); sp.position.set(x,0,-1); group.add(sp); return sp;
+  }
+  glow(0x2fbf82, -0.6, 7.5);
+  glow(0xef9f55, 0.9, 6.0);
+
+  // floating motes
+  const moteGeo = new THREE.BufferGeometry();
+  const M = 60, pos = new Float32Array(M*3);
+  for(let i=0;i<M;i++){ pos[i*3]=(Math.random()-0.5)*9; pos[i*3+1]=(Math.random()-0.5)*10; pos[i*3+2]=(Math.random()-0.5)*4-1; }
+  moteGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  const motes = new THREE.Points(moteGeo, new THREE.PointsMaterial({ color:0x9fe6c0, size:0.05, transparent:true, opacity:0.5, blending:THREE.AdditiveBlending, depthWrite:false }));
+  scene.add(motes);
+
+  document.body.classList.add('twin-3d-ready');
+
+  const clock = new THREE.Clock();
+  function tick(){
+    const t = clock.getElapsedTime();
+    if(!reduce){
+      group.rotation.y = t*0.32;
+      const breath = 1 + Math.sin(t*1.05)*0.028;
+      group.scale.setScalar(breath);
+      const e = 0.7 + Math.sin(t*1.05)*0.28;
+      A[0].material.emissiveIntensity = e; B[0].material.emissiveIntensity = e;
+      motes.rotation.y = -t*0.05;
+      motes.position.y = Math.sin(t*0.4)*0.2;
+    } else {
+      group.rotation.y = 0.5;
+    }
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  let rt; window.addEventListener('resize', ()=>{ clearTimeout(rt); rt=setTimeout(resize, 120); });
+} catch(err){
+  /* three.js unavailable — the animated SVG fallback stays visible */
+  console.warn('Living-twin 3D unavailable, using SVG fallback.', err);
+}
+</script>
+
+<!-- ===== UI behavior (reveal, ring, bars, proof trails) ===== -->
+<script>
+(function(){
+  // Scroll reveals
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold:0.16 });
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // Composite ring draw + subscore bars, animate when the score section enters
+  const scoreSec = document.getElementById('score');
+  const ringProg = document.getElementById('ringProg');
+  const C = 2*Math.PI*80; // circumference r=80
+  ringProg.style.strokeDasharray = C;
+  ringProg.style.strokeDashoffset = C;
+  let scoreFilled = false;
+  function fillScore(){
+    if(scoreFilled) return; scoreFilled = true;
+    ringProg.style.strokeDashoffset = C*(1-0.74);
+    document.querySelectorAll('.bar > span').forEach(b=>{ b.style.width = b.dataset.w + '%'; });
+  }
+  const ringIO = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ fillScore(); ringIO.disconnect(); } });
+  }, { threshold:0.35 });
+  if(scoreSec){
+    ringIO.observe(scoreSec);
+    // Safety: if the section is already on-screen at load (tall viewport /
+    // short page), fill synchronously so it never renders empty.
+    requestAnimationFrame(()=>{
+      const r = scoreSec.getBoundingClientRect();
+      if(r.top < window.innerHeight * 0.9) fillScore();
+    });
+  }
+
+  // Proof-trail expand/collapse
+  document.querySelectorAll('.why-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const panel = document.getElementById(btn.getAttribute('aria-controls'));
+      const open = panel.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.childNodes[0].textContent = open ? 'Hide the proof trail ' : 'Show the proof trail ';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

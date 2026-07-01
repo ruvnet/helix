@@ -35,7 +35,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [012](ADR-012-connector-abstraction-graceful-degradation.md) | Connector Abstraction with Graceful Degradation | Platform / ingestion |
 | [013](ADR-013-on-device-inference.md) | On-Device Inference Where Feasible | Privacy / compute |
 | [014](ADR-014-ambient-sensing-cognitum-seed.md) | Ambient Passive Sensing via the Cognitum Seed (mmWave) | Sensing |
-| [015](ADR-015-visual-3d-digital-twin.md) | Visual Health-Intelligence Layer (3D Anatomical Digital Twin) | Visual |
+| [015](ADR-015-visual-3d-digital-twin.md) | Visual Health-Intelligence Layer (3D Anatomical Digital Twin) | Visual — superseded in part by ADR-054 |
 | [016](ADR-016-composite-health-score.md) | Composite 0–100 Health Score — Transparent, Decomposable | Visual |
 | [017](ADR-017-mint-branded-harness-metaharness.md) | Mint Helix as a Branded Harness via MetaHarness | Self-optimization |
 | [018](ADR-018-darwin-mode-faithfulness-fitness.md) | Darwin Mode Self-Optimization with Faithfulness Fitness | Self-optimization |
@@ -57,9 +57,33 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [034](ADR-034-biological-age-estimate.md) | Biological / Medical Age Estimate from Routine Labs | Dashboard / biomarkers |
 | [035](ADR-035-darwin-parameter-evolution.md) | Darwin-Style Parameter Evolution (safety-frozen) | Self-optimization / safety |
 | [036](ADR-036-scale-invariant-trend-band.md) | Scale-Invariant (Reference-Range-Relative) Trend Dead-Band | Accuracy / numerics |
+| [045](ADR-045-encrypted-credential-vault-zero-knowledge.md) | Encrypted Credential Vault (Zero-Knowledge) | Security / credentials |
+| [046](ADR-046-agentic-browser-data-acquisition.md) | Agentic-Browser Data Acquisition for No-API Sources | Ingestion / integration |
+| [047](ADR-047-single-tenant-local-first-topology.md) | Single-Tenant, Local-First Product Topology | Platform / topology |
+| [048](ADR-048-aimds-guardrails-pull-analyst-surface.md) | AIMDS/AIDefence Guardrails on the Pull + Analyst Surface | Security / anti-hallucination |
+| [049](ADR-049-scheduled-per-source-pull-cadences.md) | Scheduled Per-Source Pull Cadences with Auto-Refresh | Ingestion / scheduling |
+| [050](ADR-050-design-system-visual-language.md) | Design System & Visual Language | Visual / design system |
+| [051](ADR-051-adaptive-application-shell.md) | Adaptive Application Shell (Tauri v2 Desktop + PWA Mobile over One WASM Core) | Platform / shell |
+| [052](ADR-052-proof-reasoning-trace-ux.md) | Proof / Reasoning-Trace UX | UX / anti-hallucination |
+| [053](ADR-053-witness-chained-answer-provenance.md) | Witness-Chained Answer Provenance | Provenance / security |
+| [054](ADR-054-realtime-webgl-digital-twin.md) | Real-Time WebGL Digital Twin — Live Binding & Adaptive LOD | Visual — supersedes ADR-015 |
+| [055](ADR-055-external-medical-literature-verifier.md) | External Medical-Literature Verifier (Live Citation Grounding) | Anti-hallucination / literature |
+| [056](ADR-056-cognitum-seed-offline-knowledge-substrate.md) | Cognitum Seed as Personal Offline Knowledge Substrate | Knowledge substrate / integration |
+| [057](ADR-057-privacy-tiered-model-routing.md) | Privacy-Tiered Model Routing (Connected vs Sealed) | Model routing / privacy |
 
 ## Status
 
-35 Proposed + ADR-036 Accepted (v1.0.0). They are derived from the v1.0.0 product spec and
-grounded by multi-source research; they have not yet been ratified against an
-implementation or reviewed by regulatory counsel / a clinical advisory board.
+48 Proposed + ADR-036 Accepted (v1.0.0). ADR-015 is proposed and intact, with its render
+behavior partially superseded by ADR-054 (see the note at the top of ADR-015). They are
+derived from the v1.0.0 product spec and grounded by multi-source research; they have not
+yet been ratified against an implementation or reviewed by regulatory counsel / a
+clinical advisory board.
+
+**Numbering gap (037–044).** ADR-037 through ADR-044 are referenced by later ADRs (e.g.
+ADR-045 → ADR-037 "persistent vault"; ADR-046 → ADR-041 "connector clients") and are
+described in [`../Helix-Build-Spec.md`](../Helix-Build-Spec.md) (the persistent
+encrypted vault, the holistic `ProvRecord` event-map/graph, the Lose It connector, the
+proactive daily-briefing engine, and local-embeddings-via-RVF) — but have not yet been
+filed as standalone ADR files in this directory. The gap is intentional and documented
+here rather than filled with placeholder files; do not fabricate ADR-037–044 documents
+without doing the underlying design work first.

@@ -1,11 +1,18 @@
 # ADR-015: Visual Health-Intelligence Layer (3D Anatomical Digital Twin)
 
-**Status**: Proposed
+**Status**: Proposed — **superseded in part by ADR-054** (2026-07-01)
 **Date**: 2026-06-25
 **Project**: Helix — Personal Health Intelligence (PHI)
 **Prepared by**: ISO Vision LLC
 **Substrate**: Ruflo + RuVector + Cognitum Seed + MetaHarness/Darwin
 **Related**: ADR-001, ADR-003, ADR-005, ADR-006, ADR-009, ADR-010, ADR-014, ADR-016
+
+> **2026-07-01 note**: ADR-054 supersedes this ADR's render behavior — live
+> metric→region data binding and runtime-adaptive LOD, in place of the static
+> render/static LOD described below. This ADR's stack choice (React Three
+> Fiber/WebGL), the four hard visualization-safety constraints (V-1–V-4), the
+> tap-to-reveal information architecture, and the full alternatives analysis remain
+> in force unchanged — see ADR-054 for what changed and why.
 
 ---
 
