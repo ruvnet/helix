@@ -31,6 +31,16 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 
 pub use helix_provenance::RecordId;
 
+#[cfg(feature = "persist")]
+mod persist;
+#[cfg(feature = "persist")]
+pub use persist::PersistentVaultStore;
+
+#[cfg(feature = "persist")]
+mod credentials;
+#[cfg(feature = "persist")]
+pub use credentials::{Credential, CredentialKind, CredentialVault};
+
 const KEY_LEN: usize = 32;
 const NONCE_LEN: usize = 24;
 
@@ -93,6 +103,12 @@ pub enum VaultError {
     OpenFailed,
     #[error("no record with id {0:?}")]
     NotFound(RecordId),
+    /// Disk-backed store failure (open/read/write/corruption). Only present with
+    /// the `persist` feature; the message is a `String` so `VaultError` stays
+    /// `Clone + Eq`.
+    #[cfg(feature = "persist")]
+    #[error("vault storage error: {0}")]
+    Storage(String),
 }
 
 /// Encrypt `plaintext` under `key` with a fresh random nonce.
