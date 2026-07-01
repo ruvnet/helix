@@ -239,3 +239,24 @@ body {
   .topbar h1 { font-size: 21px; }
   .score-card { flex-direction: column; text-align: center; }
 }
+
+/* ---- Synthetic demo data ------------------------------------------------ */
+.demo-banner {
+  margin: 0 0 16px; padding: 10px 14px; border-radius: 12px;
+  border: 1px solid var(--warm); background: rgba(246, 166, 35, .10);
+  color: #f3d7a6; font-size: 12.5px; line-height: 1.45;
+}
+.demo-banner b { color: var(--warm); }
+
+/* ---- Medications (Pharmacy) & clinician notes (EMR) --------------------- */
+.meds-card, .notes-card { grid-column: 1 / -1; }
+.med-item { padding: 10px 0; border-bottom: 1px solid #14233a; }
+.med-item:last-child { border: 0; }
+.med-name { font-size: 13.5px; color: var(--text); }
+.med-meta { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--muted2); margin-top: 3px; }
+.note-item { padding: 12px 0; border-bottom: 1px solid #14233a; }
+.note-item:last-child { border: 0; }
+.note-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.note-top b { color: var(--vital2); font-size: 13.5px; }
+.note-meta { color: var(--muted2); font-size: 11.5px; white-space: nowrap; }
+.note-text { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }

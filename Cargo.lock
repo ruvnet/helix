@@ -510,6 +510,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-demo"
+version = "0.1.2"
+dependencies = [
+ "helix-bioage",
+ "helix-escalation",
+ "helix-focus",
+ "helix-numeric",
+ "helix-pipeline",
+ "helix-provenance",
+ "helix-score",
+ "helix-timeline",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "helix-embed"
 version = "0.1.2"
 dependencies = [

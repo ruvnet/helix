@@ -82,6 +82,9 @@
         </div>
       </header>
 
+      <!-- Synthetic-data disclaimer (set by app.js from the demo fixture) -->
+      <div class="demo-banner" id="demo-banner" role="note" hidden></div>
+
       <!-- DASHBOARD -->
       <section class="view" data-view="dashboard">
         <div class="grid">
@@ -143,6 +146,14 @@
             <div class="card-title">Updates & recommendations</div>
             <div id="recs-list"></div>
           </div>
+          <div class="card meds-card">
+            <div class="card-title">Medications · Pharmacy</div>
+            <div id="meds-list"></div>
+          </div>
+          <div class="card notes-card">
+            <div class="card-title">Clinician notes · EMR</div>
+            <div id="notes-list"></div>
+          </div>
         </div>
       </section>
 
@@ -163,9 +174,10 @@
       <!-- RECORDS -->
       <section class="view hidden" data-view="records">
         <div class="card">
-          <div class="card-title">Records in this session <button class="link" id="add-record">+ Add record</button></div>
+          <div class="card-title">Records <span class="muted" id="records-count"></span> <button class="link" id="add-record">+ Add record</button></div>
+          <p class="muted small" style="margin:-4px 0 10px">Grouped by concept — one row per marker showing the latest reading and how many readings back it.</p>
           <table class="records" id="records-table">
-            <thead><tr><th>Concept</th><th>Value</th><th>Date</th><th>Source</th><th>Range</th></tr></thead>
+            <thead><tr><th>Concept</th><th>Latest</th><th>Date</th><th>Source</th><th>Range</th><th>Readings</th></tr></thead>
             <tbody id="records-body"></tbody>
           </table>
         </div>
