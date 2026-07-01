@@ -86,7 +86,10 @@ fn records_survive_reopen_and_disk_is_encrypted() {
         // Wrong key cannot read a persisted record.
         let other = SealKey::from_bytes([7u8; 32]);
         let sealed = store.get(&RecordId::from("rec-1")).unwrap().unwrap();
-        assert!(open(&other, &sealed).is_err(), "wrong key must fail to open");
+        assert!(
+            open(&other, &sealed).is_err(),
+            "wrong key must fail to open"
+        );
     } // drop before reading raw bytes.
 
     // --- Encrypted-at-rest proof: raw file bytes contain no plaintext fields. ---

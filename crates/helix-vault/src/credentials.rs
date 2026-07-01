@@ -167,8 +167,7 @@ impl CredentialVault {
     /// Seal `cred` under the vault key and store it, keyed by `cred.source`
     /// (overwriting any existing entry for that source).
     pub fn put(&self, cred: &Credential) -> Result<(), VaultError> {
-        let plaintext =
-            serde_json::to_vec(cred).map_err(|e| VaultError::Storage(e.to_string()))?;
+        let plaintext = serde_json::to_vec(cred).map_err(|e| VaultError::Storage(e.to_string()))?;
         let wire = to_wire(&seal(&self.key, &plaintext)?);
 
         let txn = self.db.begin_write().map_err(store_err)?;
