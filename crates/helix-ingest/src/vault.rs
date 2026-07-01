@@ -137,6 +137,34 @@ pub fn seal_records(dir: &Path, key: &SealKey, records: &[ProvRecord]) -> Result
     Ok(())
 }
 
+/// Establish (`init = true`) or verify (`init = false`) the passphrase against the
+/// vault verifier WITHOUT sealing any corpus records. Used by the companion
+/// server's unlock endpoint: `Ok(())` iff the passphrase is correct (existing
+/// vault) or the vault was freshly initialized. A wrong passphrase on an existing
+/// vault is a hard error, so the caller must NOT retain the key on `Err`.
+pub fn unlock(dir: &Path, key: &SealKey, init: bool) -> Result<()> {
+    open_verified(dir, key, init)?;
+    Ok(())
+}
+
+/// Count corpus records (non-reserved ids) WITHOUT decrypting — usable while the
+/// vault is locked (no key held). Returns 0 if the store does not exist yet.
+pub fn count_records(dir: &Path) -> Result<usize> {
+    let path = records_db_path(dir);
+    if !path.is_file() {
+        return Ok(0);
+    }
+    let store = PersistentVaultStore::open(&path)
+        .with_context(|| format!("opening vault store in {}", dir.display()))?;
+    let mut n = 0usize;
+    for id in store.ids().context("listing vault ids")? {
+        if !id.0.starts_with(RESERVED_PREFIX) {
+            n += 1;
+        }
+    }
+    Ok(n)
+}
+
 /// Re-open the store FRESH (proving durability across a close) and decrypt every
 /// corpus record back out. Internal/reserved records are skipped.
 pub fn reopen_records(dir: &Path, key: &SealKey) -> Result<Vec<ProvRecord>> {

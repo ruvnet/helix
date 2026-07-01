@@ -26,9 +26,16 @@ rpassword = "7"
 # Passphrase KDF (mirrors helix-vault's private credential-vault KDF).
 argon2 = "0.5"
 getrandom = "0.2"
+# `serve` companion server: a tiny, synchronous, loopback-only HTTP server (no
+# async runtime, no outbound capability). ADR-057 Sealed-mode bind invariant.
+tiny_http = "0.12"
+# Decode uploaded files carried as base64 (or data-URL) inside the import JSON.
+base64 = "0.22"
 
 [dev-dependencies]
 tempfile = "3"
+# Used by the serve integration tests to exercise the base64/data-URL upload path.
+base64 = "0.22"
 
 [features]
 # `persist` is a no-op passthrough kept so `cargo test -p helix-ingest --features

@@ -22,6 +22,7 @@ use helix_provenance::ProvRecord;
 
 pub mod dossier;
 pub mod parse;
+pub mod serve;
 pub mod vault;
 
 pub use parse::{APPLE_SOURCE, FHIR_SOURCE};

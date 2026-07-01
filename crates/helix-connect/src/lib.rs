@@ -95,7 +95,10 @@ pub fn parse_observation(
     if obs["resourceType"].as_str() != Some("Observation") {
         return Err(ConnectError::Parse("not an Observation".into()));
     }
-    let id = obs["id"].as_str().unwrap_or("obs").to_string();
+    // Explicit id if present; otherwise synthesized below from code + measured_at
+    // (the `id` binding near the ProvRecord). Deferring lets us fall back to a
+    // UNIQUE key instead of the literal "obs", which used to collide.
+    let explicit_id = obs["id"].as_str();
 
     // LOINC coding.
     let coding = obs["code"]["coding"]
@@ -137,8 +140,15 @@ pub fn parse_observation(
     let reference_range =
         rr.map(|r| ReferenceRange::new(r["low"]["value"].as_f64(), r["high"]["value"].as_f64()));
 
+    // With an explicit id, keep the stable `fhir-{source}-{id}`. Without one,
+    // synthesize a UNIQUE id from code + measured_at (mirrors the Apple scheme)
+    // so distinct id-less observations on the same date never collide.
+    let id = match explicit_id {
+        Some(existing) => format!("fhir-{source}-{existing}"),
+        None => format!("fhir-{source}-{code}-{measured_at}"),
+    };
     Ok(ProvRecord {
-        id: RecordId::from(format!("fhir-{source}-{id}")),
+        id: RecordId::from(id),
         source: source.to_string(),
         measured_at,
         method: MeasurementMethod::LabFeed,
@@ -336,6 +346,33 @@ mod tests {
             "valueQuantity": { "value": 1.0, "unit": "x" }, "effectiveDateTime": "2026-01-01"
         });
         assert!(parse_observation(&no_loinc, "s").is_err());
+    }
+
+    #[test]
+    fn idless_same_date_distinct_codes_get_distinct_ids() {
+        // Three id-less Observations, SAME date, DISTINCT LOINC codes. Before the
+        // fix they all collapsed to id "obs" and overwrote each other; now each
+        // gets a unique code+date id.
+        let mk = |code: &str| {
+            serde_json::json!({
+                "resourceType": "Observation",
+                "code": { "coding": [{ "system": "http://loinc.org", "code": code, "display": "x" }] },
+                "valueQuantity": { "value": 1.0, "unit": "u" },
+                "effectiveDateTime": "2026-06-19"
+            })
+        };
+        let a = parse_observation(&mk("2276-4"), "s").unwrap();
+        let b = parse_observation(&mk("2085-9"), "s").unwrap();
+        let c = parse_observation(&mk("3016-3"), "s").unwrap();
+        let ids: std::collections::BTreeSet<RecordId> = [a.id, b.id, c.id].into_iter().collect();
+        assert_eq!(ids.len(), 3, "id-less same-date distinct-code obs must yield 3 distinct ids");
+    }
+
+    #[test]
+    fn explicit_id_path_unchanged() {
+        let obs = observation("2276-4", "Ferritin", 28.0, "ng/mL", "2026-06-19");
+        let r = parse_observation(&obs, "MyChart").unwrap();
+        assert_eq!(r.id, RecordId::from("fhir-MyChart-o1"), "with-id path is stable");
     }
 
     #[test]
