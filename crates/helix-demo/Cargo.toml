@@ -11,11 +11,11 @@ description = "Synthetic, fictional demo dossier (the 'Alex Rivera' persona) tha
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
-helix-provenance = { path = "../helix-provenance" }
-helix-pipeline = { path = "../helix-pipeline" }
-helix-escalation = { path = "../helix-escalation" }
-helix-focus = { path = "../helix-focus" }
-helix-score = { path = "../helix-score" }
-helix-bioage = { path = "../helix-bioage" }
-helix-timeline = { path = "../helix-timeline" }
-helix-numeric = { path = "../helix-numeric" }
+helix-provenance = { path = "../helix-provenance", version = "0.1.2" }
+helix-pipeline = { path = "../helix-pipeline", version = "0.1.2" }
+helix-escalation = { path = "../helix-escalation", version = "0.1.2" }
+helix-focus = { path = "../helix-focus", version = "0.1.2" }
+helix-score = { path = "../helix-score", version = "0.1.2" }
+helix-bioage = { path = "../helix-bioage", version = "0.1.2" }
+helix-timeline = { path = "../helix-timeline", version = "0.1.2" }
+helix-numeric = { path = "../helix-numeric", version = "0.1.2" }
