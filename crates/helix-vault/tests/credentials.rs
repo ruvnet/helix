@@ -30,7 +30,10 @@ fn fake_credentials() -> Vec<Credential> {
     walgreens.insert("password".to_string(), FAKE_WALGREENS_PASSWORD.to_string());
 
     let mut renpho = BTreeMap::new();
-    renpho.insert("username".to_string(), "renpho-fake@example.com".to_string());
+    renpho.insert(
+        "username".to_string(),
+        "renpho-fake@example.com".to_string(),
+    );
     renpho.insert("password".to_string(), FAKE_RENPHO_PASSWORD.to_string());
 
     vec![
