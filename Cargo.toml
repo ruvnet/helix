@@ -29,6 +29,7 @@ members = [
     "crates/helix-refranges",
     "crates/helix-demo",
     "crates/helix-wasm",
+    "crates/helix-ingest",
 ]
 
 [workspace.package]

@@ -1,0 +1,37 @@
+[package]
+name = "helix-ingest"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-029/001: native ingest CLI — parse real health files through the tested importers, seal every record into the encrypted-at-rest vault, prove the round-trip and ciphertext-at-rest, and emit a local (gitignored) dossier.json for the UI."
+
+[[bin]]
+name = "helix-ingest"
+path = "src/main.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+helix-provenance = { path = "../helix-provenance", version = "0.1.0" }
+helix-connect = { path = "../helix-connect", version = "0.1.0" }
+# persist = redb + Argon2id + XChaCha20-Poly1305 encrypted-at-rest store (ADR-001).
+helix-vault = { path = "../helix-vault", version = "0.1.0", features = ["persist"] }
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+# Interactive passphrase entry only — never a CLI flag, never echoed.
+rpassword = "7"
+# Passphrase KDF (mirrors helix-vault's private credential-vault KDF).
+argon2 = "0.5"
+getrandom = "0.2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[features]
+# `persist` is a no-op passthrough kept so `cargo test -p helix-ingest --features
+# persist` is accepted; the disk-backed vault (helix-vault/persist) is always on
+# for this binary because sealing to disk is its whole purpose.
+persist = []
