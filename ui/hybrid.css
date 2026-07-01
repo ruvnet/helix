@@ -1,0 +1,58 @@
+/* ============================================================
+   hybrid.css — data-wiring additions for ui/hybrid.html
+   The visual language is UNCHANGED: every rule here reuses the
+   mockup's existing design tokens (--teal / --warm / --living …)
+   and its card/proof-trail vocabulary. Nothing is redesigned;
+   these classes only style the NEW data-driven pieces
+   (private-dossier marker, compact per-concept cards, the
+   held-for-abstention strip) so they match the aurora hybrid.
+   ============================================================ */
+
+/* ---- Private-dossier marker (swapped in when a REAL dossier loads) ---- */
+.sample-banner.private{
+  color:var(--text-hi);
+  background:linear-gradient(90deg, rgba(23,183,171,.16), rgba(63,212,137,.12));
+  border-bottom:1px solid var(--glass-brd);
+}
+.sample-banner.private .dot{ background:var(--teal); opacity:.9; }
+.sample-banner.private b{ color:var(--teal); }
+.sample-banner.private svg{ width:13px; height:13px; color:var(--teal); }
+
+/* ---- Compact per-concept grounded cards (reuse the warm .nudge look) ---- */
+.nudge.compact{ padding:18px 18px 15px; gap:9px; }
+.nudge.compact h3{ font-size:1.05rem; line-height:1.14; margin:0; }
+.nudge.compact .n-body{ font-size:.86rem; }
+
+/* value line + range / trend chips on grounded cards */
+.gv{ display:flex; align-items:baseline; gap:.55em; flex-wrap:wrap; margin:1px 0 1px; }
+.gv .num{ font-family:"Fraunces",serif; font-variation-settings:"opsz" 40; font-size:1.55rem; font-weight:420; color:var(--text-hi); line-height:1; }
+.gv .unit{ font-size:.72rem; color:var(--text-low); }
+.gv .range-chip{ font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; font-weight:700; padding:3px 9px; border-radius:100px; }
+.range-chip.inr{ color:var(--living); border:1px solid rgba(131,230,166,.42); }
+.range-chip.out{ color:var(--warm); border:1px solid rgba(246,189,124,.48); }
+.trend-tag{ font-size:.74rem; color:var(--text-low); display:inline-flex; gap:.4em; align-items:center; font-family:"Hanken Grotesk",sans-serif; }
+.trend-tag i{ font-style:normal; }
+.trend-tag.up i{ color:var(--living); } .trend-tag.down i{ color:var(--warm); }
+
+/* honesty note on the Reference row when a population fallback is used */
+.pt-note{ display:block; margin-top:3px; font-size:.62rem; color:var(--text-faint); letter-spacing:.01em; font-family:"Schibsted Grotesk",sans-serif; }
+
+/* escalation (red-flag) variant — rare, but never fabricate around it */
+.nudge.escalate::before{ background:linear-gradient(180deg,#fb7185,#e0566c); box-shadow:0 0 14px rgba(251,113,133,.4); }
+.nudge.escalate h3{ color:#ffd7dd; }
+
+/* ---- Held-for-abstention disclosure ---- */
+.abstain-wrap{ margin-top:22px; border-top:1px solid var(--line-soft); padding-top:16px; }
+.abstain-wrap summary{ cursor:pointer; list-style:none; user-select:none;
+  font-size:.75rem; font-weight:600; letter-spacing:.02em; color:var(--text-low);
+  display:flex; align-items:center; gap:.55em; font-family:"Hanken Grotesk",sans-serif; }
+.abstain-wrap summary::-webkit-details-marker{ display:none; }
+.abstain-wrap summary::before{ content:"›"; color:var(--text-faint); display:inline-block; transition:transform .3s var(--ease); }
+.abstain-wrap[open] summary::before{ transform:rotate(90deg); }
+.abstain-strip{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.abstain-chip{ display:inline-flex; align-items:center; gap:.5em; font-size:.7rem; color:var(--text-mid);
+  border:1px dashed var(--line); background:rgba(255,255,255,.015); padding:5px 11px; border-radius:100px; }
+.abstain-chip .d{ width:5px; height:5px; border-radius:50%; background:var(--text-faint); }
+
+/* keep the report-empty helper the mockup's JS never needed but ours does */
+.report-empty{ color:var(--text-low); font-size:.9rem; padding:8px 0; }

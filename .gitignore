@@ -51,3 +51,7 @@ claw_swarm_memory.db*
 ros3-agentdb.db
 # Convention for any future private data — put it under private/
 /private/
+# Real (PHI) dossier drop-in for the local UI — never commit; only the
+# synthetic demo-dossier.json is tracked. hybrid.html auto-loads this if present.
+/ui/private/
+ui/private/
