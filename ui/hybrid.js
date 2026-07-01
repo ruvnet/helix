@@ -372,49 +372,179 @@ function renderNudges() {
   });
 }
 
-// ---- per-concept grounded answers (THE generalised capability) -------------
-// Enumerates every DISTINCT concept code in the dossier, resolves a reference
-// range (own → population fallback → none), runs analyze_json, and renders a
-// proof-trail card per grounded concept. Concepts with no available range are
-// shown as honest abstentions ("insufficient reference data"), never guessed.
-function renderGrounded() {
-  const grid = document.getElementById("groundedGrid");
-  grid.innerHTML = "";
-  const cards = [];
-  const abstain = [];
+// ---- per-concept grounded answers — grouped, filterable, flagged-first ------
+// Enumerates every DISTINCT concept code, resolves a reference range
+// (own → population fallback → none) and runs analyze_json ONCE, caching an
+// item model. Results are grouped into clinical panels (Lipids, Metabolic,
+// Iron, CBC, …) derived from LOINC/concept. Out-of-range markers render as rich
+// proof-trail cards; the in-range bulk collapses into a dense per-panel table;
+// unresolved concepts fall to the quiet "held for insufficient reference data"
+// strip. A search box + status chips filter the whole set live. Nothing guessed.
 
-  for (const [code, recs] of byCode) {
-    const rng = resolveRange(recs);
-    if (rng.lo == null && rng.hi == null) { abstain.push(recs[0].concept); continue; }
-    let out;
-    try { out = analyzeConcept(code, recs, rng); } catch (e) { abstain.push(recs[0].concept); continue; }
-    if (out.outcome !== "answered") { abstain.push(recs[0].concept); continue; }
-    const lv = out.trend?.latest_value ?? recs[recs.length - 1].value;
-    const outOfRange = (rng.lo != null && lv < rng.lo) || (rng.hi != null && lv > rng.hi);
-    cards.push({ code, recs, out, rng, lv, outOfRange, lab: isLab(recs) });
-  }
-
-  // most interesting first: out-of-range, then direct-lab, then alphabetical
-  cards.sort((a, b) => (b.outOfRange - a.outOfRange) || (b.lab - a.lab) || a.recs[0].concept.localeCompare(b.recs[0].concept));
-  cards.forEach((c, i) => grid.appendChild(groundedCard(c, i)));
-
-  document.getElementById("groundedIntro").innerHTML =
-    `<b>${cards.length}</b> of your ${byCode.size} tracked concepts have a reference to check against and returned a grounded answer; ` +
-    `<b>${abstain.length}</b> are held for insufficient reference data — Helix declines rather than guesses.`;
-
-  if (abstain.length) {
-    const wrap = document.getElementById("abstainWrap");
-    wrap.hidden = false;
-    document.getElementById("abstainSummary").textContent = `Held for insufficient reference data · ${abstain.length}`;
-    document.getElementById("abstainStrip").innerHTML = abstain
-      .sort((a, b) => a.localeCompare(b))
-      .map((n) => `<span class="abstain-chip"><span class="d" aria-hidden="true"></span>${esc(n)}</span>`).join("");
-  }
+const PANELS = [
+  ["lipids", "Lipids"], ["metabolic", "Metabolic / Glucose"], ["iron", "Iron studies"],
+  ["cbc", "CBC / Hematology"], ["kidney", "Kidney"], ["liver", "Liver"],
+  ["electrolytes", "Electrolytes"], ["thyroid", "Thyroid"], ["inflammation", "Inflammation"],
+  ["vitamins", "Vitamins"], ["body", "Body composition"], ["vitals", "Vitals & activity"],
+  ["other", "Other"],
+];
+const PANEL_ORDER = PANELS.map((p) => p[0]);
+const PANEL_TITLE = Object.fromEntries(PANELS);
+// Exact LOINC → panel map for the known lab set (authoritative); regex on the
+// concept name is the fallback so private dossiers with other codes still group.
+const CODE_PANEL = {
+  "1884-6": "lipids", "2085-9": "lipids", "13457-7": "lipids", "2093-3": "lipids", "2571-8": "lipids",
+  "2345-7": "metabolic", "4548-4": "metabolic",
+  "2276-4": "iron", "2498-4": "iron", "2500-7": "iron", "2502-3": "iron",
+  "4544-3": "cbc", "718-7": "cbc", "736-9": "cbc", "786-4": "cbc", "785-6": "cbc", "787-2": "cbc",
+  "770-8": "cbc", "777-3": "cbc", "789-8": "cbc", "788-0": "cbc", "6690-2": "cbc",
+  "2160-0": "kidney", "62238-1": "kidney", "3094-0": "kidney",
+  "6768-6": "liver", "1742-6": "liver", "1920-8": "liver", "1975-2": "liver", "1751-7": "liver", "2885-2": "liver",
+  "2951-2": "electrolytes", "2075-0": "electrolytes", "2823-3": "electrolytes", "2028-9": "electrolytes", "17861-6": "electrolytes",
+  "3016-3": "thyroid", "30522-7": "inflammation", "1989-3": "vitamins",
+};
+function panelFor(code, concept) {
+  if (code && CODE_PANEL[code]) return CODE_PANEL[code];
+  if (code && /^RENPHO/i.test(code)) return "body";
+  if (code && /^HK-/i.test(code)) return "vitals";
+  const c = (concept || "").toLowerCase();
+  if (/ldl|hdl|cholesterol|apolipo|triglyc|lipid/.test(c)) return "lipids";
+  if (/glucose|hba1c|a1c|insulin/.test(c)) return "metabolic";
+  if (/ferritin|transferrin|\biron\b|tibc|iron binding|iron sat/.test(c)) return "iron";
+  if (/hemoglob|hematocrit|corpuscular|\bmcv\b|\bmch\b|\bmchc\b|\brdw\b|platelet|leukocyt|lymphocyt|neutrophil|red (blood )?cell|white (blood )?cell|\bwbc\b|\brbc\b/.test(c)) return "cbc";
+  if (/creatinin|egfr|urea|\bbun\b|cystatin/.test(c)) return "kidney";
+  if (/albumin|bilirubin|\balt\b|\bast\b|alkaline phosph|\bggt\b|total protein|hepatic/.test(c)) return "liver";
+  if (/sodium|potassium|chloride|calcium|magnesium|phosphate|bicarb|carbon dioxide|electrolyte|\bco2\b/.test(c)) return "electrolytes";
+  if (/tsh|thyro|\bt3\b|\bt4\b/.test(c)) return "thyroid";
+  if (/crp|c-reactive|\besr\b|sed rate|inflamm/.test(c)) return "inflammation";
+  if (/vitamin|25-oh|folate|\bb12\b|cobalamin/.test(c)) return "vitamins";
+  if (/body fat|body mass|\bbmi\b|muscle|lean|visceral|weight|body water|bone mass|fat mass|waist/.test(c)) return "body";
+  if (/sleep|heart rate|\bhrv\b|spo|steps|workout|oxygen satur/.test(c)) return "vitals";
+  return "other";
 }
 
-function groundedCard(c, i) {
+const GROUNDED = { items: [], abstains: [] };
+let gStatus = "all";
+
+function buildGroundedModel() {
+  const items = [], abstains = [];
+  for (const [code, recs] of byCode) {
+    const concept = recs[0].concept;
+    const panel = panelFor(code, concept);
+    const rng = resolveRange(recs);
+    if (rng.lo == null && rng.hi == null) { abstains.push({ concept, panel, code }); continue; }
+    let out;
+    try { out = analyzeConcept(code, recs, rng); } catch (e) { abstains.push({ concept, panel, code }); continue; }
+    if (out.outcome !== "answered") { abstains.push({ concept, panel, code }); continue; }
+    const lv = out.trend?.latest_value ?? recs[recs.length - 1].value;
+    const outOfRange = (rng.lo != null && lv < rng.lo) || (rng.hi != null && lv > rng.hi);
+    items.push({ code, concept, panel, status: outOfRange ? "out" : "in", c: { code, recs, out, rng, lv, outOfRange, lab: isLab(recs), concept } });
+  }
+  // out-of-range first, then direct-lab, then alphabetical (per-panel order preserved)
+  items.sort((a, b) => (b.c.outOfRange - a.c.outOfRange) || (b.c.lab - a.c.lab) || a.concept.localeCompare(b.concept));
+  GROUNDED.items = items; GROUNDED.abstains = abstains;
+}
+
+function renderGrounded() {
+  buildGroundedModel();
+  const total = GROUNDED.items.length + GROUNDED.abstains.length;
+  document.getElementById("groundedIntro").innerHTML =
+    `<b>${GROUNDED.items.length}</b> of your ${total} tracked concepts returned a grounded answer, grouped into clinical panels below; ` +
+    `<b>${GROUNDED.abstains.length}</b> are held for insufficient reference data — Helix declines rather than guesses. Search or filter to narrow the set.`;
+
+  const search = document.getElementById("gSearch");
+  if (search && !search.dataset.wired) {
+    search.dataset.wired = "1";
+    search.addEventListener("input", applyGroundedFilter);
+    document.querySelectorAll(".gf-chip").forEach((btn) => btn.addEventListener("click", () => {
+      gStatus = btn.dataset.status;
+      document.querySelectorAll(".gf-chip").forEach((b) => { const on = b === btn; b.classList.toggle("active", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
+      applyGroundedFilter();
+    }));
+  }
+  applyGroundedFilter();
+}
+
+function applyGroundedFilter() {
+  const q = ((document.getElementById("gSearch") || {}).value || "").trim().toLowerCase();
+  const items = GROUNDED.items.filter((it) => {
+    if (q && !it.concept.toLowerCase().includes(q)) return false;
+    if (gStatus === "out") return it.status === "out";
+    if (gStatus === "in") return it.status === "in";
+    if (gStatus === "abstain") return false;
+    return true;
+  });
+  const abstains = GROUNDED.abstains.filter((a) => {
+    if (q && !a.concept.toLowerCase().includes(q)) return false;
+    return gStatus === "all" || gStatus === "abstain";
+  });
+  renderPanels(items, q);
+  renderAbstainList(abstains);
+  const outN = items.filter((i) => i.status === "out").length;
+  const inN = items.length - outN;
+  const cEl = document.getElementById("gCount");
+  if (cEl) cEl.textContent = `${outN} out of range · ${inN} in range · ${abstains.length} held`;
+}
+
+function renderPanels(items, q) {
+  const wrap = document.getElementById("panelsWrap");
+  wrap.hidden = gStatus === "abstain";
+  wrap.innerHTML = "";
+  if (gStatus === "abstain") return;
+  const groups = new Map();
+  for (const it of items) { let g = groups.get(it.panel); if (!g) { g = { out: [], in: [] }; groups.set(it.panel, g); } g[it.status === "out" ? "out" : "in"].push(it.c); }
+  let any = false, gi = 0;
+  for (const key of PANEL_ORDER) {
+    const g = groups.get(key); if (!g) continue;
+    const n = g.out.length + g.in.length; if (!n) continue;
+    any = true;
+    const sec = document.createElement("section");
+    sec.className = "panel reveal"; sec.style.setProperty("--i", (gi % 6) + 1); gi++;
+    const flag = g.out.length ? `<span class="p-flag">${g.out.length} flagged</span>`
+      : (gStatus === "all" ? `<span class="p-ok">all in range</span>` : "");
+    let html = `<div class="panel-head"><span class="p-name">${esc(PANEL_TITLE[key])}</span><span class="p-meta">${n} marker${n === 1 ? "" : "s"}</span>${flag}</div>`;
+    if (g.out.length) html += `<div class="nudge-grid panel-cards">${g.out.map((c, i) => groundedCardHTML(c, i)).join("")}</div>`;
+    if (g.in.length && gStatus !== "out") {
+      const open = gStatus === "in" || !!q;
+      html += `<details class="inrange"${open ? " open" : ""}><summary>` +
+        `<svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>` +
+        `<span class="ir-sum">${g.in.length} in-range marker${g.in.length === 1 ? "" : "s"}</span></summary>` +
+        `<div class="inrange-table">${g.in.map(inRangeRow).join("")}</div></details>`;
+    }
+    sec.innerHTML = html;
+    wrap.appendChild(sec);
+  }
+  if (!any) wrap.innerHTML = '<p class="gf-empty">No markers match — clear the search or switch filters.</p>';
+}
+
+function inRangeRow(c) {
+  const unit = c.recs[c.recs.length - 1].unit || "";
+  const dir = c.out.trend?.direction;
+  const arrow = dir === "rising" ? "▲" : dir === "falling" ? "▼" : "→";
+  const tcls = dir === "rising" ? "up" : dir === "falling" ? "down" : "flat";
+  const tword = dir === "rising" ? "up" : dir === "falling" ? "down" : "steady";
+  return `<div class="ir-row"><span class="ir-name">${esc(c.concept)}</span>` +
+    `<span class="ir-val mono-num">${fmtNum(c.lv)} <u>${esc(unit)}</u></span>` +
+    `<span class="ir-range">${fmtRange(c.rng.lo, c.rng.hi, unit)}</span>` +
+    `<span class="ir-trend ${tcls}"><i>${arrow}</i> ${tword}</span>` +
+    `<span class="ir-tag">in range</span></div>`;
+}
+
+function renderAbstainList(abstains) {
+  const wrap = document.getElementById("abstainWrap");
+  if (!wrap) return;
+  if (!abstains.length) { wrap.hidden = true; return; }
+  wrap.hidden = false;
+  wrap.open = gStatus === "abstain";
+  document.getElementById("abstainSummary").textContent = `Held for insufficient reference data · ${abstains.length}`;
+  document.getElementById("abstainStrip").innerHTML = abstains
+    .slice().sort((a, b) => a.concept.localeCompare(b.concept))
+    .map((a) => `<span class="abstain-chip"><span class="d" aria-hidden="true"></span>${esc(a.concept)}</span>`).join("");
+}
+
+function groundedCardHTML(c, i) {
   const { out, recs, rng, lv, outOfRange } = c;
-  const concept = recs[0].concept;
+  const concept = c.concept;
   const unit = recs[recs.length - 1].unit || "";
   const dir = out.trend?.direction;
   const tier = tierFor(recs);
@@ -425,7 +555,6 @@ function groundedCard(c, i) {
   const trendCls = dir === "rising" ? "up" : dir === "falling" ? "down" : "";
   const trendWord = dir === "rising" ? "trending up" : dir === "falling" ? "trending down" : "steady";
   const statusWord = below ? "below its reference range" : outOfRange ? "above its reference range" : "within range";
-
   const proof = buildProof({
     source: `${esc(recs[0].source)} — ${esc(concept)} ×${recs.length} (own records)`,
     obs: `${seriesFlow(out, unit)} <span style="color:var(--text-faint)">(${statusWord}, ${trendWord})</span>`,
@@ -433,12 +562,8 @@ function groundedCard(c, i) {
     lastEv: out.claims?.[0]?.evidence?.slice(-1)[0],
     action: esc(out.recommendation?.text || "Track on your next panel to confirm the trend."),
   });
-
-  const card = document.createElement("article");
-  card.className = `nudge compact reveal ${tone === "cool" ? "cool" : ""}`;
-  card.style.setProperty("--i", (i % 8) + 1);
   const stroke = tone === "cool" ? "#83e6a6" : "#f6bd7c";
-  card.innerHTML =
+  return `<article class="nudge compact reveal ${tone === "cool" ? "cool" : ""}" style="--i:${(i % 8) + 1}">` +
     '<div class="nudge-top">' +
       `<span class="n-ico ${tone === "cool" ? "cool" : ""}"><svg viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[iconFor(concept)]}</svg></span>` +
       `<span class="tier ${tier.cls}">Tier ${tier.letter}</span>` +
@@ -447,8 +572,116 @@ function groundedCard(c, i) {
     `<div class="gv"><span class="num">${fmtNum(lv)}</span><span class="unit">${esc(unit)}</span>` +
       `<span class="range-chip ${outOfRange ? "out" : "inr"}">${rangeLbl}</span>` +
       `<span class="trend-tag ${trendCls}"><i>${arrow}</i> ${trendWord}</span></div>` +
-    proof;
-  return card;
+    proof +
+  "</article>";
+}
+
+// ---- score over time (trajectory) — real chart from timeline_json ----------
+// The composite 0–100 series the sparkline already uses, drawn as a readable
+// line/area chart with a date axis and a plain-language read. Per-subsystem
+// HISTORY is NOT in the exports (only current value + trend), so we do NOT
+// fabricate sub-lines — we show the composite trajectory prominently and a
+// current per-domain trend strip beneath it, honestly labelled.
+function renderTrajectory(tl) {
+  const host = document.getElementById("trajChart");
+  const readEl = document.getElementById("trajRead");
+  const badgeEl = document.getElementById("trajBadge");
+  if (!host) return;
+  const pts = (tl && tl.points) || [];
+
+  const first = pts.length ? Math.round(pts[0].value) : null;
+  const last = pts.length ? Math.round(pts[pts.length - 1].value) : null;
+  const delta = (first != null && last != null) ? last - first : 0;
+  const days = pts.length >= 2 ? Math.max(1, Math.round((pts[pts.length - 1].at - pts[0].at) / DAY)) : 0;
+  const dir = tl && tl.direction;
+  const word = dir === "rising" ? "Improving" : dir === "falling" ? "Declining" : "Holding steady";
+  const cls = dir === "rising" ? "up" : dir === "falling" ? "down" : "flat";
+
+  if (readEl) {
+    if (pts.length < 2) {
+      readEl.innerHTML = `<span class="tr-word flat">Not enough history yet.</span> Your trajectory appears once a second dated reading lands.`;
+    } else {
+      const move = delta > 0 ? `up <b>${delta}</b> point${delta === 1 ? "" : "s"}`
+        : delta < 0 ? `down <b>${Math.abs(delta)}</b> point${Math.abs(delta) === 1 ? "" : "s"}` : "unchanged";
+      readEl.innerHTML = `<span class="tr-word ${cls}">${word}.</span> Your composite is ${move} over the last <b>${days}</b> days (${first} → ${last})${tl.change_point_at ? ' · <span class="tr-cp">change-point detected</span>' : ""}.`;
+    }
+  }
+  if (badgeEl) {
+    if (pts.length >= 2) { badgeEl.hidden = false; badgeEl.className = `traj-badge ${cls}`; badgeEl.textContent = (delta > 0 ? "▲ +" : delta < 0 ? "▼ −" : "→ ") + (delta === 0 ? "0" : Math.abs(delta)); }
+    else badgeEl.hidden = true;
+  }
+
+  if (pts.length < 2) { host.innerHTML = ""; renderTrajSubs(); return; }
+
+  // fractional plot box (0..100 in both axes; HTML overlays keep text/dots crisp)
+  const GX0 = 7, GX1 = 98, GY0 = 7, GY1 = 92;
+  const xs = pts.map((p) => p.at), ys = pts.map((p) => p.value);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const vmin = Math.min(...ys), vmax = Math.max(...ys);
+  let lo = Math.max(0, Math.floor((vmin - 8) / 10) * 10);
+  let hi = Math.min(100, Math.ceil((vmax + 8) / 10) * 10);
+  if (hi - lo < 20) { hi = Math.min(100, lo + 20); if (hi - lo < 20) lo = Math.max(0, hi - 20); }
+  const px = (x) => GX0 + ((x - x0) / ((x1 - x0) || 1)) * (GX1 - GX0);
+  const py = (v) => GY0 + (1 - (v - lo) / ((hi - lo) || 1)) * (GY1 - GY0);
+
+  let gridSvg = "", yLabels = "";
+  for (let v = lo; v <= hi + 0.001; v += 10) {
+    const yy = py(v).toFixed(2);
+    gridSvg += `<line class="tj-grid" x1="${GX0}" y1="${yy}" x2="${GX1}" y2="${yy}" vector-effect="non-scaling-stroke"/>`;
+    yLabels += `<span class="tj-yl" style="top:${yy}%">${v}</span>`;
+  }
+  const line = pts.map((p, i) => `${i ? "L" : "M"}${px(p.at).toFixed(2)} ${py(p.value).toFixed(2)}`).join(" ");
+  const area = `${line} L${px(x1).toFixed(2)} ${GY1} L${px(x0).toFixed(2)} ${GY1} Z`;
+  const cp = tl.change_point_at
+    ? `<line class="tj-cp" x1="${px(tl.change_point_at).toFixed(2)}" y1="${GY0}" x2="${px(tl.change_point_at).toFixed(2)}" y2="${GY1}" vector-effect="non-scaling-stroke"/>` : "";
+
+  const mfmt = (t) => new Date(t).toLocaleString("en", { month: "short", day: "numeric" });
+  const nodes = pts.map((p, i) => {
+    const isLast = i === pts.length - 1;
+    return `<span class="tj-node${isLast ? " last" : ""}" style="left:${px(p.at).toFixed(2)}%;top:${py(p.value).toFixed(2)}%" tabindex="0" aria-label="${fmtDate(p.at)}: ${Math.round(p.value)} of 100"${isLast ? ` data-v="${Math.round(p.value)}"` : ""}></span>`;
+  }).join("");
+  const idxs = [...new Set([0, Math.round((pts.length - 1) / 3), Math.round((pts.length - 1) * 2 / 3), pts.length - 1])];
+  const xLabels = idxs.map((i) => {
+    const p = pts[i];
+    const tx = i === 0 ? "0" : i === pts.length - 1 ? "-100%" : "-50%";
+    return `<span class="tj-xl" style="left:${px(p.at).toFixed(2)}%;transform:translateX(${tx})">${mfmt(p.at)}</span>`;
+  }).join("");
+
+  host.innerHTML =
+    `<div class="tj-plot">` +
+      `<svg class="tj-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">` +
+        `<defs><linearGradient id="tjArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#37e6d0" stop-opacity="0.30"/><stop offset="1" stop-color="#37e6d0" stop-opacity="0"/></linearGradient>` +
+        `<linearGradient id="tjLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#17b7ab"/><stop offset="0.6" stop-color="#37e6d0"/><stop offset="1" stop-color="#8bf3a4"/></linearGradient></defs>` +
+        gridSvg +
+        `<path class="tj-area" d="${area}" fill="url(#tjArea)"/>` +
+        `<path class="tj-line" d="${line}" fill="none" stroke="url(#tjLine)" vector-effect="non-scaling-stroke"/>` +
+        cp +
+      `</svg>` +
+      yLabels + nodes +
+      `<div class="tj-xaxis">${xLabels}</div>` +
+    `</div>`;
+
+  renderTrajSubs();
+}
+
+function renderTrajSubs() {
+  const list = document.getElementById("trajSubList");
+  const note = document.getElementById("trajNote");
+  if (!list) return;
+  const subs = (SUBSYSTEMS && SUBSYSTEMS.length) ? SUBSYSTEMS : [];
+  if (!subs.length) { list.innerHTML = ""; if (note) note.textContent = ""; return; }
+  list.innerHTML = subs.map((s) => {
+    const name = cap(s.subsystem), v = Math.round(s.value), t = s.trend;
+    const up = t === "improving", down = t === "declining" || t === "slipping";
+    const arrow = up ? "▲" : down ? "▼" : "→";
+    const tcls = up ? "up" : down ? "down" : "flat";
+    const tword = up ? "improving" : down ? "declining" : "holding";
+    return `<div class="tsub"><span class="tsub-name">${esc(name)}</span>` +
+      `<span class="tsub-bar"><i style="width:${v}%"></i></span>` +
+      `<span class="tsub-val mono-num">${v}</span>` +
+      `<span class="tsub-trend ${tcls}"><i>${arrow}</i> ${tword}</span></div>`;
+  }).join("");
+  if (note) note.innerHTML = "Today’s level &amp; direction per domain — per-domain history isn’t in this export yet, so only the composite is charted above (no fabricated sub-lines).";
 }
 
 // ---- timeline: composite trajectory + sparklines + 90-day event map --------
@@ -831,6 +1064,7 @@ function initTwin() {
 
   renderScore(score);
   renderHero(score, ba, delta, firstComposite);
+  renderTrajectory(tl);
   renderNudges();
   renderGrounded();
   renderTimeline(score, tl);

@@ -558,6 +558,9 @@
         </div>
         <div class="nav-right reveal" style="--i:1">
           <span class="navdate" id="navDate">Wed · 01 Jul 2026</span>
+          <button id="wizardOpen" class="chip wizard-open" type="button" title="Import your own data — create your private twin">
+            <span class="spk" aria-hidden="true">✨</span> Make it mine
+          </button>
           <span class="chip lock" title="Runs entirely on your device">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
               <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
@@ -658,6 +661,37 @@
       </div>
     </section>
 
+    <!-- SCORE OVER TIME (trajectory) -->
+    <section class="block" id="trajectory">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <div>
+            <span class="eyebrow">Score over time</span>
+            <h2>Your trajectory — are you getting healthier?</h2>
+          </div>
+          <p class="provenance">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3v18h18M7 15l4-5 3 3 5-7"/></svg>
+            Composite 0–100 · your dated snapshots · computed on-device
+          </p>
+        </div>
+
+        <div class="glass traj-panel reveal" style="--i:1">
+          <div class="traj-top">
+            <p class="traj-read" id="trajRead">Reading your trajectory…</p>
+            <span class="traj-badge" id="trajBadge" hidden></span>
+          </div>
+          <figure class="traj-chart" id="trajChart" aria-label="Composite health score over time"></figure>
+          <div class="traj-subs">
+            <div class="traj-subs-head">
+              <span class="ttl">On which fronts</span>
+              <span class="traj-note" id="trajNote"></span>
+            </div>
+            <div class="traj-sublist" id="trajSubList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- NUDGES -->
     <section class="block" id="nudges">
       <div class="wrap">
@@ -682,7 +716,22 @@
           </div>
           <p id="groundedIntro">Each card is computed from your own records against a reference range. No range on file and none in the population fallback → Helix declines rather than guesses.</p>
         </div>
-        <div class="nudge-grid" id="groundedGrid"></div>
+
+        <div class="gf reveal" id="groundedFilter" style="--i:1">
+          <div class="gf-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="gSearch" type="search" placeholder="Search a marker — e.g. LDL, ferritin, TSH…" aria-label="Search markers by name" autocomplete="off" spellcheck="false" />
+          </div>
+          <div class="gf-chips" role="group" aria-label="Filter markers by status">
+            <button type="button" class="gf-chip active" data-status="all" aria-pressed="true">All</button>
+            <button type="button" class="gf-chip out" data-status="out" aria-pressed="false"><span class="d" aria-hidden="true"></span>Out of range</button>
+            <button type="button" class="gf-chip inr" data-status="in" aria-pressed="false"><span class="d" aria-hidden="true"></span>In range</button>
+            <button type="button" class="gf-chip abs" data-status="abstain" aria-pressed="false"><span class="d" aria-hidden="true"></span>Abstained</button>
+          </div>
+          <span class="gf-count" id="gCount" aria-live="polite"></span>
+        </div>
+
+        <div id="panelsWrap"></div>
         <details class="abstain-wrap" id="abstainWrap" hidden>
           <summary id="abstainSummary">Held for insufficient reference data</summary>
           <div class="abstain-strip" id="abstainStrip"></div>
@@ -829,7 +878,39 @@
     </div>
   </footer>
 
+  <!-- ══════════════════════════════════════════════════════════════════
+       ONBOARDING WIZARD — "Create your private twin" (3-stage)
+       Static a11y shell (role=dialog, focus-trapped). Per-step content is
+       rendered by onboarding.js against the 127.0.0.1 companion contract.
+       ══════════════════════════════════════════════════════════════════ -->
+  <div id="wizOverlay" class="wiz-overlay" hidden>
+    <div class="wiz" role="dialog" aria-modal="true" aria-labelledby="wizTitle" aria-describedby="wizLede">
+      <button class="wiz-x" id="wizClose" type="button" aria-label="Close onboarding">×</button>
+
+      <div class="wiz-head">
+        <svg class="wiz-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M11 4c0 8 18 8 18 16S11 28 11 36" stroke="#37e6d0" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M29 4c0 8-18 8-18 16s18 8 18 16" stroke="#8bf3a4" stroke-width="2.4" stroke-linecap="round" opacity="0.55"/>
+        </svg>
+        <span class="eyebrow" id="wizEyebrow">Private setup</span>
+        <h2 class="serif" id="wizTitle">Create your private twin</h2>
+        <p class="wiz-lede" id="wizLede">Everything stays on this device.</p>
+      </div>
+
+      <ol class="wiz-rail" id="wizRail" aria-label="Onboarding progress">
+        <li class="wiz-step" data-step="intro"><span class="n">1</span><span class="lbl">Intro</span></li>
+        <li class="wiz-step" data-step="pass"><span class="n">2</span><span class="lbl">Passphrase</span></li>
+        <li class="wiz-step" data-step="load"><span class="n">3</span><span class="lbl">Load data</span></li>
+        <li class="wiz-step" data-step="fresh"><span class="n">4</span><span class="lbl">Keep fresh</span></li>
+      </ol>
+
+      <div class="wiz-body" id="wizBody"><!-- rendered per step --></div>
+      <div class="wiz-foot" id="wizFoot"><!-- actions per step --></div>
+    </div>
+  </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="module" src="./hybrid.js"></script>
+<script type="module" src="./onboarding.js"></script>
 </body>
 </html>
