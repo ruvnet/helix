@@ -1,0 +1,21 @@
+[package]
+name = "helix-demo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Synthetic, fictional demo dossier (the 'Alex Rivera' persona) that seeds the Helix UI/mobile demo across all six data domains. SAMPLE DATA — not a real person."
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+helix-provenance = { path = "../helix-provenance" }
+helix-pipeline = { path = "../helix-pipeline" }
+helix-escalation = { path = "../helix-escalation" }
+helix-focus = { path = "../helix-focus" }
+helix-score = { path = "../helix-score" }
+helix-bioage = { path = "../helix-bioage" }
+helix-timeline = { path = "../helix-timeline" }
+helix-numeric = { path = "../helix-numeric" }
