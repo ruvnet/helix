@@ -656,6 +656,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-openmed"
+version = "0.1.2"
+dependencies = [
+ "hmac",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
 name = "helix-pipeline"
 version = "0.1.2"
 dependencies = [
@@ -791,6 +803,7 @@ dependencies = [
  "helix-numeric",
  "helix-ocr",
  "helix-ontology",
+ "helix-openmed",
  "helix-pipeline",
  "helix-provenance",
  "helix-refranges",
@@ -809,6 +822,15 @@ name = "hermit-abi"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc0fef456e4baa96da950455cd02c081ca953b141298e41db3fc7e36b1da849c"
+
+[[package]]
+name = "hmac"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c49c37c09c17a53d937dfbb742eb3a961d65a994e6bcdcf37e7399d0cc8ab5e"
+dependencies = [
+ "digest",
+]
 
 [[package]]
 name = "icu_collections"
@@ -1416,6 +1438,17 @@ dependencies = [
  "serde",
  "serde_core",
  "zmij",
+]
+
+[[package]]
+name = "sha2"
+version = "0.10.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
+dependencies = [
+ "cfg-if",
+ "cpufeatures",
+ "digest",
 ]
 
 [[package]]

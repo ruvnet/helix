@@ -50,6 +50,7 @@ remains the specification and the table notes the interface seam.
 | 028 | Learned visual encoder (local GPU) | ✅ Implemented + GPU-validated (value-guard verified) | `helix-vision` (moondream layout-only + MiniLM; CLIP is the quality upgrade) |
 | 029 | Live connector clients (FHIR/SMART + wearables) | ✅ Core implemented (sandbox-tested) | `helix-connect` (parse + degradation; real auth pending partner onboarding) |
 | 030 | Federation transport (opt-in, DP-gated) | ✅ Client implemented | `helix-fed` (only a DP-noised CohortVector can leave; consent required; real network pending) |
+| 050 | OpenMed local clinical-text privacy gate | ✅ Implemented | `helix-openmed` + WASM gate + `ui/openmed-adapter.js` |
 
 Each integration realizes/strengthens a core ADR: 020→014 (ambient tier backend) + 009 (escalation);
 021→005/§7.4 (genome, user-owned); 022→012 (connector degradation, the primary lab path); 023→003/005

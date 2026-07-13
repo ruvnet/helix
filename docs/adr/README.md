@@ -57,6 +57,7 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [034](ADR-034-biological-age-estimate.md) | Biological / Medical Age Estimate from Routine Labs | Dashboard / biomarkers |
 | [035](ADR-035-darwin-parameter-evolution.md) | Darwin-Style Parameter Evolution (safety-frozen) | Self-optimization / safety |
 | [036](ADR-036-scale-invariant-trend-band.md) | Scale-Invariant (Reference-Range-Relative) Trend Dead-Band | Accuracy / numerics |
+| [050](ADR-050-openmed-local-clinical-text-privacy-gate.md) | OpenMed Local Clinical-Text Privacy Gate | Privacy / on-device NLP |
 
 ## Status
 

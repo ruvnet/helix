@@ -224,6 +224,30 @@ pub fn population_range_coverage() -> usize {
     helix_refranges::coverage()
 }
 
+/// Plan complete, overlapping, Unicode-safe windows for local OpenMed
+/// inference. Boundaries are UTF-8 byte offsets and must be returned with the
+/// model spans to [`openmed_gate_json`].
+#[wasm_bindgen]
+pub fn openmed_plan_windows_json(
+    text: &str,
+    max_scalars: usize,
+    overlap_scalars: usize,
+) -> Result<String, JsValue> {
+    let coverage = helix_openmed::plan_windows(text, max_scalars, overlap_scalars).map_err(err)?;
+    serde_json::to_string(&coverage).map_err(err)
+}
+
+/// Apply the Helix OpenMed privacy gate. The payload is a
+/// `helix_openmed::GateRequest`; `hmac_key` must be a fresh vault-scoped secret
+/// of at least 32 bytes. Expected validation failures return a serialized
+/// `blocked` decision instead of releasing text.
+#[wasm_bindgen]
+pub fn openmed_gate_json(payload: &str, hmac_key: &[u8]) -> Result<String, JsValue> {
+    let request: helix_openmed::GateRequest = serde_json::from_str(payload).map_err(err)?;
+    let outcome = helix_openmed::release_or_block(&request, hmac_key);
+    serde_json::to_string(&outcome).map_err(err)
+}
+
 /// Import an Apple Health `export.xml` (ADR-029): parse known HealthKit records
 /// into provenance records. Bounded to 100k records. Returns the records JSON.
 #[wasm_bindgen]
@@ -311,5 +335,13 @@ mod tests {
     fn version_is_nonempty() {
         assert!(!version().is_empty());
         assert!(redflag_registry_version().starts_with("redflags"));
+    }
+
+    #[test]
+    fn openmed_window_plan_round_trips_through_json() {
+        let output = openmed_plan_windows_json("A🙂 clinical note", 5, 2).unwrap();
+        let coverage: helix_openmed::InferenceCoverage = serde_json::from_str(&output).unwrap();
+        assert_eq!(coverage.text_utf8_len, "A🙂 clinical note".len());
+        assert!(coverage.windows.len() > 1);
     }
 }
