@@ -1,0 +1,17 @@
+[package]
+name = "helix-openmed"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fail-closed OpenMed clinical-text privacy and de-identification gate for Helix"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+hmac.workspace = true
+regex.workspace = true

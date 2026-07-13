@@ -75,6 +75,10 @@ This is no longer just a spec — the testable core is implemented in Rust and v
   pharmacogenomics (`helix-genome`/rvDNA), OCR ingestion (`helix-ocr`), semantic retrieval
   (`helix-retrieval`), visual RAG (`helix-visual`/rupixel), privacy-preserving cohort
   (`helix-cohort`), FHIR connectors (`helix-connect`), and federation transport (`helix-fed`).
+- **Local clinical-text privacy**: OpenMed 1.9 ONNX candidate detection is wrapped by the
+  fail-closed `helix-openmed` Rust/WASM gate with artifact pinning, complete-document
+  coverage, deterministic identifier rules, Unicode-safe offsets, and HMAC-only receipts.
+  See the [integration guide](docs/openmed-integration.md).
 - **Web console + WASM mobile app** running the real pipeline in-browser — **[live demo](https://ruvnet.github.io/helix/)**.
 
 Every integration keeps the discipline: the LLM narrates (never reasons), embeddings/visual

@@ -65,7 +65,7 @@ fn credentials_round_trip_reject_wrong_pass_and_encrypt_at_rest() {
             vault.put(c).expect("put credential");
         }
         // Debug must never leak secret field VALUES.
-        let dbg = format!("{:?}", &creds[0]);
+        let dbg = format!("{:?}", creds[0]);
         assert!(
             !dbg.contains(FAKE_WALGREENS_PASSWORD),
             "Debug must redact secret field values, got: {dbg}"
