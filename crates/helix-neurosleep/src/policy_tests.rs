@@ -8,9 +8,7 @@ use ruv_neural_core::neurosleep::{
 
 use super::*;
 
-const FIXTURE: &[u8] = include_bytes!(
-    "../../../../ruv-neural/ruv-neural-core/tests/fixtures/neurosleep-v1/valid_bundle.json"
-);
+const FIXTURE: &[u8] = include_bytes!("../tests/fixtures/upstream-neurosleep-v1/valid_bundle.json");
 const STUDY: &str = "constantino-method-fixture";
 const SUBJECT: &str = "subject-random-001";
 const SCOPE: &str = "local_neurosleep_research_v1";

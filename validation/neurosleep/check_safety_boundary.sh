@@ -86,6 +86,22 @@ if [[ -d crates/helix-neurosleep-wasm/src ]] &&
   violations=1
 fi
 
+# 6. No source file may reach outside the repository. A sibling-checkout
+#    `include_bytes!("../../../../ruv-neural/...")` compiles on a developer
+#    machine that happens to have the upstream repo checked out next to this
+#    one and fails everywhere else, so local green is not evidence here.
+escape_status=0
+grep -rEn --include='*.rs' -- '(include_bytes|include_str|include)!\([[:space:]]*"?\.\./\.\./\.\./\.\.' \
+  crates/ || escape_status=$?
+if ((escape_status >= 2)); then
+  echo "FATAL: grep failed (exit $escape_status) while scanning for out-of-repo includes" >&2
+  exit 2
+fi
+if ((escape_status == 0)); then
+  echo "VIOLATION: a source file includes a path outside the repository" >&2
+  violations=1
+fi
+
 if ((violations != 0)); then
   echo "downstream NeuroSleep static safety boundary: FAILED" >&2
   exit 1

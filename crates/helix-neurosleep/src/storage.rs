@@ -195,9 +195,8 @@ mod tests {
     use crate::ingest::map_scalars;
     use crate::{AcquisitionConfidence, InterpretationMaturity};
 
-    const FIXTURE: &[u8] = include_bytes!(
-        "../../../../ruv-neural/ruv-neural-core/tests/fixtures/neurosleep-v1/valid_bundle.json"
-    );
+    const FIXTURE: &[u8] =
+        include_bytes!("../tests/fixtures/upstream-neurosleep-v1/valid_bundle.json");
 
     #[test]
     fn staged_failure_has_no_partial_visibility_or_replay_state() {

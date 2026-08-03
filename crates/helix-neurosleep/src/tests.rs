@@ -6,9 +6,7 @@ use ruv_neural_core::neurosleep::{FeatureValue, Species};
 
 use super::*;
 
-const FIXTURE: &[u8] = include_bytes!(
-    "../../../../ruv-neural/ruv-neural-core/tests/fixtures/neurosleep-v1/valid_bundle.json"
-);
+const FIXTURE: &[u8] = include_bytes!("../tests/fixtures/upstream-neurosleep-v1/valid_bundle.json");
 const STUDY: &str = "constantino-method-fixture";
 const SUBJECT: &str = "subject-random-001";
 const SCOPE: &str = "local_neurosleep_research_v1";
@@ -46,7 +44,7 @@ fn fixture_bundle() -> SignedNeuroSleepBundleV1 {
 
 fn fixture_key() -> [u8; 32] {
     let trust: serde_json::Value = serde_json::from_str(include_str!(
-        "../../../../ruv-neural/ruv-neural-core/tests/fixtures/neurosleep-v1/trust_profile.json"
+        "../tests/fixtures/upstream-neurosleep-v1/trust_profile.json"
     ))
     .unwrap();
     let bytes: Vec<u8> = serde_json::from_value(trust["verifying_key_ed25519"].clone()).unwrap();
