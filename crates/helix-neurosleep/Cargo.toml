@@ -1,0 +1,19 @@
+[package]
+name = "helix-neurosleep"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "ADR-051 verified NeuroSleep research ingestion and sealed longitudinal policy"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+hmac.workspace = true
+helix-vault = { path = "../helix-vault", version = "0.1.0" }
+ruv-neural-core = { path = "../../../ruv-neural/ruv-neural-core", version = "=0.1.0" }
+serde_json_canonicalizer = "0.3.2"
