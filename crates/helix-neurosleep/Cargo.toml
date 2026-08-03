@@ -28,5 +28,8 @@ thiserror = { workspace = true, optional = true }
 sha2 = { workspace = true, optional = true }
 hmac = { workspace = true, optional = true }
 helix-vault = { path = "../helix-vault", version = "0.1.0", optional = true }
-ruv-neural-core = { path = "../../../ruv-neural/ruv-neural-core", version = "=0.1.0", optional = true }
+# Exact pin, no path override: the verifier must be built against the same
+# published contract the signer used. A range would let an unreviewed
+# schema or extractor version change the meaning of a stored record.
+ruv-neural-core = { version = "=0.2.0-alpha.1", optional = true }
 serde_json_canonicalizer = { version = "0.3.2", optional = true }

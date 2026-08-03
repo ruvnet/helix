@@ -1529,7 +1529,9 @@ dependencies = [
 
 [[package]]
 name = "ruv-neural-core"
-version = "0.1.0"
+version = "0.2.0-alpha.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e75767dbcc9b0c8a03b250af113edbc271853841d7dd19656d598d38d22219c8"
 dependencies = [
  "ed25519-dalek",
  "num-traits",
