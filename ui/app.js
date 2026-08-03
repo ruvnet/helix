@@ -251,7 +251,8 @@ function renderBriefing() {
   const el = document.getElementById("briefing");
   if (out.outcome === "answered" && out.claims?.length) {
     const tr = out.trend;
-    const dirWord = { rising: "slowly recovering", falling: "still trending down", flat: "holding steady" }[tr.direction] || tr.direction;
+    const dirWord = { rising: "slowly recovering", falling: "still trending down", flat: "holding steady" }[tr.direction]
+      || "not yet supported by enough readings for a trend";
     const e = out.claims[0].evidence[out.claims[0].evidence.length - 1];
     const belowRange = e.reference_range && e.reference_range.low != null && e.value < e.reference_range.low;
     el.innerHTML = `${belowRange ? "Low ferritin may be behind your afternoon energy dips" : "Your ferritin looks on track"} —
@@ -325,7 +326,8 @@ function renderAnswer(out, q) {
     </div>`;
   }
   const tr = a.trend;
-  const dir = { rising: "trending up", falling: "trending down", flat: "stable" }[tr.direction];
+  const dir = { rising: "trending up", falling: "trending down", flat: "stable" }[tr.direction]
+    || "insufficient readings for a trend";
   const claim = a.claims[0];
   const cites = claim.evidence
     .map((e) => `<div class="cite">• ${e.concept} ${e.value} ${e.unit} — ${e.source}, ${fmtDate(e.measured_at)}</div>`)
@@ -494,7 +496,8 @@ function sparkline(tl) {
   const area = `${line} L${sx(x1).toFixed(1)},${h - pad} L${sx(x0).toFixed(1)},${h - pad} Z`;
   const dots = pts.map((p) => `<circle class="tl-dot" cx="${sx(p.at).toFixed(1)}" cy="${sy(p.value).toFixed(1)}" r="3"/>`).join("");
   const cp = tl.change_point_at ? `<line class="tl-cp" x1="${sx(tl.change_point_at).toFixed(1)}" y1="${pad}" x2="${sx(tl.change_point_at).toFixed(1)}" y2="${h - pad}"/>` : "";
-  const dir = { rising: "▲ improving", falling: "▼ slipping", flat: "→ steady" }[tl.direction] || "";
+  const dir = { rising: "▲ improving", falling: "▼ slipping", flat: "→ steady" }[tl.direction]
+    || "trend unavailable";
   return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
     <defs><linearGradient id="tlg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#34e0c4"/><stop offset="1" stop-color="#34e0c4" stop-opacity="0"/></linearGradient></defs>

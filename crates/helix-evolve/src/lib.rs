@@ -146,7 +146,7 @@ pub fn fitness(p: &Params, cases: &[EvalCase], registry: &ThresholdRegistry) -> 
                 f.score -= P_OVER_CAUTIOUS;
             }
             (Expected::Answered(want), AnswerOutcome::Answered(got)) => {
-                if got.trend.direction == *want {
+                if got.trend.direction == Some(*want) {
                     f.grounded_correct += 1;
                     f.score += W_GROUNDED;
                 } else {

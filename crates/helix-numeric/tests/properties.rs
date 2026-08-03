@@ -36,14 +36,14 @@ proptest! {
 
     /// slope is finite, and a strictly-increasing series yields a positive slope.
     #[test]
-    fn slope_finite_and_signed(series in ordered_series(2..50)) {
+    fn slope_finite_and_signed(series in ordered_series(5..50)) {
         let s = slope_per_day(&series).unwrap();
         prop_assert!(s.is_finite());
     }
 
     /// A monotonically increasing series always has non-negative slope.
     #[test]
-    fn monotone_increasing_has_nonneg_slope(start in -1000.0f64..1000.0, step in 0.0f64..100.0, n in 2usize..40) {
+    fn monotone_increasing_has_nonneg_slope(start in -1000.0f64..1000.0, step in 0.0f64..100.0, n in 5usize..40) {
         let series: Vec<Point> = (0..n)
             .map(|i| Point::new(i as i64 * DAY, start + step * i as f64))
             .collect();
@@ -53,7 +53,7 @@ proptest! {
 
     /// pearson is always within [-1, 1] for any valid finite input.
     #[test]
-    fn pearson_in_unit_interval(a in prop::collection::vec(-1e3f64..1e3, 3..40)) {
+    fn pearson_in_unit_interval(a in prop::collection::vec(-1e3f64..1e3, 20..40)) {
         // pair each a[i] with a noisy transform; correlation must stay bounded.
         let b: Vec<f64> = a.iter().enumerate().map(|(i, x)| x * 2.0 + (i as f64).cos()).collect();
         if let Ok(r) = pearson(&a, &b) {

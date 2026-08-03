@@ -36,6 +36,10 @@ pub enum MeasurementMethod {
     OcrExtraction,
     /// Wearable / device telemetry.
     Device,
+    /// Direct electrical measurement of physiological activity (for example,
+    /// EEG). Added for provenance v2 consumers; existing serialized method
+    /// names remain unchanged and continue to deserialize identically.
+    Electrophysiology,
     /// Contactless ambient sensing (Cognitum Seed, ADR-014) — screening grade.
     AmbientSensing,
     /// Entered by the user by hand.
@@ -315,5 +319,20 @@ mod tests {
         let json = serde_json::to_string(&g).unwrap();
         assert!(json.contains("Ferritin"));
         assert!(json.contains("2276-4"));
+    }
+
+    #[test]
+    fn electrophysiology_has_a_distinct_stable_wire_value() {
+        let json = serde_json::to_string(&MeasurementMethod::Electrophysiology).unwrap();
+        assert_eq!(json, "\"electrophysiology\"");
+        assert_eq!(
+            serde_json::from_str::<MeasurementMethod>(&json).unwrap(),
+            MeasurementMethod::Electrophysiology
+        );
+        // Existing provenance-v1 wire values remain unchanged.
+        assert_eq!(
+            serde_json::to_string(&MeasurementMethod::Device).unwrap(),
+            "\"device\""
+        );
     }
 }

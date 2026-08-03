@@ -12,7 +12,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use helix_numeric::{slope_per_day, Point};
+use helix_numeric::{slope_per_day, Point, MIN_TREND_OBSERVATIONS};
 use helix_provenance::{EpochMillis, ProvRecord, RangePosition};
 
 /// Why a concept was surfaced as a focus area.
@@ -78,7 +78,7 @@ fn latest<'a>(recs: &'a [&ProvRecord]) -> &'a ProvRecord {
 /// further out as worsening. Here we conservatively flag a sustained move toward
 /// (or further past) the nearest breached bound.
 fn adverse_slope(recs: &[&ProvRecord], band: f64) -> Option<f64> {
-    if recs.len() < 3 {
+    if recs.len() < MIN_TREND_OBSERVATIONS {
         return None;
     }
     let mut pts: Vec<Point> = recs
@@ -210,11 +210,13 @@ mod tests {
 
     #[test]
     fn worsening_out_of_range_is_elevated() {
-        // ferritin below range and still falling across 3 draws
+        // ferritin below range and still falling across five draws (ADR-007).
         let recs = vec![
-            rec("a", "2276-4", "Ferritin", 60, 33.0, 30.0, 400.0),
-            rec("b", "2276-4", "Ferritin", 30, 28.0, 30.0, 400.0),
-            rec("c", "2276-4", "Ferritin", 0, 22.0, 30.0, 400.0),
+            rec("a", "2276-4", "Ferritin", 120, 36.0, 30.0, 400.0),
+            rec("b", "2276-4", "Ferritin", 90, 33.0, 30.0, 400.0),
+            rec("c", "2276-4", "Ferritin", 60, 30.0, 30.0, 400.0),
+            rec("d", "2276-4", "Ferritin", 30, 27.0, 30.0, 400.0),
+            rec("e", "2276-4", "Ferritin", 0, 22.0, 30.0, 400.0),
         ];
         let out = select_focus(&recs, 1000 * DAY, &FocusConfig::default());
         assert_eq!(out[0].reason, FocusReason::WorseningTrend);
@@ -225,6 +227,20 @@ mod tests {
     fn in_range_stable_is_not_flagged() {
         let recs = vec![rec("x", "2823-3", "Potassium", 0, 4.2, 3.5, 5.1)];
         assert!(select_focus(&recs, 1000 * DAY, &FocusConfig::default()).is_empty());
+    }
+
+    #[test]
+    fn four_points_cannot_be_promoted_to_worsening_trend() {
+        let recs = vec![
+            rec("a", "2276-4", "Ferritin", 90, 33.0, 30.0, 400.0),
+            rec("b", "2276-4", "Ferritin", 60, 29.0, 30.0, 400.0),
+            rec("c", "2276-4", "Ferritin", 30, 25.0, 30.0, 400.0),
+            rec("d", "2276-4", "Ferritin", 0, 20.0, 30.0, 400.0),
+        ];
+        let out = select_focus(&recs, 1000 * DAY, &FocusConfig::default());
+        assert_eq!(out[0].reason, FocusReason::OutOfRange);
+        assert_eq!(out[0].severity, Severity::Watch);
+        assert!(!out[0].message.contains("trending"));
     }
 
     #[test]
@@ -245,9 +261,11 @@ mod tests {
     fn ranking_puts_elevated_first() {
         let recs = vec![
             rec("p", "x", "Calm marker", 0, 9.0, 3.0, 10.0), // in range
-            rec("a", "y", "Bad-a", 60, 33.0, 30.0, 400.0),
-            rec("b", "y", "Bad-a", 30, 28.0, 30.0, 400.0),
-            rec("c", "y", "Bad-a", 0, 22.0, 30.0, 400.0), // worsening → elevated
+            rec("a", "y", "Bad-a", 120, 36.0, 30.0, 400.0),
+            rec("b", "y", "Bad-a", 90, 33.0, 30.0, 400.0),
+            rec("c", "y", "Bad-a", 60, 30.0, 30.0, 400.0),
+            rec("d", "y", "Bad-a", 30, 27.0, 30.0, 400.0),
+            rec("e", "y", "Bad-a", 0, 22.0, 30.0, 400.0), // worsening → elevated
         ];
         let out = select_focus(&recs, 1000 * DAY, &FocusConfig::default());
         assert_eq!(out[0].severity, Severity::Elevated);

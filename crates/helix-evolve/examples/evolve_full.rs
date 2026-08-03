@@ -351,9 +351,10 @@ fn classify(p: &Params, c: &EvalCase, reg: &helix_escalation::ThresholdRegistry)
         (AnswerOutcome::Abstained(_), Expected::Abstained) => ("abstained".into(), true),
         (AnswerOutcome::Abstained(_), Expected::Answered(_)) => ("abstained".into(), false),
         (AnswerOutcome::Answered(_), Expected::Abstained) => ("answered".into(), false),
-        (AnswerOutcome::Answered(a), Expected::Answered(w)) => {
-            (format!("{:?}", a.trend.direction), a.trend.direction == *w)
-        }
+        (AnswerOutcome::Answered(a), Expected::Answered(w)) => (
+            format!("{:?}", a.trend.direction),
+            a.trend.direction == Some(*w),
+        ),
     };
     (got, ok)
 }

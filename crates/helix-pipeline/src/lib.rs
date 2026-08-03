@@ -23,8 +23,8 @@ use thiserror::Error;
 use helix_escalation::{EscalationLevel, EscalationResult, ThresholdRegistry};
 use helix_evidence::{assess, AnswerVerdict, EvidenceTier, GapNotice, TieredRecommendation};
 use helix_numeric::{
-    self as num, range_crossings, slope_per_day, trend_direction, Point, RangeCrossing,
-    TrendDirection,
+    self as num, range_crossings, slope_per_day, trend_direction, NumericAbstention, Point,
+    RangeCrossing, TrendDirection, MIN_TREND_OBSERVATIONS,
 };
 use helix_provenance::{ground, DraftClaim, EpochMillis, GroundedClaim, ProvRecord, RecordId};
 
@@ -58,9 +58,11 @@ pub struct TrendFacts {
     pub latest_value: f64,
     pub latest_at: EpochMillis,
     pub mean: f64,
-    /// `None` when there are fewer than 2 points (trend undefined).
+    /// `None` when there are fewer than five points (ADR-007 trend undefined).
     pub slope_per_day: Option<f64>,
-    pub direction: TrendDirection,
+    pub direction: Option<TrendDirection>,
+    /// Present exactly when trend fields abstain for insufficient observations.
+    pub trend_abstention: Option<NumericAbstention>,
     pub percent_change: Option<f64>,
     pub crossings: Vec<RangeCrossing>,
     pub sample_size: usize,
@@ -160,7 +162,7 @@ pub fn analyze(
     // 3. Deterministic numerics (ADR-007).
     let series = series_of(req.records);
     let mean = num::mean(&series)?;
-    let (slope, direction, pct) = if series.len() >= 2 {
+    let (slope, direction, trend_abstention) = if series.len() >= MIN_TREND_OBSERVATIONS {
         let s = slope_per_day(&series)?;
         // Prefer the scale-invariant relative band (ADR-036) when configured and a
         // reference range is available; otherwise the absolute band.
@@ -171,9 +173,21 @@ pub fn analyze(
             }
             _ => trend_direction(s, req.flat_band_per_day),
         };
-        (Some(s), dir, num::percent_change(&series).ok())
+        (Some(s), Some(dir), None)
     } else {
-        (None, TrendDirection::Flat, None)
+        (
+            None,
+            None,
+            Some(NumericAbstention::insufficient(
+                MIN_TREND_OBSERVATIONS,
+                series.len(),
+            )),
+        )
+    };
+    let pct = if series.len() >= 2 {
+        num::percent_change(&series).ok()
+    } else {
+        None
     };
     let crossings = if series.len() >= 2 {
         range_crossings(&series, req.reference_low, req.reference_high)?
@@ -186,6 +200,7 @@ pub fn analyze(
         mean,
         slope_per_day: slope,
         direction,
+        trend_abstention,
         percent_change: pct,
         crossings,
         sample_size: series.len(),
@@ -194,9 +209,10 @@ pub fn analyze(
     // 4. Ground every claim (ADR-005).
     let cites: Vec<RecordId> = req.records.iter().map(|r| r.id.clone()).collect();
     let dir_word = match trend.direction {
-        TrendDirection::Rising => "trending up",
-        TrendDirection::Falling => "trending down",
-        TrendDirection::Flat => "stable",
+        Some(TrendDirection::Rising) => "trending up",
+        Some(TrendDirection::Falling) => "trending down",
+        Some(TrendDirection::Flat) => "stable",
+        None => "not yet supported by enough readings for a trend",
     };
     let claim_text = format!(
         "Your {} is {} {} and {} over your last {} reading(s).",
@@ -209,13 +225,17 @@ pub fn analyze(
     let recommendation = if escalation.suppress_optimization {
         None
     } else {
-        Some(TieredRecommendation::new(
-            format!(
+        let text = match trend.direction {
+            Some(_) => format!(
                 "Track {} on your next panel to confirm the {} trend.",
                 latest.concept, dir_word
             ),
-            EvidenceTier::YourData,
-        ))
+            None => format!(
+                "Add another {} measurement before interpreting a trend.",
+                latest.concept
+            ),
+        };
+        Some(TieredRecommendation::new(text, EvidenceTier::YourData))
     };
 
     Ok(AnswerOutcome::Answered(Box::new(GroundedAnswer {
