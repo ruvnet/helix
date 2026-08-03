@@ -1,0 +1,52 @@
+# cargo-deny configuration (ADR-051 supply-chain gate).
+#
+# `cargo deny check` is a required release gate for the NeuroSleep research
+# rail: it processes signed third-party health data, so a permissive-only,
+# crates.io-only dependency graph is a release condition rather than a
+# preference. Anything not listed below fails the gate rather than warning.
+
+[graph]
+all-features = true
+
+[advisories]
+version = 2
+yanked = "deny"
+# No unmaintained crates are currently reachable from this workspace. If one
+# appears, add an explicit `ignore` entry with a rationale and an owner rather
+# than relaxing this to "allow".
+unmaintained = "all"
+ignore = []
+
+[licenses]
+version = 2
+# Permissive licenses only. Every entry below is present in the current graph;
+# copyleft (GPL/AGPL/LGPL/MPL) is absent by construction and stays that way
+# because an unlisted license is a hard failure.
+allow = [
+    "0BSD",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-1-Clause",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSL-1.0",
+    "CDLA-Permissive-2.0",
+    "ISC",
+    "MIT",
+    "Unicode-3.0",
+    "Unlicense",
+    "Zlib",
+]
+confidence-threshold = 0.93
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+# The NeuroSleep contract dependency must stay exactly pinned; a wildcard or
+# range there would let an unreviewed schema/extractor version in silently.
+deny = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

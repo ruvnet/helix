@@ -28,6 +28,8 @@ members = [
     "crates/helix-evolve",
     "crates/helix-refranges",
     "crates/helix-openmed",
+    "crates/helix-neurosleep",
+    "crates/helix-neurosleep-wasm",
     "crates/helix-demo",
     "crates/helix-wasm",
 ]

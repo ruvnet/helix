@@ -46,3 +46,31 @@ jobs:
         run: cargo install cargo-audit --locked
       - name: Audit dependencies
         run: cargo audit
+
+  supply-chain:
+    name: cargo deny
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-deny
+        run: cargo install cargo-deny --locked
+      # Enforces the permissive-only, crates.io-only dependency graph the
+      # NeuroSleep research rail depends on (see deny.toml).
+      - name: Check licenses, advisories, bans and sources
+        run: cargo deny check
+
+  neurosleep-boundary:
+    name: NeuroSleep safety gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # These scripts fail closed: a missing tool or a search error is a
+      # failure, not a pass. They must run on every change because the
+      # one-way boundary and the prohibited-claim surface are static
+      # properties no unit test can observe from inside the crate.
+      - name: Static one-way boundary
+        run: ./validation/neurosleep/check_safety_boundary.sh
+      - name: Prohibited diagnostic and therapeutic claims
+        run: ./validation/neurosleep/check_forbidden_claims.sh

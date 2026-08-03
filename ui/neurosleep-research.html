@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Helix NeuroSleep Research</title>
+  <link rel="stylesheet" href="./neurosleep-research.css" />
+</head>
+<body>
+  <main class="neurosleep-shell">
+    <div id="neurosleep-research-root"></div>
+  </main>
+  <script type="module">
+    import { createNeuroSleepResearchApp } from "./neurosleep-research.js";
+    import { NEUROSLEEP_RESEARCH_FLAGS } from "./neurosleep-research-config.js";
+
+    const root = document.getElementById("neurosleep-research-root");
+    createNeuroSleepResearchApp({
+      root,
+      wasm: globalThis.helixNeuroSleepResearchWasm,
+      flags: NEUROSLEEP_RESEARCH_FLAGS,
+    }).analyze({ nights: [] });
+  </script>
+</body>
+</html>
