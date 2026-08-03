@@ -1,0 +1,23 @@
+[package]
+name = "helix-neurosleep-wasm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Physically separate ADR-051 research-only WASM artifact"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+wasm-bindgen = "0.2"
+# `default-features = false` drops bundle verification, signer trust, and
+# sealed storage, so this artifact links no attestation or seal-key code.
+helix-neurosleep = { path = "../helix-neurosleep", version = "0.1.0", default-features = false }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

@@ -218,6 +218,13 @@ mod tests {
             acquisition_confidence: confidence,
             interpretation_maturity: InterpretationMaturity::PreclinicalMouseModel,
             idempotent_reimport: false,
+            verified_night: crate::VerifiedNeuroSleepNight {
+                night_start_ms: bundle.payload.night_start_ms,
+                compatibility_fingerprint: bundle.payload.compatibility_fingerprint.clone(),
+                nrem_theta_coherence: Some(0.7),
+                acquisition_confidence: confidence,
+                interpretation_maturity: InterpretationMaturity::PreclinicalMouseModel,
+            },
         };
         let mut store = SealedStudyPartition::new(
             &bundle.payload.study_id,

@@ -712,6 +712,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-neurosleep-wasm"
+version = "0.1.2"
+dependencies = [
+ "helix-neurosleep",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-test",
+]
+
+[[package]]
 name = "helix-numeric"
 version = "0.1.2"
 dependencies = [

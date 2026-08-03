@@ -4,6 +4,8 @@ use ruv_neural_core::neurosleep::{NeuroSleepPayloadV1, NullReason, SleepState, S
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
+use crate::view::{AcquisitionConfidence, InterpretationMaturity, VerifiedNeuroSleepNight};
+
 pub(crate) const MAX_BUNDLE_BYTES: usize = 1_048_576;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -90,40 +92,12 @@ impl CompatibilityBinding {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
-pub struct AcquisitionConfidence(f64);
-
 impl AcquisitionConfidence {
     pub(crate) fn from_payload(payload: &NeuroSleepPayloadV1) -> Self {
         Self(
             (payload.quality.valid_coverage_fraction * (1.0 - payload.quality.artifact_fraction))
                 .clamp(0.0, 1.0),
         )
-    }
-
-    pub fn get(self) -> f64 {
-        self.0
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum InterpretationMaturity {
-    Hypothesis,
-    PreclinicalMouseModel,
-    HumanObservational,
-    HumanValidated,
-}
-
-impl InterpretationMaturity {
-    pub(crate) fn parse(value: &str) -> Option<Self> {
-        match value {
-            "hypothesis" => Some(Self::Hypothesis),
-            "preclinical_mouse_model" => Some(Self::PreclinicalMouseModel),
-            "human_observational" => Some(Self::HumanObservational),
-            "human_validated" => Some(Self::HumanValidated),
-            _ => None,
-        }
     }
 }
 
@@ -158,11 +132,7 @@ impl MetricId {
             | Self::NremMeanBoutDuration
             | Self::RemDuration => "s",
             Self::RemBoutCount => "count",
-            // Keep the exact authoritative V1 contract unit until rUv Neural
-            // coordinates any PSD-vs-integrated-band correction and schema bump.
-            Self::DeltaAbsolutePower | Self::ThetaAbsolutePower | Self::AlphaAbsolutePower => {
-                "uV2_per_hz"
-            }
+            Self::DeltaAbsolutePower | Self::ThetaAbsolutePower | Self::AlphaAbsolutePower => "uV2",
             Self::DeltaRelativePower
             | Self::ThetaRelativePower
             | Self::FrontalParietalFullBandCoherence
@@ -205,6 +175,7 @@ pub struct NeuroSleepIngest {
     pub acquisition_confidence: AcquisitionConfidence,
     pub interpretation_maturity: InterpretationMaturity,
     pub idempotent_reimport: bool,
+    pub verified_night: VerifiedNeuroSleepNight,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

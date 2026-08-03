@@ -2,7 +2,9 @@ use helix_vault::SealKey;
 use ruv_neural_core::attestation::{
     sign_neurosleep_bundle, PersistentEd25519Signer, SignedNeuroSleepBundleV1,
 };
-use ruv_neural_core::neurosleep::{FeatureValue, NeuroSleepPayloadV1, Species};
+use ruv_neural_core::neurosleep::{
+    compatibility_fingerprint_v1, FeatureValue, NeuroSleepPayloadV1, Species,
+};
 
 use super::*;
 
@@ -182,15 +184,24 @@ fn reviewed_compatibility_projection_detects_method_drift() {
     });
     let mut changed = payload();
     changed.acquisition.sampling_rate_hz = 256.0;
+    assert!(sign_neurosleep_bundle(changed.clone(), &signer).is_err());
+    changed.compatibility_fingerprint =
+        compatibility_fingerprint_v1(&changed.acquisition, &changed.algorithm).unwrap();
     assert_eq!(
-        verify_signed(changed, &signer, &trust, &policy()),
-        VerificationCode::CompatibilityProfileMismatch
+        verify_signed(changed.clone(), &signer, &trust, &policy()),
+        VerificationCode::CompatibilityProfileNotAllowed
     );
 
-    let mut unknown = payload();
-    unknown.compatibility_fingerprint = "55".repeat(32);
+    // Helix re-derives the acquisition and algorithm binding itself rather than
+    // trusting the fingerprint the signer computed, so an enrolled profile that
+    // no longer pins the method it claims to pin fails closed.
+    let mut mis_bound = policy();
+    mis_bound.compatibility_profiles.insert(
+        payload().compatibility_fingerprint,
+        CompatibilityBinding::from_payload(&changed).unwrap(),
+    );
     assert_eq!(
-        verify_signed(unknown, &signer, &trust, &policy()),
-        VerificationCode::CompatibilityProfileNotAllowed
+        verify_signed(payload(), &signer, &trust, &mis_bound),
+        VerificationCode::CompatibilityProfileMismatch
     );
 }

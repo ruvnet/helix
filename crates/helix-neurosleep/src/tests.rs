@@ -118,6 +118,18 @@ fn accepts_authoritative_fixture_and_seals_envelope_and_scalars() {
         InterpretationMaturity::PreclinicalMouseModel
     );
     assert!((receipt.acquisition_confidence.get() - 0.9025).abs() < 1e-12);
+    assert_eq!(receipt.verified_night.nrem_theta_coherence, Some(0.7));
+    let view_json = serde_json::to_string(&receipt.verified_night).unwrap();
+    for forbidden in [
+        "study_id",
+        "subject_pseudonym",
+        "recording_id",
+        "nonce",
+        "payload_sha256",
+        "signer",
+    ] {
+        assert!(!view_json.contains(forbidden));
+    }
     assert_eq!(store.sealed_record_count(), 19);
     let dump = store.sealed_dump_for_audit();
     for forbidden in [STUDY, SUBJECT, "recording-001", "theta", "2.5"] {
@@ -373,18 +385,7 @@ fn unknown_fields_species_extractor_quality_and_units_are_closed() {
         unreachable!()
     };
     *unit = "minutes".into();
-    let wrong_unit = sign_neurosleep_bundle(payload, &signer).unwrap();
-    assert_eq!(
-        code(verify_and_store(
-            &serde_json::to_vec(&wrong_unit).unwrap(),
-            &signed_trust,
-            &Consent(true),
-            &policy(),
-            context(),
-            &mut store
-        )),
-        VerificationCode::UnitNotAllowed
-    );
+    assert!(sign_neurosleep_bundle(payload, &signer).is_err());
 
     let mut payload = fixture_bundle().payload;
     payload.literature_context[0].evidence_maturity = "unknown_maturity".into();

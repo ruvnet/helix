@@ -120,6 +120,13 @@ pub fn verify_and_store(
         acquisition_confidence: confidence,
         interpretation_maturity: maturity,
         idempotent_reimport: false,
+        verified_night: crate::VerifiedNeuroSleepNight {
+            night_start_ms: payload.night_start_ms,
+            compatibility_fingerprint: payload.compatibility_fingerprint.clone(),
+            nrem_theta_coherence: nrem_theta_coherence(payload),
+            acquisition_confidence: confidence,
+            interpretation_maturity: maturity,
+        },
     };
     if partition.by_digest.contains(&bundle.payload_sha256) {
         receipt.idempotent_reimport = true;
@@ -150,6 +157,17 @@ pub fn verify_and_store(
         return rejected(VerificationCode::StorageFailed);
     }
     IngestDisposition::Accepted(receipt)
+}
+
+fn nrem_theta_coherence(payload: &NeuroSleepPayloadV1) -> Option<f64> {
+    let features = payload
+        .qeeg_by_stage
+        .iter()
+        .find(|features| features.state == SleepState::Nrem)?;
+    match &features.frontal_parietal_theta_coherence {
+        FeatureValue::Observed { value, unit } if unit == "ratio" => Some(*value),
+        _ => None,
+    }
 }
 
 fn interpretation_maturity(

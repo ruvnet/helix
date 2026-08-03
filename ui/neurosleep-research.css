@@ -1,0 +1,68 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: #07111f;
+  color: #e6f2ff;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at top, #123047, #07111f 58%);
+}
+
+.neurosleep-shell {
+  width: min(720px, calc(100vw - 32px));
+}
+
+.neurosleep-panel {
+  padding: 28px;
+  border: 1px solid #24536b;
+  border-radius: 18px;
+  background: #0b1b2bcc;
+  box-shadow: 0 22px 70px #0008;
+}
+
+.neurosleep-kicker {
+  margin: 0 0 10px;
+  color: #65d8c4;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.neurosleep-title {
+  margin: 0 0 16px;
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+}
+
+.neurosleep-observation,
+.neurosleep-status {
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.neurosleep-caveat {
+  margin-top: 22px;
+  padding: 14px;
+  border-left: 3px solid #d8a84e;
+  background: #2d2416;
+  color: #f2d49a;
+  line-height: 1.55;
+}
+
+.neurosleep-quality {
+  margin: 20px 0 0;
+  color: #9db6c9;
+  font-size: 0.85rem;
+}
+
+.neurosleep-method,
+.neurosleep-source {
+  margin: 8px 0 0;
+  color: #9db6c9;
+  font-size: 0.82rem;
+}

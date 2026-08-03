@@ -8,17 +8,29 @@
 //! This crate intentionally has no dependency on Helix's generic pipeline,
 //! Focus Areas, score, escalation, LLM, neural-session adapter, or retrieval.
 
-mod contract;
-mod ingest;
+mod config;
 mod longitudinal;
+mod view;
+
+pub use config::NeuroSleepResearchFlags;
+pub use longitudinal::*;
+pub use view::*;
+
+#[cfg(feature = "native-ingest")]
+mod contract;
+#[cfg(feature = "native-ingest")]
+mod ingest;
+#[cfg(feature = "native-ingest")]
 mod storage;
 
+#[cfg(feature = "native-ingest")]
 pub use contract::*;
+#[cfg(feature = "native-ingest")]
 pub use ingest::verify_and_store;
-pub use longitudinal::*;
+#[cfg(feature = "native-ingest")]
 pub use storage::SealedStudyPartition;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "native-ingest"))]
 mod policy_tests;
-#[cfg(test)]
+#[cfg(all(test, feature = "native-ingest"))]
 mod tests;

@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test openmed-adapter.test.mjs"
+    "test": "node --test *.test.mjs"
   }
 }

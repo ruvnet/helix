@@ -8,12 +8,25 @@ repository.workspace = true
 rust-version.workspace = true
 description = "ADR-051 verified NeuroSleep research ingestion and sealed longitudinal policy"
 
+[features]
+default = ["native-ingest"]
+# Bundle verification, signer trust, and sealed storage. The research build
+# omits this so its artifact links no attestation or seal-key code.
+native-ingest = [
+    "dep:thiserror",
+    "dep:sha2",
+    "dep:hmac",
+    "dep:helix-vault",
+    "dep:ruv-neural-core",
+    "dep:serde_json_canonicalizer",
+]
+
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true
-thiserror.workspace = true
-sha2.workspace = true
-hmac.workspace = true
-helix-vault = { path = "../helix-vault", version = "0.1.0" }
-ruv-neural-core = { path = "../../../ruv-neural/ruv-neural-core", version = "=0.1.0" }
-serde_json_canonicalizer = "0.3.2"
+thiserror = { workspace = true, optional = true }
+sha2 = { workspace = true, optional = true }
+hmac = { workspace = true, optional = true }
+helix-vault = { path = "../helix-vault", version = "0.1.0", optional = true }
+ruv-neural-core = { path = "../../../ruv-neural/ruv-neural-core", version = "=0.1.0", optional = true }
+serde_json_canonicalizer = { version = "0.3.2", optional = true }
