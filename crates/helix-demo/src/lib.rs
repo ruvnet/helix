@@ -1796,8 +1796,10 @@ mod tests {
         let AnswerOutcome::Answered(ans) = analyze(&req, &builtin_registry_v1()).unwrap() else {
             panic!("ferritin should produce a grounded answer, not an abstention");
         };
-        // Recovering (rising) but the claim is grounded in all three real records.
-        assert_eq!(ans.trend.direction, TrendDirection::Rising);
+        // The point values remain grounded, but three draws cannot establish an
+        // ADR-007 trend (minimum five).
+        assert_eq!(ans.trend.direction, None);
+        assert!(ans.trend.trend_abstention.is_some());
         assert_eq!(ans.trend.sample_size, 3);
         assert_eq!(ans.claims.len(), 1);
         assert_eq!(ans.claims[0].evidence().len(), 3);
@@ -1824,7 +1826,7 @@ mod tests {
         let AnswerOutcome::Answered(ans) = analyze(&req, &builtin_registry_v1()).unwrap() else {
             panic!("deep sleep should answer");
         };
-        assert_eq!(ans.trend.direction, TrendDirection::Rising);
+        assert_eq!(ans.trend.direction, Some(TrendDirection::Rising));
     }
 
     #[test]

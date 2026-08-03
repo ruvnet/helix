@@ -19,6 +19,27 @@ use thiserror::Error;
 /// the wall clock).
 pub type EpochMillis = i64;
 
+/// ADR-007 policy minima. Keeping these in the numeric authority prevents
+/// downstream consumers from silently reintroducing weaker local thresholds.
+pub const MIN_TREND_OBSERVATIONS: usize = 5;
+pub const MIN_CORRELATION_PAIRS: usize = 20;
+pub const MIN_CHANGE_POINT_SEGMENT: usize = 10;
+
+/// A typed, serializable explanation for an unavailable numeric result.
+/// Consumers carry this next to an absent statistic instead of coercing the
+/// absence into a valid `flat`/`stable` result.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "reason", rename_all = "snake_case")]
+pub enum NumericAbstention {
+    InsufficientObservations { needed: usize, got: usize },
+}
+
+impl NumericAbstention {
+    pub const fn insufficient(needed: usize, got: usize) -> Self {
+        Self::InsufficientObservations { needed, got }
+    }
+}
+
 /// One observation in a series.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Point {
@@ -106,11 +127,12 @@ pub fn percent_change(series: &[Point]) -> Result<f64, NumericError> {
 }
 
 /// Ordinary least-squares slope of value vs. time, in **units per day**.
-/// Positive == trending up. Minimum: 2 points; errors if all timestamps equal.
+/// Positive == trending up. Minimum: 5 points (ADR-007); errors if all
+/// timestamps equal.
 pub fn slope_per_day(series: &[Point]) -> Result<f64, NumericError> {
-    if series.len() < 2 {
+    if series.len() < MIN_TREND_OBSERVATIONS {
         return Err(NumericError::TooFewPoints {
-            needed: 2,
+            needed: MIN_TREND_OBSERVATIONS,
             got: series.len(),
         });
     }
@@ -202,7 +224,7 @@ pub fn range_crossings(
 }
 
 /// Pearson correlation between two equal-length, index-aligned series of
-/// values. Minimum: 3 pairs (below that, correlation is not meaningful).
+/// values. Minimum: 20 aligned pairs (ADR-007).
 /// Returns a value in `[-1.0, 1.0]`.
 pub fn pearson(a: &[f64], b: &[f64]) -> Result<f64, NumericError> {
     if a.len() != b.len() {
@@ -211,9 +233,9 @@ pub fn pearson(a: &[f64], b: &[f64]) -> Result<f64, NumericError> {
             got: a.len().min(b.len()),
         });
     }
-    if a.len() < 3 {
+    if a.len() < MIN_CORRELATION_PAIRS {
         return Err(NumericError::TooFewPoints {
-            needed: 3,
+            needed: MIN_CORRELATION_PAIRS,
             got: a.len(),
         });
     }
@@ -247,11 +269,11 @@ pub struct ChangePoint {
 }
 
 /// Detects the single most significant change-point via the maximum absolute
-/// CUSUM deviation from the global mean. Minimum: 4 points (need ≥2 on each
-/// side of a split). Returns `Ok(None)` when no interior split improves on a
-/// flat series.
+/// CUSUM deviation from the global mean. ADR-007 requires at least 10 points on
+/// each side of a candidate split. Returns `Ok(None)` when no eligible split
+/// improves on a flat series.
 pub fn change_point(series: &[Point]) -> Result<Option<ChangePoint>, NumericError> {
-    const MIN: usize = 4;
+    const MIN: usize = MIN_CHANGE_POINT_SEGMENT * 2;
     if series.len() < MIN {
         return Err(NumericError::TooFewPoints {
             needed: MIN,
@@ -267,13 +289,16 @@ pub fn change_point(series: &[Point]) -> Result<Option<ChangePoint>, NumericErro
     let mut best_abs = 0.0;
     for (i, p) in series.iter().enumerate().take(n - 1) {
         cusum += p.value - global_mean;
-        if cusum.abs() > best_abs {
+        let split = i + 1;
+        if split >= MIN_CHANGE_POINT_SEGMENT
+            && n - split >= MIN_CHANGE_POINT_SEGMENT
+            && cusum.abs() > best_abs
+        {
             best_abs = cusum.abs();
             best_idx = i;
         }
     }
-    // Require at least 2 points on each side.
-    if best_idx < 1 || best_idx > n - 3 {
+    if best_abs == 0.0 {
         return Ok(None);
     }
     let split = best_idx + 1;
@@ -395,7 +420,7 @@ mod tests {
     #[test]
     fn slope_is_units_per_day() {
         // +2 per day, exactly.
-        let s = series(&[(0, 0.0), (1, 2.0), (2, 4.0), (3, 6.0)]);
+        let s = series(&[(0, 0.0), (1, 2.0), (2, 4.0), (3, 6.0), (4, 8.0)]);
         assert!((slope_per_day(&s).unwrap() - 2.0).abs() < 1e-9);
         assert_eq!(trend_direction(2.0, 0.1), TrendDirection::Rising);
     }
@@ -405,7 +430,10 @@ mod tests {
         let s = series(&[(0, 1.0)]);
         assert_eq!(
             slope_per_day(&s),
-            Err(NumericError::TooFewPoints { needed: 2, got: 1 })
+            Err(NumericError::TooFewPoints {
+                needed: MIN_TREND_OBSERVATIONS,
+                got: 1
+            })
         );
     }
 
@@ -434,41 +462,43 @@ mod tests {
 
     #[test]
     fn pearson_perfect_positive() {
-        let a = [1.0, 2.0, 3.0, 4.0];
-        let b = [2.0, 4.0, 6.0, 8.0];
+        let a: Vec<f64> = (1..=20).map(f64::from).collect();
+        let b: Vec<f64> = a.iter().map(|x| x * 2.0).collect();
         assert!((pearson(&a, &b).unwrap() - 1.0).abs() < 1e-12);
     }
 
     #[test]
-    fn pearson_needs_three_pairs() {
+    fn pearson_needs_twenty_pairs() {
         assert_eq!(
             pearson(&[1.0, 2.0], &[1.0, 2.0]),
-            Err(NumericError::TooFewPoints { needed: 3, got: 2 })
+            Err(NumericError::TooFewPoints {
+                needed: MIN_CORRELATION_PAIRS,
+                got: 2
+            })
         );
     }
 
     #[test]
     fn change_point_finds_level_shift() {
-        // flat at 10 then flat at 20.
-        let s = series(&[
-            (0, 10.0),
-            (1, 10.0),
-            (2, 10.0),
-            (3, 20.0),
-            (4, 20.0),
-            (5, 20.0),
-        ]);
+        // Ten observations at 10 then ten at 20.
+        let values: Vec<(i64, f64)> = (0..20)
+            .map(|day| (day, if day < 10 { 10.0 } else { 20.0 }))
+            .collect();
+        let s = series(&values);
         let cp = change_point(&s).unwrap().expect("a change-point");
         assert!((cp.mean_before - 10.0).abs() < 1e-9);
         assert!((cp.mean_after - 20.0).abs() < 1e-9);
     }
 
     #[test]
-    fn change_point_needs_four_points() {
+    fn change_point_needs_ten_points_per_segment() {
         let s = series(&[(0, 1.0), (1, 2.0), (2, 3.0)]);
         assert_eq!(
             change_point(&s),
-            Err(NumericError::TooFewPoints { needed: 4, got: 3 })
+            Err(NumericError::TooFewPoints {
+                needed: MIN_CHANGE_POINT_SEGMENT * 2,
+                got: 3
+            })
         );
     }
 }

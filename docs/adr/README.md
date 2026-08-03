@@ -58,9 +58,10 @@ The product spec these decisions implement is [`../Helix-PHI-ADR-Product-Spec.md
 | [035](ADR-035-darwin-parameter-evolution.md) | Darwin-Style Parameter Evolution (safety-frozen) | Self-optimization / safety |
 | [036](ADR-036-scale-invariant-trend-band.md) | Scale-Invariant (Reference-Range-Relative) Trend Dead-Band | Accuracy / numerics |
 | [050](ADR-050-openmed-local-clinical-text-privacy-gate.md) | OpenMed Local Clinical-Text Privacy Gate | Privacy / on-device NLP |
+| [051](ADR-051-signed-neurosleep-qeeg-phenotype-bridge.md) | Signed NeuroSleep qEEG Phenotype Bridge from rUv Neural to Helix | Research neurophysiology / safety |
 
 ## Status
 
-35 Proposed + ADR-036 Accepted (v1.0.0). They are derived from the v1.0.0 product spec and
+ADR-001–035 and ADR-051 are Proposed; ADR-036 and ADR-050 are Accepted. They are derived from the v1.0.0 product spec and
 grounded by multi-source research; they have not yet been ratified against an
 implementation or reviewed by regulatory counsel / a clinical advisory board.

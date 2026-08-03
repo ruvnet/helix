@@ -48,8 +48,10 @@ fn fresh_falling_ferritin_yields_grounded_cited_trended_answer() {
     let reg = builtin_registry_v1();
     let records = vec![
         ferritin("f1", 100, 45.0),
-        ferritin("f2", 130, 33.0),
-        ferritin("f3", 160, 28.0),
+        ferritin("f2", 115, 39.0),
+        ferritin("f3", 130, 34.0),
+        ferritin("f4", 145, 31.0),
+        ferritin("f5", 160, 28.0),
     ];
     let req = AnalyzeRequest {
         concept_code: "2276-4",
@@ -73,19 +75,57 @@ fn fresh_falling_ferritin_yields_grounded_cited_trended_answer() {
     assert!(ans.recommendation.is_some());
 
     // Deterministic trend: falling, with a range crossing into Below.
-    assert_eq!(ans.trend.direction, TrendDirection::Falling);
-    assert_eq!(ans.trend.sample_size, 3);
+    assert_eq!(ans.trend.direction, Some(TrendDirection::Falling));
+    assert_eq!(ans.trend.sample_size, 5);
     assert!(ans.trend.slope_per_day.unwrap() < 0.0);
     assert_eq!(ans.trend.crossings.len(), 1); // 33 -> 28 crosses below 30
 
-    // Grounded: exactly one claim, backed by all three real records.
+    // Grounded: exactly one claim, backed by all five real records.
     assert_eq!(ans.claims.len(), 1);
-    assert_eq!(ans.claims[0].evidence().len(), 3);
+    assert_eq!(ans.claims[0].evidence().len(), 5);
     assert!(ans.claims[0].text().contains("trending down"));
 
     // Serializable end to end (UI / audit).
     let json = serde_json::to_string(&ans).unwrap();
     assert!(json.contains("Ferritin"));
+}
+
+#[test]
+fn four_readings_answer_point_value_but_abstain_from_trend() {
+    let reg = builtin_registry_v1();
+    let records = vec![
+        ferritin("f1", 100, 45.0),
+        ferritin("f2", 120, 40.0),
+        ferritin("f3", 140, 35.0),
+        ferritin("f4", 160, 35.0),
+    ];
+    let req = AnalyzeRequest {
+        concept_code: "2276-4",
+        records: &records,
+        now: 161 * DAY,
+        staleness_window_days: 365,
+        confidence_floor: 0.5,
+        reference_low: Some(30.0),
+        reference_high: Some(400.0),
+        flat_band_per_day: 0.01,
+        flat_band_frac: 0.0,
+    };
+    let AnswerOutcome::Answered(ans) = analyze(&req, &reg).unwrap() else {
+        panic!("point value should remain answerable");
+    };
+    assert_eq!(ans.trend.direction, None);
+    assert_eq!(
+        ans.trend.trend_abstention,
+        Some(helix_numeric::NumericAbstention::InsufficientObservations { needed: 5, got: 4 })
+    );
+    assert!(ans.claims[0].text().contains("not yet supported"));
+    assert_eq!(
+        ans.recommendation.as_ref().map(|r| r.text.as_str()),
+        Some("Add another Ferritin measurement before interpreting a trend.")
+    );
+    let json = serde_json::to_string(&ans.trend).unwrap();
+    assert!(json.contains("insufficient_observations"));
+    assert!(!json.contains("\"direction\":\"flat\""));
 }
 
 #[test]

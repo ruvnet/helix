@@ -11,7 +11,10 @@
 
 use serde::{Deserialize, Serialize};
 
-use helix_numeric::{change_point, slope_per_day, trend_direction, Point, TrendDirection};
+use helix_numeric::{
+    change_point, slope_per_day, trend_direction, NumericAbstention, Point, TrendDirection,
+    MIN_CHANGE_POINT_SEGMENT, MIN_TREND_OBSERVATIONS,
+};
 use helix_score::{compose, SubScore};
 
 /// A dated snapshot of the subsystem sub-scores (the inputs available at `at`).
@@ -35,10 +38,12 @@ pub struct ScorePoint {
 pub struct Timeline {
     pub points: Vec<ScorePoint>,
     /// Overall direction across the series (units = score points/day).
-    pub direction: TrendDirection,
+    pub direction: Option<TrendDirection>,
     pub slope_per_day: Option<f64>,
+    pub trend_abstention: Option<NumericAbstention>,
     /// Most significant change-point timestamp, if any.
     pub change_point_at: Option<i64>,
+    pub change_point_abstention: Option<NumericAbstention>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -82,25 +87,41 @@ pub fn build_timeline(
 
     // Trend + change-point over the value series (deterministic, ADR-007).
     let series: Vec<Point> = points.iter().map(|p| Point::new(p.at, p.value)).collect();
-    let (slope, direction) = if series.len() >= 2 {
+    let (slope, direction, trend_abstention) = if series.len() >= MIN_TREND_OBSERVATIONS {
         match slope_per_day(&series) {
-            Ok(s) => (Some(s), trend_direction(s, flat_band)),
-            Err(_) => (None, TrendDirection::Flat),
+            Ok(s) => (Some(s), Some(trend_direction(s, flat_band)), None),
+            Err(_) => (None, None, None),
         }
     } else {
-        (None, TrendDirection::Flat)
+        (
+            None,
+            None,
+            Some(NumericAbstention::insufficient(
+                MIN_TREND_OBSERVATIONS,
+                series.len(),
+            )),
+        )
     };
-    let change_point_at = if series.len() >= 4 {
-        change_point(&series).ok().flatten().map(|cp| cp.at)
+    let change_point_min = MIN_CHANGE_POINT_SEGMENT * 2;
+    let (change_point_at, change_point_abstention) = if series.len() >= change_point_min {
+        (change_point(&series).ok().flatten().map(|cp| cp.at), None)
     } else {
-        None
+        (
+            None,
+            Some(NumericAbstention::insufficient(
+                change_point_min,
+                series.len(),
+            )),
+        )
     };
 
     Ok(Timeline {
         points,
         direction,
         slope_per_day: slope,
+        trend_abstention,
         change_point_at,
+        change_point_abstention,
     })
 }
 
@@ -140,25 +161,31 @@ mod tests {
 
     #[test]
     fn rising_series_is_rising() {
-        let tl = build_timeline(vec![snap(0, 60.0), snap(10, 70.0), snap(20, 80.0)], 0.01).unwrap();
-        assert_eq!(tl.direction, TrendDirection::Rising);
-        assert!(tl.slope_per_day.unwrap() > 0.0);
-    }
-
-    #[test]
-    fn detects_change_point() {
-        // flat at 60 then jumps to 85
         let tl = build_timeline(
             vec![
                 snap(0, 60.0),
-                snap(10, 61.0),
-                snap(20, 84.0),
-                snap(30, 85.0),
+                snap(10, 65.0),
+                snap(20, 70.0),
+                snap(30, 75.0),
+                snap(40, 80.0),
             ],
             0.01,
         )
         .unwrap();
+        assert_eq!(tl.direction, Some(TrendDirection::Rising));
+        assert!(tl.slope_per_day.unwrap() > 0.0);
+        assert!(tl.trend_abstention.is_none());
+    }
+
+    #[test]
+    fn detects_change_point() {
+        // Ten low observations then ten high observations.
+        let snapshots = (0..20)
+            .map(|day| snap(day, if day < 10 { 60.0 } else { 85.0 }))
+            .collect();
+        let tl = build_timeline(snapshots, 0.01).unwrap();
         assert!(tl.change_point_at.is_some());
+        assert!(tl.change_point_abstention.is_none());
     }
 
     #[test]
@@ -170,5 +197,18 @@ mod tests {
     fn sorts_unordered_snapshots() {
         let tl = build_timeline(vec![snap(20, 80.0), snap(0, 60.0)], 0.01).unwrap();
         assert!(tl.points[0].at < tl.points[1].at);
+    }
+
+    #[test]
+    fn insufficient_points_serialize_as_abstention_not_flat() {
+        let tl = build_timeline(vec![snap(0, 60.0), snap(10, 60.0)], 0.01).unwrap();
+        assert_eq!(tl.direction, None);
+        assert_eq!(
+            tl.trend_abstention,
+            Some(NumericAbstention::InsufficientObservations { needed: 5, got: 2 })
+        );
+        let json = serde_json::to_string(&tl).unwrap();
+        assert!(json.contains("insufficient_observations"));
+        assert!(!json.contains("\"direction\":\"flat\""));
     }
 }
