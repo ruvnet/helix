@@ -63,7 +63,7 @@ and **clinical safety** ([ADR-009](docs/adr/ADR-009-red-flag-escalation-clinicia
 
 This is no longer just a spec — the testable core is implemented in Rust and validated.
 
-- **22 crates · 153 tests · 30 ADRs** · clippy/fmt clean · `cargo audit` clean.
+- **31 crates · 232 tests · 43 ADRs** · clippy/fmt clean · `cargo audit` and `cargo deny` clean.
 - **Anti-hallucination core**: provenance grounding (`helix-provenance`), deterministic
   numerics (`helix-numeric`), evidence tiering (`helix-evidence`), red-flag escalation
   (`helix-escalation`), verifier (`helix-verifier`), the grounded-answer pipeline
@@ -79,10 +79,30 @@ This is no longer just a spec — the testable core is implemented in Rust and v
   fail-closed `helix-openmed` Rust/WASM gate with artifact pinning, complete-document
   coverage, deterministic identifier rules, Unicode-safe offsets, and HMAC-only receipts.
   See the [integration guide](docs/openmed-integration.md).
+- **Verified NeuroSleep qEEG research ingestion** (`helix-neurosleep`): accepts only
+  signed derived nightly features from rUv Neural — never raw EEG — and verifies the
+  signature itself against a separately enrolled key, so a bundle carrying its own
+  trust root is rejected. Consent, study/subject binding, replay protection, and atomic
+  sealing under participant-opaque identifiers all sit on that path. Interpretation
+  abstains below the compatible-night floor rather than showing a provisional trend,
+  and nights recorded with incompatible methods are never pooled. The research
+  visualisation is a **physically separate** WASM artifact (`helix-neurosleep-wasm`)
+  whose entire dependency tree is `serde` + `serde_json` — it links no attestation or
+  key-custody code at all. All four research flags default to off.
+  See [ADR-051](docs/validation/ADR-051-requirement-evidence.md).
 - **Web console + WASM mobile app** running the real pipeline in-browser — **[live demo](https://ruvnet.github.io/helix/)**.
 
 Every integration keeps the discipline: the LLM narrates (never reasons), embeddings/visual
 are recall (not grounding), genomics/cohort data is privacy-gated, and nothing diagnoses.
+
+That last point is enforced, not just stated. A fail-closed static gate fails the build if
+diagnostic or therapeutic language appears in the NeuroSleep crates or their UI, and a second
+gate rejects any dependency from that rail onto the score, Focus Area, escalation, LLM,
+retrieval, or actuation crates. The NeuroSleep features are associated with a **preclinical
+APP/PS1 mouse study** and are not a validated human clinical marker: nothing estimates
+Alzheimer's disease, amyloid burden, or microglial activity. Numeric parity with the reference
+implementation is still unproven, which is why the upstream contract is pinned at an exact
+alpha (`ruv-neural-core =0.2.0-alpha.1`) and the first deployment is an offline research build.
 
 ## Status
 

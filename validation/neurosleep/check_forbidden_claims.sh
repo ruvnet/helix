@@ -19,6 +19,10 @@ targets=()
 # The research WASM crate holds the user-facing measurement label and caveat
 # copy, so it must be scanned alongside the native crate.
 [[ -d crates/helix-neurosleep-wasm ]] && targets+=(crates/helix-neurosleep-wasm)
+# The README is the most public surface this project has. It now describes the
+# NeuroSleep rail, so an overclaim there would reach more readers than one
+# buried in a crate.
+[[ -f README.md ]] && targets+=(README.md)
 while IFS= read -r file; do
   targets+=("$file")
 done < <(find ui -maxdepth 2 -type f -iname '*neurosleep*' -print 2>/dev/null | sort)
