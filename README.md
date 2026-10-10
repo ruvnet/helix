@@ -118,3 +118,8 @@ clinical/regulatory sign-off.
 *Prepared by ISO Vision LLC. This repository provides architectural and product guidance,
 **not** legal, regulatory, or medical advice. Engage regulatory counsel and clinical
 governance before building any diagnostic or treatment-recommending features.*
+
+<!-- ruv-constellation:manifest -->
+## ruv constellation
+
+[manifest.ruv](manifest.ruv) describes this repository with source-pinned capability evidence. Explore the [ruvnet nexus](https://github.com/ruvnet/ruvnet/blob/main/docs/ruv-catalog.md) and [manifest contract](https://github.com/ruvnet/ruvnet/blob/main/docs/ruv-manifest.md). Declared integration roles are discovery metadata and do not grant execution authority or certify runtime behavior.
